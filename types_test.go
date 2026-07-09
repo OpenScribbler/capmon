@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 func TestExtractedSource_ZeroValue(t *testing.T) {

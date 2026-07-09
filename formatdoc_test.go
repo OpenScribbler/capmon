@@ -148,7 +148,7 @@ func TestLoadFormatDoc_FileNotFound(t *testing.T) {
 // against the canonical-keys.yaml vocabulary. This test acts as a gatekeeper:
 // all real format docs must pass ValidateFormatDoc before merging.
 func TestValidateAllFormatDocs(t *testing.T) {
-	repoRoot := filepath.Join("..", "..", "..")
+	repoRoot := syllagoRoot(t)
 	formatsDir := filepath.Join(repoRoot, "docs", "provider-formats")
 	canonicalKeysPath := filepath.Join(repoRoot, "docs", "spec", "canonical-keys.yaml")
 

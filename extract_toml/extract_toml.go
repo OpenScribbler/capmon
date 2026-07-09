@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 func init() {

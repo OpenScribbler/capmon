@@ -3,7 +3,7 @@ package capmon_test
 import (
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 // realZedRulesLandmarks is a snapshot of the rules-relevant headings + filename

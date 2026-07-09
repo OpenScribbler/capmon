@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 // checkTestEnv sets up a minimal directory structure for RunCapmonCheck tests.

@@ -3,7 +3,7 @@ package capmon_test
 import (
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 // realAmpLandmarks is a snapshot of the headings extracted from amp's skills doc

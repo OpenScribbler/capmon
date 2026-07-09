@@ -3,7 +3,7 @@ package capmon_test
 import (
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 // realClineLandmarks is a snapshot of the headings extracted from cline's skills

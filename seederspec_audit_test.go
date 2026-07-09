@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 	"gopkg.in/yaml.v3"
 )
 
@@ -16,7 +16,7 @@ import (
 // Catches schema drift: if the SeederSpec struct changes in a way that breaks
 // existing specs, this test fails before capmon pipelines break silently.
 func TestSeederSpecs_AllLoad(t *testing.T) {
-	specsDir := filepath.Join("..", "..", "..", ".develop", "seeder-specs")
+	specsDir := filepath.Join(syllagoRoot(t), ".develop", "seeder-specs")
 	entries, err := os.ReadDir(specsDir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -75,7 +75,7 @@ func TestSeederSpecs_AllLoad(t *testing.T) {
 // refactor so future regressions surface immediately instead of polluting
 // capmon-process PRs.
 func TestDeriveOutputMatchesCommitted(t *testing.T) {
-	repoRoot := filepath.Join("..", "..", "..")
+	repoRoot := syllagoRoot(t)
 	formatsDir := filepath.Join(repoRoot, "docs", "provider-formats")
 	capsDir := filepath.Join(repoRoot, "docs", "provider-capabilities")
 	canonicalKeysPath := filepath.Join(repoRoot, "docs", "spec", "canonical-keys.yaml")

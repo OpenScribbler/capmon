@@ -1,0 +1,49 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build + Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Checkout syllago (drift-guard fixture)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: OpenScribbler/syllago
+          path: syllago
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
+        with:
+          go-version-file: go.mod
+
+      - name: gofmt check
+        run: |
+          UNFORMATTED=$(gofmt -l . | grep -v '^syllago/' || true)
+          if [ -n "$UNFORMATTED" ]; then
+            echo "gofmt needed on:"; echo "$UNFORMATTED"; exit 1
+          fi
+
+      - name: Build (CGO on, all extractors)
+        run: go build ./...
+
+      - name: Build (CGO off, nocgo stubs)
+        run: CGO_ENABLED=0 go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        env:
+          SYLLAGO_ROOT: ${{ github.workspace }}/syllago
+        run: go test -race ./...

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 // keyPattern is the canonical capability key regex enforced by MUST 2 in the
@@ -84,7 +84,7 @@ func TestRecognitionConformance_KindTagged(t *testing.T) {
 // recognize_registry_test.go to keep coverage automatic.
 func registeredProviderSlugs(t *testing.T) []string {
 	t.Helper()
-	sourcesDir := filepath.Join("..", "..", "..", "docs", "provider-sources")
+	sourcesDir := filepath.Join(syllagoRoot(t), "docs", "provider-sources")
 	entries, err := os.ReadDir(sourcesDir)
 	if err != nil {
 		t.Fatalf("cannot read docs/provider-sources/: %v", err)

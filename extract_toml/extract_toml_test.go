@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
-	_ "github.com/OpenScribbler/syllago/cli/internal/capmon/extract_toml"
+	"github.com/OpenScribbler/capmon"
+	_ "github.com/OpenScribbler/capmon/extract_toml"
 )
 
 func TestTOMLExtractor_FlatTable(t *testing.T) {

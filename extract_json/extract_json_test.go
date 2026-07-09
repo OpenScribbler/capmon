@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
-	_ "github.com/OpenScribbler/syllago/cli/internal/capmon/extract_json"
+	"github.com/OpenScribbler/capmon"
+	_ "github.com/OpenScribbler/capmon/extract_json"
 )
 
 func TestJSONExtractor_FlatObject(t *testing.T) {

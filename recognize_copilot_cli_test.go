@@ -3,7 +3,7 @@ package capmon_test
 import (
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 // realCopilotCliSkillsLandmarks merges the headings extracted from both Copilot

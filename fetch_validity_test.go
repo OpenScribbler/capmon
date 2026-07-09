@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 func TestValidateContentResponse_Valid(t *testing.T) {

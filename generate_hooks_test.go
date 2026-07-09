@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 func TestGenerateHooksSpecTables_BasicOutput(t *testing.T) {

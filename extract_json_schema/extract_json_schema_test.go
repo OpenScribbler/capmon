@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
-	_ "github.com/OpenScribbler/syllago/cli/internal/capmon/extract_json_schema"
+	"github.com/OpenScribbler/capmon"
+	_ "github.com/OpenScribbler/capmon/extract_json_schema"
 )
 
 func TestJSONSchemaExtractor_Definitions(t *testing.T) {

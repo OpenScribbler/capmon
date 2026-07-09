@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
-	"github.com/OpenScribbler/syllago/cli/internal/capmon/capyaml"
+	"github.com/OpenScribbler/capmon"
+	"github.com/OpenScribbler/capmon/capyaml"
 )
 
 func TestSeedProviderCapabilities_Idempotent(t *testing.T) {
@@ -99,7 +99,7 @@ func TestSeedCrushAndRooCodeE2E(t *testing.T) {
 	// This test exercises the full pipeline:
 	// cache extraction → recognition → capability YAML writing
 	// It uses the real .capmon-cache directory relative to the project root.
-	cacheRoot := filepath.Join("..", "..", "..", ".capmon-cache")
+	cacheRoot := filepath.Join(syllagoRoot(t), ".capmon-cache")
 	if _, err := os.Stat(cacheRoot); os.IsNotExist(err) {
 		t.Skip("no .capmon-cache directory — run capmon fetch first")
 	}

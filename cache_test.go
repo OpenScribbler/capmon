@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 func TestWriteAndReadCacheEntry(t *testing.T) {

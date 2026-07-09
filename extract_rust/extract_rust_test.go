@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
-	_ "github.com/OpenScribbler/syllago/cli/internal/capmon/extract_rust"
+	"github.com/OpenScribbler/capmon"
+	_ "github.com/OpenScribbler/capmon/extract_rust"
 )
 
 func TestRustExtractor_EnumVariantNames(t *testing.T) {

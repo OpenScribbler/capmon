@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 func TestLoadSourceManifest(t *testing.T) {
@@ -304,7 +304,7 @@ content_types:
 // auth-gate diagnostic and re-introduces the /manual/hooks/index.md
 // variant-generation bug.
 func TestAmpManifest_DocsConventions_Populated(t *testing.T) {
-	path := filepath.Join("..", "..", "..", "docs", "provider-sources", "amp.yaml")
+	path := filepath.Join(syllagoRoot(t), "docs", "provider-sources", "amp.yaml")
 	m, err := capmon.LoadSourceManifest(path)
 	if err != nil {
 		t.Fatalf("LoadSourceManifest(amp.yaml): %v", err)

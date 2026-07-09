@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 func TestRecognizeContentTypeDotPaths_SkillGoStruct(t *testing.T) {

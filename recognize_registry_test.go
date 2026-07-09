@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 // TestAllProviderSlugsRegistered asserts that every provider slug found in
@@ -15,7 +15,7 @@ import (
 func TestAllProviderSlugsRegistered(t *testing.T) {
 	// Walk docs/provider-sources/ relative to the repo root.
 	// The test binary runs from cli/internal/capmon/, so we use ../../../docs/provider-sources/.
-	sourcesDir := filepath.Join("..", "..", "..", "docs", "provider-sources")
+	sourcesDir := filepath.Join(syllagoRoot(t), "docs", "provider-sources")
 	entries, err := os.ReadDir(sourcesDir)
 	if err != nil {
 		t.Fatalf("cannot read docs/provider-sources/: %v", err)
@@ -43,7 +43,7 @@ func TestAllProviderSlugsRegistered(t *testing.T) {
 // TestAllRegisteredRecognizersReturnMap calls RecognizeContentTypeDotPaths for every
 // registered recognizer with empty fields and asserts the result is non-nil.
 func TestAllRegisteredRecognizersReturnMap(t *testing.T) {
-	sourcesDir := filepath.Join("..", "..", "..", "docs", "provider-sources")
+	sourcesDir := filepath.Join(syllagoRoot(t), "docs", "provider-sources")
 	entries, err := os.ReadDir(sourcesDir)
 	if err != nil {
 		t.Fatalf("cannot read docs/provider-sources/: %v", err)

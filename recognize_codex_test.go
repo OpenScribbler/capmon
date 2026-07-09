@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
+	"github.com/OpenScribbler/capmon"
 )
 
 // TestRecognizeCodex_MultiStructAllowList exercises the codex 5-prefix allow-list:

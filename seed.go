@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon/capyaml"
+	"github.com/OpenScribbler/capmon/capyaml"
 	"gopkg.in/yaml.v3"
 )
 

@@ -2,7 +2,6 @@ package capmon
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -21,8 +20,7 @@ func TestCanonicalRulesKeys_MatchesCanonicalKeysYAML(t *testing.T) {
 	// validator (formatdoc_validate.go) and recognizers (recognize_*.go) will
 	// disagree about which keys are legal — silent acceptance is the failure
 	// mode this test guards against.
-	repoRoot := filepath.Join("..", "..", "..")
-	keysPath := filepath.Join(repoRoot, "docs", "spec", "canonical-keys.yaml")
+	keysPath := canonicalKeysPath(t)
 	data, err := os.ReadFile(keysPath)
 	if err != nil {
 		t.Fatalf("read canonical-keys.yaml: %v", err)

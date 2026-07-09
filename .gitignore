@@ -1,0 +1,10 @@
+# Build artifacts
+/capmon
+/provider-monitor
+*.test
+
+# Pipeline cache (written when running against a local syllago checkout)
+.capmon-cache/
+
+# Coverage
+*.out

@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
-	_ "github.com/OpenScribbler/syllago/cli/internal/capmon/extract_html"
-	_ "github.com/OpenScribbler/syllago/cli/internal/capmon/extract_yaml"
+	"github.com/OpenScribbler/capmon"
+	_ "github.com/OpenScribbler/capmon/extract_html"
+	_ "github.com/OpenScribbler/capmon/extract_yaml"
 )
 
 func TestFixtures_ClaudeCodeHooksHTML(t *testing.T) {

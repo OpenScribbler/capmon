@@ -1,0 +1,259 @@
+name: capmon — capability monitor pipeline
+
+# Runs the full pipeline against a fresh checkout of OpenScribbler/syllago.
+# Migrated from syllago's .github/workflows/capmon.yml during the capmon
+# extraction; stage semantics and flags are unchanged.
+#
+# Cross-repo access: the SYLLAGO_TOKEN repository secret (fine-grained PAT
+# scoped to OpenScribbler/syllago; contents/pull-requests/issues read-write)
+# authenticates the syllago checkout (so heal-branch pushes work) and the
+# gh CLI (PRs + issues on syllago). This repo's own GITHUB_TOKEN only writes
+# the heartbeat commit.
+
+on:
+  schedule:
+    # Every 4 days at 06:00 UTC (day-of-month based: 1,5,9,...,29)
+    - cron: '0 6 */4 * *'
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Pipeline stage: fetch-extract, report, or all (default)'
+        required: false
+        default: ''
+      provider:
+        description: 'Provider slug for the hash check (leave empty to check all providers)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Hash check: log actions without creating GitHub issues'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-extract:
+    name: Fetch + Extract (Stage 1-2)
+    runs-on: ubuntu-latest
+    permissions: {}
+    container:
+      image: chromedp/headless-shell@sha256:01b37545a4e91a53ceb52e6f88ae1be375dbeb7e2148797d4b400989ea123d3a # 148.0.7778.97
+      options: --shm-size=1gb
+    outputs:
+      artifact-sha256: ${{ steps.sha.outputs.sha256 }}
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Checkout syllago
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: OpenScribbler/syllago
+          path: syllago
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install build tools
+        run: apt-get update -qq && apt-get install -y -qq ca-certificates
+
+      - name: Build capmon
+        run: go build -o capmon-bin ./cmd/capmon
+
+      - name: Run fetch-extract stage
+        working-directory: syllago
+        run: ../capmon-bin run --stage fetch-extract
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHROMEDP_URL: ""
+
+      - name: Compute artifact SHA-256
+        id: sha
+        run: |
+          tar -czf .capmon-cache.tar.gz -C syllago .capmon-cache/
+          SHA=$(sha256sum .capmon-cache.tar.gz | awk '{print $1}')
+          echo "sha256=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "## capmon artifact SHA-256" >> "$GITHUB_STEP_SUMMARY"
+          printf '```\n%s  .capmon-cache.tar.gz\n```\n' "${SHA}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload cache artifact
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: capmon-cache
+          path: .capmon-cache.tar.gz
+          retention-days: 7
+          include-hidden-files: true
+
+  report:
+    name: Diff + Report (Stage 3-4)
+    runs-on: ubuntu-latest
+    needs: fetch-extract
+    continue-on-error: false
+    permissions: {}
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Checkout syllago (writable)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: OpenScribbler/syllago
+          path: syllago
+          token: ${{ secrets.SYLLAGO_TOKEN }}
+
+      - name: Download cache artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: capmon-cache
+
+      - name: Verify artifact SHA-256
+        env:
+          EXPECTED_SHA: ${{ needs.fetch-extract.outputs.artifact-sha256 }}
+        run: |
+          ACTUAL=$(sha256sum .capmon-cache.tar.gz | awk '{print $1}')
+          if [ "$EXPECTED_SHA" != "$ACTUAL" ]; then
+            echo "SHA-256 mismatch: expected $EXPECTED_SHA, got $ACTUAL"
+            exit 1
+          fi
+          tar -xzf .capmon-cache.tar.gz -C syllago
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build capmon
+        run: go build -o capmon-bin ./cmd/capmon
+
+      - name: Configure git identity for heal branches
+        working-directory: syllago
+        run: |
+          git config user.name "capmon-bot"
+          git config user.email "capmon-bot@users.noreply.github.com"
+
+      - name: Run report stage
+        working-directory: syllago
+        run: ../capmon-bin run --stage report
+        env:
+          GITHUB_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+          GH_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+
+  staleness-check:
+    name: Staleness Check
+    runs-on: ubuntu-latest
+    needs: [fetch-extract, report]
+    if: always()
+    permissions: {}
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Checkout syllago
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: OpenScribbler/syllago
+          path: syllago
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build capmon
+        run: go build -o capmon-bin ./cmd/capmon
+
+      - name: Download cache artifact (if available)
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: capmon-cache
+        continue-on-error: true
+
+      - name: Extract cache (if present)
+        run: tar -xzf .capmon-cache.tar.gz -C syllago 2>/dev/null || true
+
+      - name: Check staleness
+        working-directory: syllago
+        run: |
+          ../capmon-bin verify \
+            --staleness-check \
+            --threshold-hours 108
+        env:
+          GH_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+
+  hash-check:
+    name: Content Hash Check
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Checkout syllago
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: OpenScribbler/syllago
+          path: syllago
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build capmon
+        run: go build -o capmon-bin ./cmd/capmon
+
+      - name: Run capmon check (all providers)
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.provider == '' }}
+        working-directory: syllago
+        run: ../capmon-bin check --all --providers-json=cli/providers.json
+        env:
+          GH_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+
+      - name: Run capmon check (single provider)
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.provider != '' }}
+        working-directory: syllago
+        env:
+          GH_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+          CAPMON_PROVIDER: ${{ github.event.inputs.provider }}
+          CAPMON_DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          FLAGS=""
+          if [ "$CAPMON_DRY_RUN" = "true" ]; then
+            FLAGS="--dry-run"
+          fi
+          ../capmon-bin check --provider="$CAPMON_PROVIDER" --providers-json=cli/providers.json $FLAGS
+
+  heartbeat:
+    # Commits a last-run marker to THIS repo so GitHub's 60-day-inactivity
+    # rule never auto-disables the schedule (pipeline output lands in
+    # syllago, so this repo would otherwise look dormant).
+    name: Heartbeat
+    runs-on: ubuntu-latest
+    needs: [fetch-extract, report, staleness-check, hash-check]
+    if: always() && github.event_name == 'schedule'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Commit heartbeat
+        run: |
+          mkdir -p .heartbeat
+          printf '{"last_run":"%s","run_id":"%s","fetch_extract":"%s","report":"%s"}\n' \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            "${{ github.run_id }}" \
+            "${{ needs.fetch-extract.result }}" \
+            "${{ needs.report.result }}" \
+            > .heartbeat/last-run.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .heartbeat/last-run.json
+          git commit -m "chore: pipeline heartbeat ${{ github.run_id }}" || exit 0
+          git push

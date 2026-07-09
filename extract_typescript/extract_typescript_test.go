@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon"
-	_ "github.com/OpenScribbler/syllago/cli/internal/capmon/extract_typescript"
+	"github.com/OpenScribbler/capmon"
+	_ "github.com/OpenScribbler/capmon/extract_typescript"
 )
 
 func TestTypeScriptExtractor_EnumStringValues(t *testing.T) {

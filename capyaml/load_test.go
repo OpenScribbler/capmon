@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenScribbler/syllago/cli/internal/capmon/capyaml"
+	"github.com/OpenScribbler/capmon/capyaml"
 )
 
 func TestLoadCapabilityYAML_Roundtrip(t *testing.T) {
