@@ -77,7 +77,7 @@ func IsCanonicalRulesKey(key string) bool {
 //
 // For object-typed canonical keys (activation_mode,
 // cross_provider_recognition), Capability MAY use a dot-separated form like
-// "activation_mode.always_on" or "cross_provider_recognition.agents_md".
+// "activation_mode.always" or "cross_provider_recognition.agents_md".
 // Validation only checks the first segment.
 func RulesLandmarkOptions(patterns ...LandmarkPattern) LandmarkOptions {
 	for _, p := range patterns {
@@ -117,7 +117,7 @@ func RulesLandmarkPattern(canonicalKey, anchor, mechanism string, required []Str
 
 // firstSegment returns the substring before the first '.' in s, or s if no dot
 // is present. Used to extract the canonical-key head of a possibly nested
-// Capability path so validation handles "activation_mode.always_on" the same
+// Capability path so validation handles "activation_mode.always" the same
 // as "activation_mode".
 func firstSegment(s string) string {
 	for i := 0; i < len(s); i++ {

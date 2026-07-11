@@ -165,12 +165,12 @@ func TestSeedProviderCapabilities_NestedSubCapabilities(t *testing.T) {
 		Provider: "test-provider",
 		Extracted: map[string]string{
 			"rules.supported": "true",
-			"rules.capabilities.activation_mode.always_on.supported":          "true",
-			"rules.capabilities.activation_mode.always_on.mechanism":          "rules without conditionals load every request",
-			"rules.capabilities.activation_mode.always_on.confidence":         "inferred",
-			"rules.capabilities.activation_mode.frontmatter_globs.supported":  "true",
-			"rules.capabilities.activation_mode.frontmatter_globs.mechanism":  "glob-based path matching",
-			"rules.capabilities.activation_mode.frontmatter_globs.confidence": "inferred",
+			"rules.capabilities.activation_mode.always.supported":  "true",
+			"rules.capabilities.activation_mode.always.mechanism":  "rules without conditionals load every request",
+			"rules.capabilities.activation_mode.always.confidence": "inferred",
+			"rules.capabilities.activation_mode.glob.supported":    "true",
+			"rules.capabilities.activation_mode.glob.mechanism":    "glob-based path matching",
+			"rules.capabilities.activation_mode.glob.confidence":   "inferred",
 		},
 	}
 	if err := capmon.SeedProviderCapabilities(seedOpts); err != nil {
@@ -184,8 +184,8 @@ func TestSeedProviderCapabilities_NestedSubCapabilities(t *testing.T) {
 	out := string(data)
 	for _, want := range []string{
 		"activation_mode:",
-		"always_on:",
-		"frontmatter_globs:",
+		"always:",
+		"glob:",
 		"glob-based path matching",
 		"confidence: inferred",
 	} {
@@ -212,19 +212,19 @@ func TestSeedProviderCapabilities_NestedSubCapabilities(t *testing.T) {
 	if len(am.Capabilities) != 2 {
 		t.Fatalf("expected 2 sub-capabilities, got %d: %v", len(am.Capabilities), am.Capabilities)
 	}
-	always := am.Capabilities["always_on"]
+	always := am.Capabilities["always"]
 	if !always.Supported {
-		t.Error("always_on.supported should be true")
+		t.Error("always.supported should be true")
 	}
 	if always.Confidence != "inferred" {
-		t.Errorf("always_on.confidence = %q, want %q", always.Confidence, "inferred")
+		t.Errorf("always.confidence = %q, want %q", always.Confidence, "inferred")
 	}
 	if always.Mechanism == "" {
-		t.Error("always_on.mechanism should be populated")
+		t.Error("always.mechanism should be populated")
 	}
-	globs := am.Capabilities["frontmatter_globs"]
+	globs := am.Capabilities["glob"]
 	if !globs.Supported {
-		t.Error("frontmatter_globs.supported should be true")
+		t.Error("glob.supported should be true")
 	}
 }
 

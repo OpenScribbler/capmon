@@ -52,11 +52,11 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: steering loaded on every prompt by default (documented under 'Always included' inclusion mode)
             confidence: inferred
-          frontmatter_globs:
+          glob:
             supported: true
             mechanism: glob-based path matching activates steering files (documented under 'Conditional inclusion' inclusion mode)
             confidence: inferred

@@ -20,7 +20,7 @@ func geminiCliRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Understand the context hierarchy", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "Understand the context hierarchy",
+		RulesLandmarkPattern("activation_mode.always", "Understand the context hierarchy",
 			"GEMINI.md files load automatically within scope (global, workspace, or JIT) — no frontmatter activation modes documented", required),
 		RulesLandmarkPattern("file_imports", "Modularize context with imports",
 			"GEMINI.md supports importing other markdown files (documented under 'Modularize context with imports' heading)", required),

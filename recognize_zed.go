@@ -33,9 +33,9 @@ func zedRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Migrating from Prompt Library", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", ".rules files",
+		RulesLandmarkPattern("activation_mode.always", ".rules files",
 			"project-root .rules file (or first-match fallback name) auto-included in every Agent Panel interaction; Library entries marked as Default Rules also load always_on (documented under '.rules files' / 'Default Rules')", required),
-		RulesLandmarkPattern("activation_mode.slash_command", "Slash Commands in Rules",
+		RulesLandmarkPattern("activation_mode.manual", "Slash Commands in Rules",
 			"Library rules invoked via slash command to inject the rule into the current agent context (documented under 'Slash Commands in Rules')", required),
 		RulesLandmarkPattern("cross_provider_recognition.agents_md", "AGENTS.md",
 			"AGENTS.md (and AGENT.md) recognized as fallback rule-file names in project root, first match wins (documented under '.rules files')", required),

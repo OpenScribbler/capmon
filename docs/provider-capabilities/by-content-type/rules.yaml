@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-04-17T16:13:10Z
+# Generated at: 2026-07-11T23:55:29Z
 
 content_type: rules
 providers:
@@ -10,11 +10,11 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: AGENTS.md files are always_on within their scope (cwd, parent dirs, subtrees) — documented under 'AGENTS.md' / 'Writing AGENTS.md Files'
                         confidence: inferred
-                    frontmatter_globs:
+                    glob:
                         supported: true
                         mechanism: '@-mentioned files use ''globs'' frontmatter for selective activation (documented under ''Granular Guidance''); globs implicitly prefixed with **/ unless ../ or ./'
                         confidence: inferred
@@ -39,7 +39,7 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: CLAUDE.md auto-loads when present in project root or working tree
                         confidence: inferred
@@ -72,11 +72,11 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: rules without conditionals load for every request (documented under 'Conditional Rules' / 'How It Works')
                         confidence: inferred
-                    frontmatter_globs:
+                    glob:
                         supported: true
                         mechanism: '''paths'' Conditional uses glob-based path matching to scope rule activation (documented under ''The paths Conditional'' / ''Writing Conditional Rules'')'
                         confidence: inferred
@@ -90,7 +90,7 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: AGENTS.md files are always_on within their scope (project root and child directories) — documented under 'AGENTS.md' (per docs/agents_md.md, redirects to developers.openai.com spec)
                         confidence: inferred
@@ -111,11 +111,11 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: .github/copilot-instructions.md applies to all requests in repository scope (documented under 'Repository-wide custom instructions')
                         confidence: inferred
-                    frontmatter_globs:
+                    glob:
                         supported: true
                         mechanism: NAME.instructions.md uses 'applyTo' frontmatter glob to scope to file patterns (documented under 'Path-specific custom instructions')
                         confidence: inferred
@@ -144,11 +144,11 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: '''Always'' Rule Type — rule included in every prompt (documented under ''Activation and enforcement'')'
                         confidence: inferred
-                    frontmatter_globs:
+                    glob:
                         supported: true
                         mechanism: '''Auto Attached'' Rule Type — frontmatter glob patterns activate when matching files in context (documented under ''Activation and enforcement'')'
                         confidence: inferred
@@ -181,7 +181,7 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: GEMINI.md files load automatically within scope (global, workspace, or JIT) — no frontmatter activation modes documented
                         confidence: inferred
@@ -203,11 +203,11 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: steering loaded on every prompt by default (documented under 'Always included' inclusion mode)
                         confidence: inferred
-                    frontmatter_globs:
+                    glob:
                         supported: true
                         mechanism: glob-based path matching activates steering files (documented under 'Conditional inclusion' inclusion mode)
                         confidence: inferred
@@ -240,7 +240,7 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: always_on trigger value documented in 'Activation Modes' table — full rule content included in system prompt every message
                         confidence: inferred
@@ -277,11 +277,11 @@ providers:
             activation_mode:
                 supported: true
                 capabilities:
-                    always_on:
+                    always:
                         supported: true
                         mechanism: project-root .rules file (or first-match fallback name) auto-included in every Agent Panel interaction; Library entries marked as Default Rules also load always_on (documented under '.rules files' / 'Default Rules')
                         confidence: inferred
-                    slash_command:
+                    manual:
                         supported: true
                         mechanism: Library rules invoked via slash command to inject the rule into the current agent context (documented under 'Slash Commands in Rules')
                         confidence: inferred

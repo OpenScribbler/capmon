@@ -51,7 +51,7 @@ func codexSkillsOptions() GoStructOptions {
 //   - "AGENTS.md"
 //   - "Hierarchical agents message"
 //
-// Per the seeder spec, codex supports activation_mode.always_on,
+// Per the seeder spec, codex supports activation_mode.always,
 // cross_provider_recognition.agents_md, and hierarchical_loading. file_imports
 // and auto_memory are intentionally absent from the cached doc surface.
 func codexRulesLandmarkOptions() LandmarkOptions {
@@ -60,7 +60,7 @@ func codexRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Hierarchical agents message", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "AGENTS.md",
+		RulesLandmarkPattern("activation_mode.always", "AGENTS.md",
 			"AGENTS.md files are always_on within their scope (project root and child directories) — documented under 'AGENTS.md' (per docs/agents_md.md, redirects to developers.openai.com spec)", required),
 		RulesLandmarkPattern("cross_provider_recognition.agents_md", "AGENTS.md",
 			"codex is a primary AGENTS.md spec implementer (per github.com/openai/codex docs); AGENTS.md is the cross-provider standard", required),

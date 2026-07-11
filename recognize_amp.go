@@ -53,9 +53,9 @@ func ampRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Writing AGENTS.md Files", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "AGENTS.md",
+		RulesLandmarkPattern("activation_mode.always", "AGENTS.md",
 			"AGENTS.md files are always_on within their scope (cwd, parent dirs, subtrees) — documented under 'AGENTS.md' / 'Writing AGENTS.md Files'", required),
-		RulesLandmarkPattern("activation_mode.frontmatter_globs", "Granular Guidance",
+		RulesLandmarkPattern("activation_mode.glob", "Granular Guidance",
 			"@-mentioned files use 'globs' frontmatter for selective activation (documented under 'Granular Guidance'); globs implicitly prefixed with **/ unless ../ or ./", required),
 		RulesLandmarkPattern("file_imports", "Granular Guidance",
 			"@-mention syntax includes other files as context — supports relative, absolute, and ~/ paths (documented under 'Granular Guidance')", required),

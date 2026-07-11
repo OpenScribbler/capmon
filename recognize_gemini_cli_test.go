@@ -80,7 +80,7 @@ func TestRecognizeGeminiCli_RealRulesLandmarks(t *testing.T) {
 		t.Error("rules.supported missing")
 	}
 	rulesInferred := []string{
-		"activation_mode.always_on",
+		"activation_mode.always",
 		"file_imports",
 		"auto_memory",
 		"hierarchical_loading",

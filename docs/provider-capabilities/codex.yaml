@@ -59,7 +59,7 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: AGENTS.md files are always_on within their scope (project root and child directories) — documented under 'AGENTS.md' (per docs/agents_md.md, redirects to developers.openai.com spec)
             confidence: inferred

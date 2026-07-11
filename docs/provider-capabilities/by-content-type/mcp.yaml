@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-04-17T16:13:10Z
+# Generated at: 2026-07-11T23:55:29Z
 
 content_type: mcp
 providers:
@@ -87,6 +87,25 @@ providers:
             transport_types:
                 supported: true
                 mechanism: stdio transport documented under 'STDIO server configuration' heading; SSE and Streamable HTTP variants covered in body text and configuration tables
+                confidence: inferred
+    factory-droid:
+        supported: true
+        capabilities:
+            marketplace:
+                supported: true
+                mechanism: '40+ pre-configured MCP servers (Linear, GitHub, Stripe, etc.) documented under ''Quick Start: Add from Registry'' heading'
+                confidence: inferred
+            oauth_support:
+                supported: true
+                mechanism: OS-keyring OAuth-token storage for HTTP MCP servers documented under 'OAuth Tokens' heading
+                confidence: inferred
+            tool_filtering:
+                supported: true
+                mechanism: per-server tool allowlisting via the `disabledTools` field documented under 'Configuration Schema' heading
+                confidence: inferred
+            transport_types:
+                supported: true
+                mechanism: http and stdio transports documented under 'Adding HTTP Servers' and 'Adding Stdio Servers' headings
                 confidence: inferred
     gemini-cli:
         supported: true

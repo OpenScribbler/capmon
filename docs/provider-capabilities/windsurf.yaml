@@ -45,7 +45,7 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: always_on trigger value documented in 'Activation Modes' table — full rule content included in system prompt every message
             confidence: inferred

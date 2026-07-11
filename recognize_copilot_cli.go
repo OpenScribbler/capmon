@@ -59,9 +59,9 @@ func copilotCliRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Path-specific custom instructions", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "Repository-wide custom instructions",
+		RulesLandmarkPattern("activation_mode.always", "Repository-wide custom instructions",
 			".github/copilot-instructions.md applies to all requests in repository scope (documented under 'Repository-wide custom instructions')", required),
-		RulesLandmarkPattern("activation_mode.frontmatter_globs", "Path-specific custom instructions",
+		RulesLandmarkPattern("activation_mode.glob", "Path-specific custom instructions",
 			"NAME.instructions.md uses 'applyTo' frontmatter glob to scope to file patterns (documented under 'Path-specific custom instructions')", required),
 		RulesLandmarkPattern("cross_provider_recognition.agents_md", "Agent instructions",
 			"AGENTS.md at repository root, cwd, or COPILOT_CUSTOM_INSTRUCTIONS_DIRS (documented under 'Agent instructions' section)", required),

@@ -46,11 +46,11 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: rules without conditionals load for every request (documented under 'Conditional Rules' / 'How It Works')
             confidence: inferred
-          frontmatter_globs:
+          glob:
             supported: true
             mechanism: '''paths'' Conditional uses glob-based path matching to scope rule activation (documented under ''The paths Conditional'' / ''Writing Conditional Rules'')'
             confidence: inferred

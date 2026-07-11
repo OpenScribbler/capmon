@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-04-17T16:13:10Z
+# Generated at: 2026-07-11T23:55:29Z
 
 content_type: agents
 providers:
@@ -76,6 +76,47 @@ providers:
                 supported: true
                 mechanism: per-agent tool allowlist via tools field, with tool aliases for renaming, documented under 'Tools' / 'Tool aliases' / 'Tools processing' headings
                 confidence: inferred
+    cursor:
+        supported: true
+        capabilities:
+            agent_scopes:
+                supported: true
+                capabilities:
+                    project:
+                        supported: true
+                        mechanism: .cursor/agents/ project scope, taking precedence over user scope (documented under 'File locations' heading)
+                        confidence: inferred
+                    user:
+                        supported: true
+                        mechanism: ~/.cursor/agents/ user-global scope (documented under 'File locations' heading)
+                        confidence: inferred
+            definition_format:
+                supported: true
+                mechanism: Markdown files with YAML frontmatter (name, description, model, readonly, is_background) followed by a prompt body, documented under 'File format' heading
+                confidence: inferred
+            invocation_patterns:
+                supported: true
+                capabilities:
+                    automatic_delegation:
+                        supported: true
+                        mechanism: Cursor's Agent proactively delegates tasks to subagents based on description, complexity, and available tools (documented under 'Automatic delegation' heading)
+                        confidence: inferred
+                    explicit:
+                        supported: true
+                        mechanism: /<name> syntax or natural-language mentions invoke a specific subagent (documented under 'Explicit invocation' heading)
+                        confidence: inferred
+            model_selection:
+                supported: true
+                mechanism: model frontmatter field accepts 'inherit', 'fast', or a specific model id; admin policies and Max Mode requirements may override (documented under 'Model configuration' heading)
+                confidence: inferred
+            subagent_spawning:
+                supported: true
+                mechanism: Since Cursor 2.5, subagents can launch child subagents to create a tree of coordinated work; nested launches require Task tool access and can be restricted by hooks or tool policies (FAQ heading 'Can subagents launch other subagents?')
+                confidence: inferred
+            tool_restrictions:
+                supported: true
+                mechanism: readonly frontmatter flag restricts the subagent to read-only tools (documented in 'Configuration fields')
+                confidence: inferred
     factory-droid:
         supported: true
         capabilities:
@@ -86,6 +127,25 @@ providers:
             tool_restrictions:
                 supported: true
                 mechanism: categorical tool policy using named categories (filesystem, shell, search, browser, web_fetch) documented under 'Tool categories → concrete tools' heading
+                confidence: inferred
+    gemini-cli:
+        supported: true
+        capabilities:
+            definition_format:
+                supported: true
+                mechanism: Markdown files with YAML frontmatter at .gemini/agents/<name>.md (project) and ~/.gemini/agents/<name>.md (user); body of the file becomes the subagent system prompt (documented under 'Agent definition files' / 'File format' headings)
+                confidence: inferred
+            invocation_patterns:
+                supported: true
+                mechanism: 'two invocation patterns: (1) automatic delegation by the main agent based on subagent description, (2) explicit @-mention at start of prompt (documented under ''Automatic delegation'' / ''Forcing a subagent (@ syntax)'' / ''How to use subagents'' headings)'
+                confidence: inferred
+            per_agent_mcp:
+                supported: true
+                mechanism: per-subagent mcpServers{} frontmatter declares inline MCP server configurations scoped to this subagent only (documented under 'Configuring isolated tools and servers' heading)
+                confidence: inferred
+            tool_restrictions:
+                supported: true
+                mechanism: 'per-subagent tool allow-listing via tools[] frontmatter with wildcards: ''*'', ''mcp_*'', ''mcp_<server>_*'' (documented under ''Tool wildcards'' / ''Subagent tool isolation'' / ''Configuring isolated tools and servers'' headings)'
                 confidence: inferred
     kiro:
         supported: true

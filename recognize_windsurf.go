@@ -27,7 +27,7 @@ func windsurfRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Rules Storage Locations", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "Activation Modes",
+		RulesLandmarkPattern("activation_mode.always", "Activation Modes",
 			"always_on trigger value documented in 'Activation Modes' table — full rule content included in system prompt every message", required),
 		RulesLandmarkPattern("activation_mode.manual", "Activation Modes",
 			"manual trigger value documented in 'Activation Modes' table — activated via @-mention", required),

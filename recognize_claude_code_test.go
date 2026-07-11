@@ -173,7 +173,7 @@ func TestRecognizeClaudeCode_RealLandmarks(t *testing.T) {
 		t.Error("rules.supported missing")
 	}
 	rulesCaps := []string{
-		"activation_mode.always_on",
+		"activation_mode.always",
 		"activation_mode.glob",
 		"file_imports",
 		"cross_provider_recognition.agents_md",

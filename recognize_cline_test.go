@@ -199,8 +199,8 @@ func TestRecognizeCline_RealRulesLandmarks(t *testing.T) {
 		t.Error("rules.supported missing")
 	}
 	rulesInferred := []string{
-		"activation_mode.always_on",
-		"activation_mode.frontmatter_globs",
+		"activation_mode.always",
+		"activation_mode.glob",
 		"hierarchical_loading",
 	}
 	for _, c := range rulesInferred {

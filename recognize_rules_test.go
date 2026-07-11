@@ -126,7 +126,7 @@ func TestRulesLandmarkOptions_AcceptsNestedCanonicalKey(t *testing.T) {
 		}
 	}()
 	_ = RulesLandmarkOptions(
-		LandmarkPattern{Capability: "activation_mode.always_on", Mechanism: "m"},
+		LandmarkPattern{Capability: "activation_mode.always", Mechanism: "m"},
 		LandmarkPattern{Capability: "cross_provider_recognition.agents_md", Mechanism: "m"},
 	)
 }

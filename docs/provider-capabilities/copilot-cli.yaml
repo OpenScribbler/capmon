@@ -35,11 +35,11 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: .github/copilot-instructions.md applies to all requests in repository scope (documented under 'Repository-wide custom instructions')
             confidence: inferred
-          frontmatter_globs:
+          glob:
             supported: true
             mechanism: NAME.instructions.md uses 'applyTo' frontmatter glob to scope to file patterns (documented under 'Path-specific custom instructions')
             confidence: inferred

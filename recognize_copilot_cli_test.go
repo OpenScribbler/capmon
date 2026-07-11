@@ -280,8 +280,8 @@ func TestRecognizeCopilotCli_RealRulesLandmarks(t *testing.T) {
 		t.Error("rules.supported missing")
 	}
 	rulesInferred := []string{
-		"activation_mode.always_on",
-		"activation_mode.frontmatter_globs",
+		"activation_mode.always",
+		"activation_mode.glob",
 		"cross_provider_recognition.agents_md",
 		"cross_provider_recognition.claude_md",
 		"cross_provider_recognition.gemini_md",

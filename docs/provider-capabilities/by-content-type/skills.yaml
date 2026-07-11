@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-04-17T16:13:10Z
+# Generated at: 2026-07-11T23:55:29Z
 
 content_type: skills
 providers:
@@ -166,7 +166,7 @@ providers:
                 confidence: confirmed
             display_name:
                 supported: true
-                mechanism: 'yaml frontmatter key: name'
+                mechanism: 'yaml frontmatter key: display_name'
                 confidence: confirmed
             global_scope:
                 supported: true
@@ -296,6 +296,25 @@ providers:
             project_scope:
                 supported: true
                 mechanism: per-project .crush/skills/ directory
+                confidence: confirmed
+    cursor:
+        supported: true
+        capabilities:
+            canonical_filename:
+                supported: true
+                mechanism: SKILL.md is the canonical skill filename, documented under 'SKILL.md file format' heading
+                confidence: inferred
+            disable_model_invocation:
+                supported: true
+                mechanism: disable-model-invocation frontmatter toggle documented under 'Disabling automatic invocation' heading
+                confidence: inferred
+            global_scope:
+                supported: true
+                mechanism: Skills stored in ~/.agents/skills/<name>/SKILL.md per the cross-provider Agent Skills convention
+                confidence: confirmed
+            project_scope:
+                supported: true
+                mechanism: Skills stored in .cursor/skills/<name>/SKILL.md (cursor-native) or .agents/skills/<name>/SKILL.md (cross-provider Agent Skills convention)
                 confidence: confirmed
     factory-droid:
         supported: true

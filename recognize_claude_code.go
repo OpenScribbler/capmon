@@ -56,7 +56,7 @@ func claudeCodeRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "How CLAUDE.md files load", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "CLAUDE.md files",
+		RulesLandmarkPattern("activation_mode.always", "CLAUDE.md files",
 			"CLAUDE.md auto-loads when present in project root or working tree", required),
 		RulesLandmarkPattern("activation_mode.glob", "Path-specific rules",
 			"path-specific rules in .claude/rules/<name>.md fire on glob match (documented under 'Path-specific rules')", required),

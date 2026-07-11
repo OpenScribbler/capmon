@@ -62,9 +62,9 @@ func clineRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Conditional Rules", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "Conditional Rules",
+		RulesLandmarkPattern("activation_mode.always", "Conditional Rules",
 			"rules without conditionals load for every request (documented under 'Conditional Rules' / 'How It Works')", required),
-		RulesLandmarkPattern("activation_mode.frontmatter_globs", "The paths Conditional",
+		RulesLandmarkPattern("activation_mode.glob", "The paths Conditional",
 			"'paths' Conditional uses glob-based path matching to scope rule activation (documented under 'The paths Conditional' / 'Writing Conditional Rules')", required),
 		RulesLandmarkPattern("hierarchical_loading", "Global Rules Directory",
 			"two-tier scope: Project rules (.clinerules/ in workspace) + Global rules (~/.cline/rules/ user-wide) — documented under 'Where Rules Live' / 'Global Rules Directory'", required),

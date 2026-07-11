@@ -51,8 +51,8 @@ func TestRecognizeZed_RealRulesLandmarks(t *testing.T) {
 		t.Error("rules.supported missing")
 	}
 	rulesInferred := []string{
-		"activation_mode.always_on",
-		"activation_mode.slash_command",
+		"activation_mode.always",
+		"activation_mode.manual",
 		"cross_provider_recognition.agents_md",
 		"cross_provider_recognition.claude_md",
 		"cross_provider_recognition.gemini_md",
@@ -73,9 +73,8 @@ func TestRecognizeZed_RealRulesLandmarks(t *testing.T) {
 		"rules.capabilities.file_imports.supported",
 		"rules.capabilities.auto_memory.supported",
 		"rules.capabilities.hierarchical_loading.supported",
-		"rules.capabilities.activation_mode.manual.supported",
 		"rules.capabilities.activation_mode.model_decision.supported",
-		"rules.capabilities.activation_mode.frontmatter_globs.supported",
+		"rules.capabilities.activation_mode.glob.supported",
 	} {
 		if _, has := caps[absent]; has {
 			t.Errorf("%s should NOT be present for zed", absent)

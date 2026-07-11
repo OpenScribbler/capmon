@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-04-17T16:13:10Z
+# Generated at: 2026-07-11T23:55:29Z
 
 content_type: hooks
 providers:
@@ -110,6 +110,21 @@ providers:
             json_io_protocol:
                 supported: true
                 mechanism: JSON I/O protocol documented under 'Reading input' / 'Outputting JSON' headings
+                confidence: inferred
+    cursor:
+        supported: true
+        capabilities:
+            hook_scopes:
+                supported: true
+                mechanism: project + user-global hook scopes documented under 'Project Hooks (Version Control)' / 'Configuration' headings
+                confidence: inferred
+            json_io_protocol:
+                supported: true
+                mechanism: JSON I/O protocol documented under 'Common schema' / 'Input (all hooks)' headings (event data on stdin, structured decision JSON on stdout)
+                confidence: inferred
+            matcher_patterns:
+                supported: true
+                mechanism: matcher patterns documented under 'Matcher Configuration' heading
                 confidence: inferred
     factory-droid:
         supported: true

@@ -27,9 +27,9 @@ func cursorRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Rule anatomy", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "Activation and enforcement",
+		RulesLandmarkPattern("activation_mode.always", "Activation and enforcement",
 			"'Always' Rule Type — rule included in every prompt (documented under 'Activation and enforcement')", required),
-		RulesLandmarkPattern("activation_mode.frontmatter_globs", "Activation and enforcement",
+		RulesLandmarkPattern("activation_mode.glob", "Activation and enforcement",
 			"'Auto Attached' Rule Type — frontmatter glob patterns activate when matching files in context (documented under 'Activation and enforcement')", required),
 		RulesLandmarkPattern("activation_mode.manual", "Activation and enforcement",
 			"'Apply Manually' Rule Type — activated via @-mention in chat (documented under 'Activation and enforcement')", required),

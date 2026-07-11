@@ -98,7 +98,7 @@ var realCodexRulesLandmarks = []string{
 
 // TestRecognizeCodex_RealRulesLandmarks proves rules recognition on the
 // minimal landmark set codex's spec doc provides. Codex supports
-// activation_mode.always_on, cross_provider_recognition.agents_md, and
+// activation_mode.always, cross_provider_recognition.agents_md, and
 // hierarchical_loading. file_imports and auto_memory are intentionally absent.
 func TestRecognizeCodex_RealRulesLandmarks(t *testing.T) {
 	result := capmon.RecognizeWithContext("codex", capmon.RecognitionContext{
@@ -115,7 +115,7 @@ func TestRecognizeCodex_RealRulesLandmarks(t *testing.T) {
 		t.Error("rules.supported missing")
 	}
 	rulesInferred := []string{
-		"activation_mode.always_on",
+		"activation_mode.always",
 		"cross_provider_recognition.agents_md",
 		"hierarchical_loading",
 	}
@@ -133,7 +133,7 @@ func TestRecognizeCodex_RealRulesLandmarks(t *testing.T) {
 		"rules.capabilities.auto_memory.supported",
 		"rules.capabilities.activation_mode.manual.supported",
 		"rules.capabilities.activation_mode.model_decision.supported",
-		"rules.capabilities.activation_mode.frontmatter_globs.supported",
+		"rules.capabilities.activation_mode.glob.supported",
 	} {
 		if _, has := caps[absent]; has {
 			t.Errorf("%s should NOT be present for codex", absent)

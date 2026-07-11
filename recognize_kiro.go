@@ -56,9 +56,9 @@ func kiroRulesLandmarkOptions() LandmarkOptions {
 		{Kind: "substring", Value: "Steering file scope", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always_on", "Always included",
+		RulesLandmarkPattern("activation_mode.always", "Always included",
 			"steering loaded on every prompt by default (documented under 'Always included' inclusion mode)", required),
-		RulesLandmarkPattern("activation_mode.frontmatter_globs", "Conditional inclusion",
+		RulesLandmarkPattern("activation_mode.glob", "Conditional inclusion",
 			"glob-based path matching activates steering files (documented under 'Conditional inclusion' inclusion mode)", required),
 		RulesLandmarkPattern("activation_mode.manual", "Manual inclusion",
 			"user explicitly references the file to activate (documented under 'Manual inclusion' inclusion mode)", required),

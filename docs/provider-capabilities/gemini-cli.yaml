@@ -77,7 +77,7 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: GEMINI.md files load automatically within scope (global, workspace, or JIT) — no frontmatter activation modes documented
             confidence: inferred

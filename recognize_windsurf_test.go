@@ -51,7 +51,7 @@ func TestRecognizeWindsurf_RealRulesLandmarks(t *testing.T) {
 		t.Error("rules.supported missing")
 	}
 	rulesInferred := []string{
-		"activation_mode.always_on",
+		"activation_mode.always",
 		"activation_mode.manual",
 		"activation_mode.model_decision",
 		"activation_mode.glob",

@@ -113,7 +113,7 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: CLAUDE.md auto-loads when present in project root or working tree
             confidence: inferred

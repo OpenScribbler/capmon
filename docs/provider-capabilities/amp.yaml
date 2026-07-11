@@ -35,11 +35,11 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: AGENTS.md files are always_on within their scope (cwd, parent dirs, subtrees) — documented under 'AGENTS.md' / 'Writing AGENTS.md Files'
             confidence: inferred
-          frontmatter_globs:
+          glob:
             supported: true
             mechanism: '@-mentioned files use ''globs'' frontmatter for selective activation (documented under ''Granular Guidance''); globs implicitly prefixed with **/ unless ../ or ./'
             confidence: inferred

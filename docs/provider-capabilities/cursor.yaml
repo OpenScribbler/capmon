@@ -92,11 +92,11 @@ content_types:
       activation_mode:
         supported: true
         capabilities:
-          always_on:
+          always:
             supported: true
             mechanism: '''Always'' Rule Type — rule included in every prompt (documented under ''Activation and enforcement'')'
             confidence: inferred
-          frontmatter_globs:
+          glob:
             supported: true
             mechanism: '''Auto Attached'' Rule Type — frontmatter glob patterns activate when matching files in context (documented under ''Activation and enforcement'')'
             confidence: inferred
