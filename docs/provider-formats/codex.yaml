@@ -1,0 +1,723 @@
+provider: codex
+docs_url: "https://github.com/openai/codex"
+category: cli
+last_fetched_at: "2026-05-06T00:00:00Z"
+last_changed_at: "2026-05-06T00:00:00Z"
+generation_method: subagent
+
+content_types:
+  skills:
+    status: supported
+    sources:
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/model.rs"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:355f746c1354f5fbc2f1b3898ab73cef138850972536cd7000842b9f067e2eca"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/loader.rs"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:f4f600ddbca1bd66c2fc7f20684c32773b55b367a387d686c34da80887404135"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/docs/skills.md"
+        type: documentation
+        fetch_method: gh_raw
+        content_hash: "sha256:e59789d09692310bbf94e2ef8db0aaf00d97f2226982c8c5330d2d260583a97d"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      display_name:
+        supported: true
+        provider_field: "name"
+        mechanism: "YAML frontmatter key: name (optional — falls back to parent directory name if absent or empty; max 64 chars enforced after whitespace normalization)"
+        confidence: confirmed
+      description:
+        supported: true
+        provider_field: "description"
+        mechanism: "YAML frontmatter key: description (required — empty string triggers MissingField error; max 1024 chars enforced after whitespace normalization)"
+        confidence: confirmed
+      disable_model_invocation:
+        supported: true
+        mechanism: "openai.yaml companion file key: policy.allow_implicit_invocation (optional bool; false disables implicit/auto invocation; defaults to true when absent)"
+        confidence: confirmed
+      project_scope:
+        supported: true
+        mechanism: "Skills directory at <project_config_folder>/skills/ (SkillScope::Repo) or any .agents/skills/ directory between project root and cwd (monorepo traversal)"
+        paths:
+          - ".agents/skills/<name>/SKILL.md"
+        confidence: confirmed
+      global_scope:
+        supported: true
+        mechanism: "Skills directory at $HOME/.agents/skills/ or the user config layer's skills/ subdir ($CODEX_HOME/skills, deprecated but kept for backward compatibility) (SkillScope::User)"
+        paths:
+          - "~/.agents/skills/<name>/SKILL.md"
+        confidence: confirmed
+      shared_scope:
+        supported: true
+        mechanism: "Admin scope at /etc/codex/skills on Unix (SkillScope::Admin) — machine-level shared skills readable by all local users; injected via System config layer"
+        paths:
+          - "/etc/codex/skills/<name>/SKILL.md"
+        confidence: confirmed
+      canonical_filename:
+        supported: true
+        mechanism: "Fixed filename SKILL.md required within each named skill directory (SKILLS_FILENAME constant)"
+        confidence: confirmed
+      user_invocable:
+        supported: false
+        confidence: confirmed
+    provider_extensions:
+      - id: short_description
+        name: Short Description
+        summary: "Condensed skill description for compact UI; SKILL.md metadata.short-description or openai.yaml interface.short_description (≤1024 chars)."
+        source_ref: "loader.rs (SkillFrontmatterMetadata.short_description, resolve_interface)"
+        graduation_candidate: false
+        provider_field: "metadata.short-description"
+        conversion: embedded
+      - id: openai_yaml_companion_file
+        name: openai.yaml Companion Metadata File
+        summary: "Optional <skill_dir>/agents/openai.yaml file providing interface, dependencies, and policy metadata separate from SKILL.md frontmatter."
+        source_ref: "loader.rs (SKILLS_METADATA_DIR, SKILLS_METADATA_FILENAME, load_skill_metadata)"
+        graduation_candidate: true
+        conversion: not-portable
+      - id: skill_interface_icons
+        name: Skill Interface Icons
+        summary: "Small and large skill icons via openai.yaml interface.icon_small/icon_large; paths must be relative under assets/."
+        source_ref: "loader.rs (resolve_asset_path), model.rs (SkillInterface.icon_small, icon_large)"
+        graduation_candidate: false
+        provider_field: "interface.icon_small"
+        conversion: dropped
+      - id: skill_interface_brand_color
+        name: Skill Brand Color
+        summary: "Brand color for the skill card via openai.yaml interface.brand_color (#RRGGBB hex)."
+        source_ref: "loader.rs (resolve_color_str), model.rs (SkillInterface.brand_color)"
+        graduation_candidate: false
+        provider_field: "interface.brand_color"
+        conversion: dropped
+      - id: skill_interface_default_prompt
+        name: Default Prompt
+        summary: "Pre-filled starting prompt for UI invocation via openai.yaml interface.default_prompt (≤1024 chars)."
+        source_ref: "loader.rs (resolve_interface), model.rs (SkillInterface.default_prompt)"
+        graduation_candidate: false
+        provider_field: "interface.default_prompt"
+        conversion: embedded
+      - id: tool_dependencies
+        name: Tool Dependencies
+        summary: "Declare required external tools or MCP servers via openai.yaml dependencies.tools (type, value, transport, command, url)."
+        source_ref: "loader.rs (resolve_dependency_tool, DependencyTool), model.rs (SkillDependencies, SkillToolDependency)"
+        graduation_candidate: false
+        provider_field: "dependencies.tools"
+        conversion: embedded
+      - id: product_gating
+        name: Product Gating
+        summary: "Restrict skill visibility to specific OpenAI products via openai.yaml policy.products (empty = all products)."
+        source_ref: "model.rs (SkillPolicy.products, matches_product_restriction_for_product), loader.rs (resolve_policy)"
+        graduation_candidate: false
+        provider_field: "policy.products"
+        conversion: dropped
+      - id: system_scope
+        name: System Scope (Embedded Skills Cache)
+        summary: "Fourth scope beyond Repo/User/Admin: embedded skills cached under $CODEX_HOME/skills/.system; symlinks not followed."
+        source_ref: "loader.rs (skill_roots_from_layer_stack_inner, discover_skills_under_root follow_symlinks logic)"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: plugin_scope
+        name: Plugin Scope
+        summary: "Externally-injected plugin_skill_roots assigned User scope with namespaced name prefix; no config file required."
+        source_ref: "loader.rs (skill_roots_with_home_dir, namespaced_skill_name, plugin_namespace_for_skill_path)"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: monorepo_traversal
+        name: Monorepo Skill Discovery
+        summary: "Walk between project root and cwd collecting .agents/skills/ dirs; capped by MAX_SCAN_DEPTH=6 and MAX_SKILLS_DIRS_PER_ROOT=2000."
+        source_ref: "loader.rs (repo_agents_skill_roots, dirs_between_project_root_and_cwd, MAX_SCAN_DEPTH, MAX_SKILLS_DIRS_PER_ROOT)"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: skill_deduplication
+        name: Skill Deduplication
+        summary: "Skills with duplicate paths are deduped (highest-priority scope wins) then sorted Repo > User > System > Admin, then by name and path."
+        source_ref: "loader.rs (load_skills_from_roots dedup and sort logic)"
+        graduation_candidate: false
+        conversion: not-portable
+    loading_model: >
+      Skills are loaded by scanning a priority-ordered list of roots: Repo (project config folder
+      skills/ and monorepo .agents/skills/ dirs), User ($HOME/.agents/skills/ and deprecated
+      $CODEX_HOME/skills/), System ($CODEX_HOME/skills/.system, embedded/cached), and Admin
+      (/etc/codex/skills on Unix). Each root is BFS-scanned up to MAX_SCAN_DEPTH=6 directories
+      deep, capped at MAX_SKILLS_DIRS_PER_ROOT=2000 dirs per root. Symlinks are followed for
+      Repo, User, and Admin scopes; not for System. A SKILL.md file within any subdirectory
+      is parsed: YAML frontmatter (--- delimited) is extracted and deserialized into
+      SkillFrontmatter (name, description, metadata.short-description). The name falls back to
+      the parent directory name if absent. Description is required (empty triggers MissingField
+      error). An optional agents/openai.yaml companion file in the skill directory provides
+      interface, dependencies, and policy metadata. After loading all roots, duplicate paths are
+      removed (highest-priority scope wins) and skills are sorted by scope then name then path.
+      Plugin-injected roots receive User scope and a namespaced name prefix.
+    notes: >
+      The docs/skills.md source is a redirect stub pointing to the external Codex CLI docs
+      at developers.openai.com/codex/skills — it contains no implementation details. The
+      substantive implementation sources remain model.rs and loader.rs. The shared_scope
+      canonical mapping covers the Admin scope (/etc/codex/skills) — machine-level shared
+      scope (all local users), not org/cloud shared scope. The user_invocable key has no
+      evidence in the source (no concept of hiding skills from user-facing menus in the Rust
+      implementation) — set to supported: false, confidence: confirmed. The openai_yaml_companion_file
+      is flagged graduation_candidate: true because other providers (windsurf, amp, cline,
+      claude-code) support additional supporting files in the skill directory beyond the
+      primary content file.
+
+  rules:
+    status: supported
+    sources:
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/docs/agents_md.md"
+        type: documentation
+        fetch_method: gh_raw
+        content_hash: "sha256:fe9c918a09a3573bf6428f4da0322750900760ef709ac1fd13d07358c702aaa1"
+        fetched_at: "2026-04-11T21:50:01.662777227Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/AGENTS.md"
+        type: documentation
+        fetch_method: gh_raw
+        content_hash: "sha256:585bdddaf9967d4799d46e7924b3c6aec9a433d9d0a9ee02edec73662aa3a405"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      activation_mode:
+        supported: false
+        mechanism: "Codex AGENTS.md files load unconditionally; no conditional or model-decision activation documented"
+        confidence: inferred
+      file_imports:
+        supported: false
+        mechanism: "No file import syntax documented for Codex AGENTS.md files"
+        confidence: inferred
+      cross_provider_recognition:
+        supported: true
+        mechanism: "agents_md_filename: Codex reads AGENTS.md files using the standard filename used by multiple providers"
+        confidence: confirmed
+      auto_memory:
+        supported: false
+        mechanism: "Codex does not have an AI-generated auto-memory system"
+        confidence: confirmed
+      hierarchical_loading:
+        supported: true
+        mechanism: "hierarchical_agents_md: Codex loads AGENTS.md from subdirectories with defined precedence (deeper overrides higher)"
+        confidence: confirmed
+    provider_extensions:
+      - id: agents_md_filename
+        name: AGENTS.md Filename
+        summary: "Native rules filename is AGENTS.md, with configurable fallback list via config.toml project_doc_fallback_filenames."
+        source_ref: "config.schema.json (project_doc_fallback_filenames, project_doc_max_bytes)"
+        graduation_candidate: false
+        provider_field: "project_doc_fallback_filenames"
+        conversion: translated
+      - id: hierarchical_agents_md
+        name: Hierarchical AGENTS.md (child_agents_md feature flag)
+        summary: "When features.child_agents_md is enabled, Codex emits scope/precedence guidance and combines AGENTS.md files across a directory hierarchy."
+        source_ref: "docs/agents_md.md (Hierarchical agents message section)"
+        graduation_candidate: true
+        provider_field: "features.child_agents_md"
+        conversion: not-portable
+      - id: project_doc_max_bytes
+        name: Project Doc Max Bytes
+        summary: "Configurable byte cap on AGENTS.md reads via config.toml project_doc_max_bytes; prevents oversized rules files from blowing the context window."
+        source_ref: "config.schema.json (project_doc_max_bytes)"
+        graduation_candidate: false
+        provider_field: "project_doc_max_bytes"
+        conversion: dropped
+    loading_model: >
+      Codex reads AGENTS.md (or configured fallback filenames) by scanning ancestors of the
+      current working directory and the user home directory. Multiple AGENTS.md files across
+      the hierarchy are discovered and combined. The primary filename is AGENTS.md; a fallback
+      list can be configured in config.toml via project_doc_fallback_filenames (ordered). File
+      content is capped at project_doc_max_bytes bytes (default 32768). When the child_agents_md
+      feature flag is enabled, codex emits additional hierarchy guidance about scope and
+      precedence. Rules content is injected into the system/user instructions context at session
+      start.
+    notes: >
+      Codex uses AGENTS.md as its native rules format, which is now a widely-adopted cross-provider
+      convention. The rules-0 source (docs/agents_md.md) is a short redirect to the external docs
+      site rather than a substantive spec. The rules-1 source (AGENTS.md at repo root) is the
+      Codex codebase's own AGENTS.md for AI contributors and shows the format in practice — the
+      updated version contains extensive Rust coding guidelines and TUI style conventions. The
+      config schema confirms project_doc_fallback_filenames and project_doc_max_bytes as the
+      primary configuration surface for rules loading. The hierarchical_agents_md extension is
+      flagged graduation_candidate: true because hierarchical / scoped rules merging is a pattern
+      that could be useful across providers.
+
+  hooks:
+    status: supported
+    sources:
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/pre-tool-use.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:ceba5948ecd9417a6f13a2e1f2f8a8dc746a51aa59e90a9a2fe526e2962939f7"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/pre-tool-use.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:72941d27afdfc1bc79d07f3e8b9a5b049d757f2da399746fa572cae5ec4f9aae"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/post-tool-use.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:72859733d7130bc5a0990b7cd898a8609827a11e314d91997e07528f181edcaf"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/post-tool-use.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:0470c83dbc46b997fefd9c2afe81c94f28081272509e36734c3e266d8a602692"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/session-start.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:2c63caff448b05d53abcf91049f16bdba53b2cdd85d1789b73c8df2d44f31b09"
+        fetched_at: "2026-04-11T21:48:21.781020488Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/session-start.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:fdafe61bacd05e9cabcc846eeaaf7f4989b98870034d967d38a2f6cb7743b61f"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/user-prompt-submit.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:a2612724a11d839bcc480b6e1791920d1b57176c3563f8b86eb1835647ed44fc"
+        fetched_at: "2026-04-11T21:48:22.191327658Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/user-prompt-submit.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:3be3a26fc5c4c857374decdbf6885d7974a183cdbf28e821dcd941964d447094"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/stop.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:7db4793c404b5c46b230c27b9507eb1a558fd958689d8715221c5dd81351a06a"
+        fetched_at: "2026-04-11T21:48:22.582043536Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/stop.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:dc2b30e84c97beca5825aa64ca46e1337e402781dc5a9142b67111d10523f15c"
+        fetched_at: "2026-04-11T21:48:22.791765828Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript/v2/HookEventName.ts"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:05a14b171ae2253e5713e56b11d2738dc7e71dbd098f040b60f5e83d8b19b1b2"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript/v2/HookHandlerType.ts"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:bdacef7921e59b6debc3cd512edb69ed1cbf8eab5a257316075c4e71c1cc317b"
+        fetched_at: "2026-04-11T21:48:23.234022944Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript/v2/HookExecutionMode.ts"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:e8bcb5b57feed919b55542cf80efa7f0b78b3997cad57e44021b038f7346a230"
+        fetched_at: "2026-04-11T21:48:23.392661496Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript/v2/HookScope.ts"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:d9d65a4afcd428a6124ccc40b3ca1bfc95430be484030f717100482a78b46ce6"
+        fetched_at: "2026-04-11T21:48:23.551768221Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/src/engine/schema_loader.rs"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:3f00b4617eae2df7be9fde9eb7c300b52e1325dc049eab3fed51fbbf7874cddd"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/src/types.rs"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:cdc1fa86126fb6cdc1bf1afa9195312366b3931eef7c5b5886808dc4f7eefe1d"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      handler_types:
+        supported: true
+        mechanism: "hook_handler_types: Codex supports shell command and LLM prompt handler types; TypeScript extension type also documented"
+        confidence: confirmed
+      matcher_patterns:
+        supported: true
+        mechanism: "hook_matcher: Codex hooks support pattern matching to filter which tools or events trigger the hook"
+        confidence: confirmed
+      decision_control:
+        supported: true
+        mechanism: "hook_result_abort: Codex hooks can abort (block) the triggering action; allow and modify sub-capabilities documented via hook result schema"
+        confidence: confirmed
+      input_modification:
+        supported: true
+        mechanism: "hook_updated_input: Codex PreToolUse hooks return modified input arguments that replace the original tool input"
+        confidence: confirmed
+      async_execution:
+        supported: true
+        mechanism: "hook_execution_mode: Codex supports async hook execution mode for fire-and-forget background hook runs"
+        confidence: confirmed
+      hook_scopes:
+        supported: true
+        mechanism: "hook_scope: Codex hooks can be scoped to global/user or project configuration"
+        confidence: confirmed
+      json_io_protocol:
+        supported: true
+        mechanism: "Codex hooks communicate via structured JSON on stdin (typed per-event payload conforming to the event input schema) and stdout (typed response conforming to the event output schema); exit codes alone are not the protocol"
+        confidence: confirmed
+      context_injection:
+        supported: true
+        mechanism: "hook_system_message: Codex hooks can inject a system message into the agent's active session context"
+        confidence: confirmed
+      permission_control:
+        supported: true
+        mechanism: "hook_permission_decision: Codex hooks can return permission decisions that grant or deny tool availability"
+        confidence: confirmed
+    provider_extensions:
+      - id: hook_events
+        name: Hook Events
+        summary: "Six hook events: PreToolUse, PostToolUse, PermissionRequest, SessionStart, UserPromptSubmit, Stop (PascalCase in config.toml, camelCase in TS protocol)."
+        source_ref: "schema_loader.rs (GeneratedHookSchemas struct fields), config.schema.json (HooksToml), HookEventName.ts"
+        graduation_candidate: false
+        conversion: translated
+      - id: hook_handler_types
+        name: Hook Handler Types
+        summary: "Each hook entry has a type: command (shell), prompt (LLM prompt), or agent (sub-agent delegation)."
+        source_ref: "config.schema.json (HookHandlerConfig enum), HookHandlerType.ts"
+        graduation_candidate: false
+        provider_field: "type"
+        conversion: translated
+      - id: hook_matcher
+        name: Tool Matcher (PreToolUse / PostToolUse)
+        summary: "Optional matcher string on PreToolUse/PostToolUse entries filters which tool calls trigger the hook (absent = all tools)."
+        source_ref: "config.schema.json (MatcherGroup.matcher)"
+        graduation_candidate: false
+        provider_field: "matcher"
+        conversion: translated
+      - id: hook_execution_mode
+        name: Hook Execution Mode (sync / async)
+        summary: "Hook handlers run sync (blocking) or async (fire-and-forget) via the async flag on command handlers / HookExecutionMode."
+        source_ref: "HookExecutionMode.ts, config.schema.json (HookHandlerConfig::Command.async)"
+        graduation_candidate: false
+        provider_field: "async"
+        conversion: translated
+      - id: hook_scope
+        name: Hook Scope (thread / turn)
+        summary: "Hooks scoped to a thread (whole session) or a turn (one request/response cycle) via the HookScope value."
+        source_ref: "HookScope.ts"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: hook_result_abort
+        name: Hook Result Abort vs Continue
+        summary: "Tri-state hook outcome: Success, FailedContinue, FailedAbort; output JSON also supports continue and decision (approve/block) fields."
+        source_ref: "types.rs (HookResult enum), pre-tool-use.command.output.schema.json"
+        graduation_candidate: false
+        conversion: translated
+      - id: hook_suppress_output
+        name: Suppress Output Flag
+        summary: "Hook output suppressOutput boolean (default false) hides stdout/stderr from the user; available on all six event schemas."
+        source_ref: "pre-tool-use.command.output.schema.json (suppressOutput)"
+        graduation_candidate: false
+        provider_field: "suppressOutput"
+        conversion: dropped
+      - id: hook_system_message
+        name: System Message Injection
+        summary: "Hook output systemMessage field injects extra context into the current turn's system message; available on all six event schemas."
+        source_ref: "pre-tool-use.command.output.schema.json (systemMessage)"
+        graduation_candidate: false
+        provider_field: "systemMessage"
+        conversion: translated
+      - id: hook_turn_id
+        name: Turn ID in Hook Payload
+        summary: "PreToolUse/PostToolUse input payload includes a turn_id field (marked Codex extension) so hooks can correlate with model turns."
+        source_ref: "pre-tool-use.command.input.schema.json (turn_id description)"
+        graduation_candidate: false
+        provider_field: "turn_id"
+        conversion: not-portable
+      - id: hook_updated_input
+        name: Updated Tool Input (PreToolUse)
+        summary: "PreToolUse output updatedInput field replaces the tool's arguments before execution, allowing hooks to modify or sanitize input."
+        source_ref: "pre-tool-use.command.output.schema.json (hookSpecificOutput.updatedInput)"
+        graduation_candidate: false
+        provider_field: "hookSpecificOutput.updatedInput"
+        conversion: translated
+      - id: hook_permission_decision
+        name: Permission Decision (PreToolUse)
+        summary: "PreToolUse output permissionDecision (allow/deny/ask) gives fine-grained tool permission control separate from the top-level decision."
+        source_ref: "pre-tool-use.command.output.schema.json (PreToolUsePermissionDecisionWire)"
+        graduation_candidate: false
+        provider_field: "hookSpecificOutput.permissionDecision"
+        conversion: translated
+      - id: hook_updated_mcp_tool_output
+        name: Updated MCP Tool Output (PostToolUse)
+        summary: "PostToolUse output updatedMCPToolOutput field allows hooks to replace the MCP tool's response before it is returned to the model."
+        source_ref: "post-tool-use.command.output.schema.json (PostToolUseHookSpecificOutputWire.updatedMCPToolOutput)"
+        graduation_candidate: false
+        provider_field: "hookSpecificOutput.updatedMCPToolOutput"
+        conversion: translated
+    loading_model: >
+      Hooks are configured in the codex config.toml file under a top-level [hooks] section.
+      Six event types are supported: PreToolUse, PostToolUse, PermissionRequest, SessionStart,
+      UserPromptSubmit, and Stop — each maps to a list of MatcherGroup entries. Each MatcherGroup
+      has an optional matcher string (for tool-name filtering on pre/post events) and a list of
+      HookHandlerConfig entries. Each handler has a type (command, prompt, or agent) and
+      type-specific fields. Command handlers specify a shell command string, an optional timeout
+      in seconds, an async flag, and an optional status message. At runtime, the hooks engine
+      serializes a JSON payload conforming to the per-event JSON schema and pipes it to the
+      handler command's stdin. The command writes a JSON response to stdout conforming to the
+      output schema, which the engine reads to determine continue/abort/decision behavior and
+      optional system message injection. Hook state (enabled/trusted_hash) is tracked per-hook
+      in the [hooks.state] table.
+    notes: >
+      Codex's hook system is a full-featured lifecycle hook engine implemented in Rust
+      (codex-rs/hooks). In this update, a sixth hook event PermissionRequest was confirmed
+      in the HooksToml schema, schema_loader.rs (GeneratedHookSchemas struct), and
+      HookEventName.ts (now "preToolUse" | "permissionRequest" | "postToolUse" | "sessionStart"
+      | "userPromptSubmit" | "stop"). The json_io_protocol canonical mapping was corrected from
+      false to true — Codex clearly uses structured JSON stdin/stdout for all hook events, as
+      evidenced by the full JSON schemas for each event's input and output. A new provider
+      extension hook_updated_mcp_tool_output was added for the PostToolUse updatedMCPToolOutput
+      field, which allows hooks to replace MCP tool responses before they reach the model.
+      The types.rs source changed: it now defines the internal hook execution runtime types
+      (HookFn, HookPayload, HookEvent, HookResult, HookToolInput) rather than configuration
+      types; the HookResult tri-state enum (Success/FailedContinue/FailedAbort) remains as
+      documented. The schema_loader.rs source (previously empty hash) now has a real hash and
+      confirms all six generated schema pairs are loaded at init time via OnceLock.
+
+  mcp:
+    status: supported
+    sources:
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:81ea10c49d9b161ec8dfbf624103276ed71b41fb6dc21c1ba9151ec4b806fb88"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/docs/codex_mcp_interface.md"
+        type: documentation
+        fetch_method: gh_raw
+        content_hash: "sha256:b675b17bc4367d4d6701140e130fa8f9d9fcd52fc9f8fc92193bf867b5fe8854"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      transport_types:
+        supported: false
+        mechanism: "Codex MCP transport types not documented beyond basic MCP support; likely stdio only"
+        confidence: inferred
+      oauth_support:
+        supported: true
+        mechanism: "mcp_oauth_support: Codex supports OAuth 2.0 authentication for remote MCP servers"
+        confidence: confirmed
+      env_var_expansion:
+        supported: true
+        mechanism: "mcp_env_vars: Codex RawMcpServerConfig supports an env_vars array of McpServerEnvVar entries; each entry is either a plain string or a structured object with name and optional source fields enabling named environment variable sourcing"
+        confidence: confirmed
+      tool_filtering:
+        supported: true
+        mechanism: "mcp_enabled_disabled_tools: Codex supports per-server tool enable/disable configuration controlling which tools are exposed to the agent"
+        confidence: confirmed
+      auto_approve:
+        supported: true
+        mechanism: "mcp_per_tool_approval: Codex supports per-tool approval configuration to suppress confirmation prompts for trusted tools"
+        confidence: confirmed
+      marketplace:
+        supported: false
+        mechanism: "Codex does not have an in-IDE MCP marketplace"
+        confidence: confirmed
+      resource_referencing:
+        supported: false
+        mechanism: "Codex does not document MCP resource referencing"
+        confidence: inferred
+      enterprise_management:
+        supported: false
+        mechanism: "Codex does not document organization-level MCP management"
+        confidence: inferred
+    provider_extensions:
+      - id: mcp_servers_config
+        name: MCP Servers Config (config.toml mcp_servers)
+        summary: "MCP servers declared under mcp_servers in config.toml as RawMcpServerConfig entries (command/url, args, env, env_vars, http_headers, env_http_headers, OAuth, timeouts, enabled/disabled tools, bearer_token_env_var, supports_parallel_tool_calls)."
+        source_ref: "config.schema.json (RawMcpServerConfig, mcp_servers)"
+        graduation_candidate: false
+        provider_field: "mcp_servers"
+        conversion: translated
+      - id: mcp_per_tool_approval
+        name: Per-Tool Approval Mode
+        summary: "Each MCP server can set per-tool approval_mode via the tools map, overriding session-level approval policy for individual tools."
+        source_ref: "config.schema.json (McpServerToolConfig, AppToolApproval)"
+        graduation_candidate: false
+        provider_field: "tools.approval_mode"
+        conversion: translated
+      - id: mcp_oauth_support
+        name: MCP OAuth Support
+        summary: "OAuth fields mcp_oauth_callback_port, mcp_oauth_callback_url, and mcp_oauth_credentials_store (keyring/file/auto), plus per-server oauth_resource and scopes."
+        source_ref: "config.schema.json (mcp_oauth_callback_port, mcp_oauth_callback_url, mcp_oauth_credentials_store)"
+        graduation_candidate: false
+        provider_field: "mcp_oauth_credentials_store"
+        conversion: translated
+      - id: mcp_server_interface
+        name: Codex MCP Server Interface (codex mcp-server)
+        summary: "Codex exposes itself as an MCP server via `codex mcp-server` (JSON-RPC 2.0 over stdio). Primary v2 RPCs cover thread/turn/account/config/model/app/collaborationMode management. Approval requests (applyPatchApproval, execCommandApproval) flow server-to-client. Legacy v1 compatibility surface retained for existing clients. Experimental and subject to change."
+        source_ref: "codex_mcp_interface.md"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: mcp_enabled_disabled_tools
+        name: MCP Tool Allowlist and Blocklist
+        summary: "Per-server enabled_tools (allowlist) and disabled_tools (blocklist) arrays restrict which tools an MCP server exposes."
+        source_ref: "config.schema.json (RawMcpServerConfig.enabled_tools, disabled_tools)"
+        graduation_candidate: false
+        provider_field: "enabled_tools"
+        conversion: translated
+      - id: mcp_env_vars
+        name: MCP Server Environment Variable Sourcing
+        summary: "Per-server env_vars array of McpServerEnvVar entries; each is either a plain string (env var name to pass through) or a structured object {name, source} for named/sourced env var injection."
+        source_ref: "config.schema.json (RawMcpServerConfig.env_vars, McpServerEnvVar)"
+        graduation_candidate: false
+        provider_field: "env_vars"
+        conversion: translated
+    loading_model: >
+      MCP servers are declared in config.toml under the mcp_servers key. Each entry maps a
+      logical name to a RawMcpServerConfig that specifies either a stdio command (command + args)
+      or an HTTP/SSE URL. At session start, Codex launches or connects to each enabled server
+      and registers its tools. Servers with required: true cause the session to fail if they
+      are unreachable. Tool-level approval modes can be set per server via the tools map.
+      Environment variables can be injected via the env map (key→value) or the env_vars array
+      (plain string or structured {name, source} for env var sourcing). OAuth credentials are
+      managed separately via the mcp_oauth_credentials_store backend. The mcp subcommand manages
+      server configuration interactively; the mcp-server subcommand runs Codex itself as an MCP
+      endpoint for external clients.
+    notes: >
+      The config.schema.json is the authoritative source for MCP server configuration — it is
+      the same file used for agents configuration (shared config.toml). In this update, the
+      env_var_expansion canonical mapping was corrected from false to true: the new
+      RawMcpServerConfig schema includes an env_vars field accepting McpServerEnvVar entries
+      (either a plain string or a {name, source} structured object), confirming that env var
+      sourcing is supported. A new mcp_env_vars provider extension captures this. The
+      mcp_server_interface extension summary was expanded to reflect the now-documented v2 RPC
+      surface (thread/turn/account/config/model/app/collaborationMode) and the server-to-client
+      approval request flow. The codex_mcp_interface.md is now much more detailed than in the
+      previous fetch.
+
+  agents:
+    status: supported
+    sources:
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/config.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:81ea10c49d9b161ec8dfbf624103276ed71b41fb6dc21c1ba9151ec4b806fb88"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/agent/role.rs"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:65678857a29d95986fa2118b98eb8f71b8964a2049d9480edb166c10e0a98e28"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/agent/builtins/awaiter.toml"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:0e760708892f50ae3c6bcc0080e10276c8ac40e6f98bdd4924c3094ba5693f69"
+        fetched_at: "2026-04-11T21:50:08.816691781Z"
+    canonical_mappings:
+      definition_format:
+        supported: true
+        mechanism: "TOML role config files referenced from config.toml [agents] section; built-in roles (default/explorer/worker) always available without user config"
+        confidence: confirmed
+      tool_restrictions:
+        supported: false
+        mechanism: "role config layers override model/settings but no explicit tool allowlist or denylist in role definitions"
+        confidence: inferred
+      invocation_patterns:
+        supported: true
+        mechanism: "spawn-agent tool at LLM discretion; LLM selects role from dynamically-built role descriptions combining built-in and user-defined roles"
+        confidence: confirmed
+      agent_scopes:
+        supported: true
+        mechanism: "built-in roles always available; user-defined roles in config.toml [agents] section; user-defined roles override built-in roles of same name"
+        confidence: confirmed
+      model_selection:
+        supported: true
+        mechanism: "role config_file can override model and model_reasoning_effort; caller's current profile and model_provider preserved unless explicitly overridden"
+        confidence: confirmed
+      per_agent_mcp:
+        supported: false
+        mechanism: "MCP configuration is workspace-wide; no per-role MCP scoping mechanism"
+        confidence: inferred
+      subagent_spawning:
+        supported: true
+        mechanism: "multi-agent V2 feature flag; max_threads and max_concurrent_threads_per_session control concurrent agent count, max_depth controls nesting depth; spawn-agent tool initiates delegation"
+        confidence: confirmed
+    provider_extensions:
+      - id: agent_roles
+        name: Agent Roles (config.toml [agents] section)
+        summary: "Named sub-agent roles declared in config.toml [agents] (description, config_file, nickname_candidates) plus global limits (max_threads, max_depth, job_max_runtime_seconds, interrupt_message)."
+        source_ref: "config.schema.json (AgentsToml, AgentRoleToml), role.rs"
+        graduation_candidate: false
+        provider_field: "agents"
+        conversion: translated
+      - id: builtin_agent_roles
+        name: Built-in Agent Roles (default, explorer, worker)
+        summary: "Three built-in roles always available without config: default (standard), explorer (fast read-focused, low reasoning), and worker (execution); awaiter exists but is disabled."
+        source_ref: "role.rs (built_in::configs(), DEFAULT_ROLE_NAME, explorer, worker, awaiter)"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: role_config_layer
+        name: Role Config Layer
+        summary: "A role's config_file is loaded as a high-precedence config layer overriding model, reasoning effort, and developer instructions for that spawned agent."
+        source_ref: "role.rs (apply_role_to_config, apply_role_to_config_inner, preservation_policy)"
+        graduation_candidate: false
+        provider_field: "config_file"
+        conversion: not-portable
+      - id: multi_agent_v2
+        name: Multi-Agent V2 Feature Flag
+        summary: "Feature flag features.multi_agent_v2 (bool or object) gates the multi-agent system; object fields include enabled, hide_spawn_agent_metadata, max_concurrent_threads_per_session, min_wait_timeout_ms (1–3600000ms), usage_hint_enabled, usage_hint_text, root_agent_usage_hint_text, subagent_usage_hint_text."
+        source_ref: "config.schema.json (MultiAgentV2ConfigToml, FeatureToml_for_MultiAgentV2ConfigToml)"
+        graduation_candidate: false
+        provider_field: "features.multi_agent_v2"
+        conversion: not-portable
+      - id: spawn_tool_spec
+        name: Spawn Tool Role Description Generation
+        summary: "The spawn-agent tool description is built dynamically at session start from all role descriptions and locked settings; user roles override built-in roles by name."
+        source_ref: "role.rs (spawn_tool_spec::build, build_from_configs, format_role)"
+        graduation_candidate: false
+        conversion: not-portable
+    loading_model: >
+      Codex's multi-agent system uses a role-based spawning model. Roles are declared in
+      config.toml under [agents] as a map of role names to AgentRoleToml entries, alongside
+      global limits (max_threads, max_depth, job_max_runtime_seconds, interrupt_message).
+      Three built-in roles are always available: default, explorer, and worker. At spawn time,
+      the chosen role name is resolved first against user-defined roles, then built-in roles.
+      If the role specifies a config_file, that file is loaded as a high-precedence config layer,
+      potentially overriding model, reasoning effort, and developer instructions. The caller's
+      current profile and model_provider are preserved unless the role explicitly overrides them.
+      The multi-agent V2 feature must be enabled via features.multi_agent_v2. The spawn-agent
+      tool description is generated dynamically from all available role descriptions. Concurrent
+      thread limits can be controlled via max_threads (workspace-wide) and
+      max_concurrent_threads_per_session (per-session, in the multi_agent_v2 object config).
+    notes: >
+      Codex has a mature, production-grade multi-agent system with a role abstraction that is
+      more explicit and configurable than most other providers. In this update, AgentsToml gained
+      an interrupt_message boolean field (whether to record a model-visible message when an agent
+      turn is interrupted, defaults true). MultiAgentV2ConfigToml gained new fields:
+      max_concurrent_threads_per_session (per-session concurrent thread cap), min_wait_timeout_ms
+      (1–3600000ms), root_agent_usage_hint_text, and subagent_usage_hint_text. The awaiter role
+      (for monitoring long-running commands) remains commented out of the active built-in registry
+      in role.rs. The agents-3 source (explorer.toml) fetched as an empty file confirming it
+      exists but contains no config overrides — explorer's behavior is driven entirely by its
+      description text.
+
+  commands:
+    status: supported
+    sources:
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/docs/slash_commands.md"
+        type: documentation
+        fetch_method: gh_raw
+        content_hash: "sha256:0c063e80ca817a88bc7cd81c11669f73dad1941296142153bdac4dc08a733e69"
+        fetched_at: "2026-04-11T21:46:20.726110295Z"
+    canonical_mappings:
+      argument_substitution:
+        supported: false
+        mechanism: "no implementation details captured; only source is a redirect stub to external docs — cannot confirm argument substitution support"
+        confidence: unknown
+      builtin_commands:
+        supported: false
+        mechanism: "no implementation details captured; slash commands feature exists but format and capabilities are undocumented in cached sources"
+        confidence: unknown
+    provider_extensions: []
+    loading_model: >
+      The slash_commands.md source is a redirect stub pointing to the external Codex CLI docs
+      at developers.openai.com/codex/cli/slash-commands. No schema or implementation source
+      was captured in the cache. Based on the redirect, slash commands exist as a feature but
+      the format, registration mechanism, and config surface are not yet documented in the cache.
+      Commands are invoked by the user in the Codex CLI chat interface with a leading slash.
+    notes: >
+      The only cached source for commands (commands-0) is a 145-byte redirect pointing to the
+      external docs site — it contains no implementation details. The docs/slash_commands.md
+      file in the repository is itself a stub with no substantive content. No implementation
+      source files were captured. As a result, no provider_extensions can be documented with
+      confidence. The status is supported based on the existence of the slash commands docs
+      page and the docs/slash_commands.md file in the repo, but implementation details are
+      unknown. A follow-up fetch of the external docs URL
+      (https://developers.openai.com/codex/cli/slash-commands) would be needed to populate
+      this section fully.

@@ -1,0 +1,469 @@
+provider: cline
+docs_url: "https://docs.cline.bot"
+category: ide-extension
+last_fetched_at: "2026-05-06T00:00:00Z"
+last_changed_at: "2026-05-06T00:00:00Z"
+generation_method: subagent
+
+content_types:
+  skills:
+    status: supported
+    sources:
+      - uri: "https://docs.cline.bot/customization/skills.md"
+        type: documentation
+        fetch_method: md_url
+        content_hash: "sha256:976a101896fc0bbfc0573055d4f3ffecfc2ea833b7c10edcb64236b0d2de5500"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://docs.cline.bot/customization/skills"
+        type: documentation
+        fetch_method: readability
+        content_hash: "sha256:c6e0aa7e2d9bf93b4b5f4dc029a0432dac561a79a0fb5b52a6565a8d41204f1a"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      display_name:
+        supported: true
+        provider_field: "name"
+        mechanism: "yaml frontmatter key: name (required) — must exactly match the directory name"
+        confidence: confirmed
+      description:
+        supported: true
+        provider_field: "description"
+        extension_id: description_based_auto_invocation
+        mechanism: "yaml frontmatter key: description (required) — tells Cline when to use this skill, max 1024 characters"
+        confidence: confirmed
+      project_scope:
+        supported: true
+        mechanism: "Skills stored in .cline/skills/<name>/SKILL.md (recommended path)"
+        paths:
+          - ".cline/skills/<name>/SKILL.md"
+          - ".clinerules/skills/<name>/SKILL.md"
+          - ".claude/skills/<name>/SKILL.md"
+        confidence: confirmed
+      global_scope:
+        supported: true
+        mechanism: "Skills stored in ~/.cline/skills/<name>/SKILL.md (macOS/Linux)"
+        paths:
+          - "~/.cline/skills/<name>/SKILL.md"
+        confidence: confirmed
+      shared_scope:
+        supported: false
+        confidence: confirmed
+      canonical_filename:
+        supported: true
+        mechanism: "Fixed filename SKILL.md required inside a named skill directory"
+        confidence: confirmed
+      custom_filename:
+        supported: false
+        mechanism: "Not applicable — Cline uses fixed SKILL.md canonical filename only"
+        confidence: confirmed
+      disable_model_invocation:
+        supported: false
+        confidence: confirmed
+      user_invocable:
+        supported: false
+        confidence: confirmed
+      auto_invocable:
+        supported: true
+        extension_id: description_based_auto_invocation
+        mechanism: "Cline auto-invokes skills by matching user message against the description frontmatter field via the use_skill tool; no explicit @-mention syntax exists."
+        confidence: confirmed
+      skill_bundled_resources:
+        supported: true
+        mechanism: "Optional docs/, templates/, scripts/ subdirectories under SKILL.md are loaded on demand when the skill is invoked."
+        source_ref: "https://docs.cline.bot/customization/skills.md#bundling-supporting-files"
+        confidence: confirmed
+    # Optional extension depth fields (populated by capmon subagent):
+    # - required: true | false | null (null = source doesn't say)
+    # - value_type: see allow-list in formatdoc_validate.go
+    # - examples: [{title?, lang, code, note?}]
+    provider_extensions:
+      - id: supporting_files
+        name: Supporting Files in Skill Directory
+        summary: "Optional docs/, templates/, scripts/ subdirectories under SKILL.md, loaded on demand so source bytes never enter context."
+        source_ref: "https://docs.cline.bot/customization/skills.md#bundling-supporting-files"
+        graduation_candidate: false
+        graduation_notes: "Graduated to skill_bundled_resources canonical key (issue #74)."
+        conversion: not-portable
+      - id: description_based_auto_invocation
+        name: Description-Based Auto-Invocation via use_skill Tool
+        summary: "Cline auto-invokes skills by matching user message against the description field; no explicit @-mention syntax exists."
+        source_ref: "https://docs.cline.bot/customization/skills.md#how-skills-work"
+        graduation_candidate: false
+        graduation_notes: "Graduated to auto_invocable canonical key (issue #73)."
+        provider_field: "description"
+        conversion: not-portable
+      - id: skill_toggle
+        name: Per-Skill Enable/Disable Toggle
+        summary: "UI toggle to enable or disable each skill without deleting its directory."
+        source_ref: "https://docs.cline.bot/customization/skills.md#toggling-skills"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: global_precedence_over_project
+        name: Global Skill Takes Precedence Over Project Skill
+        summary: "On name collision, the global skill wins over the project skill — the inverse of typical scope-override behavior."
+        source_ref: "https://docs.cline.bot/customization/skills.md#where-skills-live"
+        graduation_candidate: false
+        conversion: not-portable
+    loading_model: >
+      Three-tier progressive loading: (1) Metadata — name and description from YAML
+      frontmatter loaded at startup (~100 tokens per skill, always active); (2) Instructions
+      — SKILL.md body loaded on demand when the use_skill tool is triggered (under 5k tokens
+      recommended); (3) Resources — bundled files in docs/, templates/, scripts/ subdirectories
+      accessed via read_file or script execution as needed (effectively unlimited, only output
+      enters context). Cline reads SKILL.md sequentially, so important information should be
+      front-loaded.
+    notes: "Skills is an experimental feature as of 2026-04. Must be enabled in Settings → Features → Enable Skills. The format doc predating this feature listed Skills as Not supported. Windows global path is C:\\Users\\USERNAME\\.cline\\skills\\."
+
+  rules:
+    status: supported
+    sources:
+      - uri: "https://docs.cline.bot/customization/cline-rules"
+        type: documentation
+        fetch_method: readability
+        content_hash: "sha256:7c2687a2da2a6981d9a1b2e2df33268af46a608f146c9077e4e135570762e488"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      activation_mode:
+        supported: true
+        mechanism: "conditional_rules_paths: Cline supports path-conditional rules alongside always-on rules; conditions use glob patterns"
+        confidence: confirmed
+      file_imports:
+        supported: false
+        mechanism: "No file import/include syntax documented for Cline rule files"
+        confidence: inferred
+      cross_provider_recognition:
+        supported: true
+        mechanism: "multi_source_rule_detection: Cline reads .clinerules/, .cursorrules, CLAUDE.md, and other provider rule files automatically"
+        confidence: confirmed
+      auto_memory:
+        supported: false
+        mechanism: "Cline does not have an AI-generated auto-memory system distinct from user-authored rules"
+        confidence: confirmed
+      hierarchical_loading:
+        supported: false
+        mechanism: "Cline rules are project-scoped or global; no per-subdirectory loading hierarchy documented"
+        confidence: inferred
+    provider_extensions:
+      - id: multi_source_rule_detection
+        name: Multi-Source Rule Detection
+        summary: "Cline auto-loads rule files from .cursorrules, .windsurfrules, and AGENTS.md alongside its own .clinerules/ directory."
+        source_ref: "https://docs.cline.bot/customization/cline-rules#supported-rule-types"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: rule_toggle
+        name: Per-Rule Enable/Disable Toggle
+        summary: "UI toggle in the Rules panel to enable or disable each rule file without deleting it."
+        source_ref: "https://docs.cline.bot/customization/cline-rules#toggling-rules"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: conditional_rules_paths
+        name: Conditional Rules via YAML Frontmatter paths
+        summary: "Gates rule activation to files matching a glob array; empty array disables, missing frontmatter is always-on."
+        source_ref: "https://docs.cline.bot/customization/cline-rules#conditional-rules"
+        graduation_candidate: true
+        provider_field: "paths"
+        conversion: embedded
+      - id: newrule_slash_command
+        name: /newrule Slash Command for Interactive Rule Creation
+        summary: "Built-in /newrule command guides the user through creating a .clinerules file interactively."
+        source_ref: "https://docs.cline.bot/customization/cline-rules#creating-rules"
+        graduation_candidate: false
+        conversion: not-portable
+    loading_model: >
+      All .md and .txt files inside .clinerules/ are processed and combined into a unified
+      rule set at task start. Numeric prefixes (e.g., 01-coding.md) are optional and used
+      for organization only. When both workspace (.clinerules/) and global rules exist, Cline
+      combines them with workspace rules taking precedence on conflict. Conditional rules with
+      YAML frontmatter are evaluated against current context and loaded only when a path
+      pattern matches. Rules consume context tokens on every request — Cline recommends
+      keeping rules concise and linking to external docs rather than embedding large
+      style guides.
+    notes: "Global rules directory is ~/Documents/Cline/Rules on macOS/Linux and Documents\\Cline\\Rules on Windows. Linux/WSL may also use ~/Cline/Rules. Workspace rules (.clinerules/) take precedence over global rules when they conflict."
+
+  hooks:
+    status: supported
+    sources:
+      - uri: "https://docs.cline.bot/customization/hooks"
+        type: documentation
+        fetch_method: http
+        content_hash: "sha256:a127d7a4123f8cf85f779b4242e8aeff257b8b86502e5b6bc062f5505acbc7e4"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      handler_types:
+        supported: false
+        mechanism: "Cline hooks execute shell commands only; no HTTP, LLM prompt, or agent handler types documented"
+        confidence: inferred
+      matcher_patterns:
+        supported: false
+        mechanism: "Cline hooks fire on configured lifecycle events; no per-tool pattern matching documented"
+        confidence: inferred
+      decision_control:
+        supported: true
+        mechanism: "pre_tool_use_cancellation: PreToolUse hooks can cancel (block) the tool invocation; no allow or modify sub-capabilities documented"
+        confidence: confirmed
+      input_modification:
+        supported: true
+        mechanism: "context_modification_output: Cline PreToolUse hooks can return modified context/input before tool execution"
+        confidence: confirmed
+      async_execution:
+        supported: false
+        mechanism: "Cline hooks run synchronously before/after tool events; no async execution documented"
+        confidence: inferred
+      hook_scopes:
+        supported: true
+        mechanism: "global_and_project_hooks: Cline supports global (user-wide) and project-level hook configuration"
+        confidence: confirmed
+      json_io_protocol:
+        supported: true
+        mechanism: "Hooks receive a JSON object via stdin (taskId, hookName, clineVersion, timestamp, workspaceRoots, userId, model, plus hook-specific fields) and return JSON to stdout with cancel (bool), contextModification (string), and errorMessage (string); debug output goes to stderr"
+        confidence: confirmed
+      context_injection:
+        supported: true
+        mechanism: "context_modification_output: Cline hooks can inject additional context into the agent's session via hook output"
+        confidence: confirmed
+      permission_control:
+        supported: false
+        mechanism: "Cline hooks can cancel tool invocations (decision_control) but cannot grant/deny tool availability"
+        confidence: inferred
+    provider_extensions:
+      - id: eight_hook_types
+        name: Eight Named Hook Types
+        summary: "Eight lifecycle hook types: TaskStart, TaskResume, TaskCancel, TaskComplete, PreToolUse, PostToolUse, UserPromptSubmit, PreCompact."
+        source_ref: "https://docs.cline.bot/customization/hooks#hook-types"
+        graduation_candidate: true
+        conversion: translated
+      - id: context_modification_output
+        name: contextModification Output Field for Injecting Conversation Context
+        summary: "Hook stdout JSON `contextModification` (string) injects text into the active conversation as runtime context."
+        source_ref: "https://docs.cline.bot/customization/hooks#context-modification"
+        graduation_candidate: true
+        provider_field: "contextModification"
+        conversion: embedded
+      - id: global_and_project_hooks
+        name: Global and Project Hook Scopes with Additive Execution
+        summary: "Global (~/Documents/Cline/Hooks) and project (.clinerules/hooks) hooks both run for the same event; global first, then workspace."
+        source_ref: "https://docs.cline.bot/customization/hooks#hook-locations"
+        graduation_candidate: true
+        conversion: not-portable
+      - id: platform_specific_file_format
+        name: Platform-Specific Hook File Format
+        summary: "Hook filenames are platform-sensitive: Windows uses <HookName>.ps1, macOS/Linux uses extensionless <HookName>; mismatches are silently skipped."
+        source_ref: "https://docs.cline.bot/customization/hooks#quick-start-your-first-hook"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: pre_tool_use_cancellation
+        name: PreToolUse Can Cancel Tool Execution Before It Happens
+        summary: "PreToolUse hooks block tool execution by returning `cancel: true` with an `errorMessage`; PostToolUse can stop the task but not undo the call."
+        source_ref: "https://docs.cline.bot/customization/hooks#pretooluse"
+        graduation_candidate: true
+        provider_field: "cancel"
+        conversion: embedded
+      - id: model_info_in_hook_input
+        name: Active Model Provider and Slug in Hook Input
+        summary: "Hook input JSON includes a `model` object with provider and slug, enabling model-aware logic in hook scripts."
+        source_ref: "https://docs.cline.bot/customization/hooks#input-structure"
+        graduation_candidate: true
+        provider_field: "model"
+        conversion: not-portable
+    loading_model: >
+      Hooks are executable scripts (bash/shell on macOS/Linux, PowerShell on Windows) invoked
+      by Cline at fixed lifecycle points. They receive a JSON object via stdin containing
+      taskId, hookName, clineVersion, timestamp (string ms since epoch), workspaceRoots
+      (array), userId, model (provider + slug), and a hook-specific field (e.g., preToolUse,
+      taskStart). They return JSON to stdout with cancel (bool), contextModification (string),
+      and errorMessage (string). Debug output must go to stderr. Hooks are discovered by
+      filename matching the hook type name in the hooks directory.
+    notes: >
+      CLI support: hooks can be enabled per-task via cline "..." -s hooks_enabled=true or
+      globally via cline config set hooks-enabled=true. The timestamp field is a string
+      (milliseconds since epoch), not a number — this is a migration note for older scripts.
+      workspaceRoots replaces the old singular workspacePath field.
+
+  mcp:
+    status: supported
+    sources:
+      - uri: "https://docs.cline.bot/mcp/configuring-mcp-servers"
+        type: documentation
+        fetch_method: http
+        content_hash: "sha256:eda2a0484ef5174a3653c427e2af14a6201dcd6be1f80b3d16233aaa9566bcbc"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://docs.cline.bot/mcp/mcp-transport-mechanisms"
+        type: documentation
+        fetch_method: readability
+        content_hash: "sha256:69dfa51966bd3bb4455bd7b17fa34b3a23afa2165245753b5ba6c417c3d52e12"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      transport_types:
+        supported: true
+        mechanism: "sse_transport_support: Cline supports SSE transport alongside stdio; HTTP transport support follows MCP protocol adoption"
+        confidence: confirmed
+      oauth_support:
+        supported: false
+        mechanism: "Cline MCP does not document OAuth 2.0 authentication for remote servers"
+        confidence: inferred
+      env_var_expansion:
+        supported: false
+        mechanism: "Cline MCP configuration does not document environment variable expansion syntax"
+        confidence: inferred
+      tool_filtering:
+        supported: true
+        mechanism: "always_allow_tools (visibility scope): Cline's always_allow list controls which MCP tools are exposed in the agent's available tool set without per-invocation prompts"
+        confidence: confirmed
+      auto_approve:
+        supported: true
+        mechanism: "always_allow_tools (execution-gating scope): Cline's always_allow list suppresses per-invocation confirmation prompts for listed tools that are already visible"
+        confidence: confirmed
+      marketplace:
+        supported: true
+        mechanism: "mcp_marketplace: Cline has an in-IDE MCP server discovery and installation experience"
+        confidence: confirmed
+      resource_referencing:
+        supported: false
+        mechanism: "Cline does not document @-mention or equivalent access to MCP resources"
+        confidence: inferred
+      enterprise_management:
+        supported: false
+        mechanism: "Cline does not document organization-level MCP configuration management"
+        confidence: inferred
+    provider_extensions:
+      - id: mcp_marketplace
+        name: Built-In MCP Marketplace for Server Discovery and Installation
+        summary: "In-IDE Marketplace UI for browsing and installing MCP servers directly from the MCP Servers panel."
+        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#finding-mcp-servers"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: ai_assisted_server_setup
+        name: AI-Assisted MCP Server Setup via Conversation
+        summary: "Conversational setup flow: paste a GitHub repo URL and Cline clones, builds, and configures the MCP server with clarifying questions."
+        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#adding-servers-with-cline"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: always_allow_tools
+        name: alwaysAllow List for Auto-Approving Specific MCP Tools
+        summary: "Per-server `alwaysAllow` array of tool names that execute without user confirmation; server-scoped, tool-name-specific."
+        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#stdio-transport-local-servers"
+        graduation_candidate: true
+        provider_field: "alwaysAllow"
+        conversion: translated
+      - id: global_mcp_mode
+        name: Global MCP Mode Setting for Token Usage Control
+        summary: "Global Cline>Mcp:Mode setting in Advanced MCP Settings that tunes token usage across all MCP servers."
+        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#global-mcp-mode"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: sse_transport_support
+        name: SSE Transport Support for Remote MCP Servers
+        summary: "SSE transport for remote MCP servers over HTTP/HTTPS, configured via `url` + optional `headers` instead of command/args."
+        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#sse-transport-remote-servers"
+        graduation_candidate: true
+        provider_field: "url"
+        conversion: translated
+      - id: stdio_vs_sse_deployment
+        name: "STDIO vs SSE: Per-User vs Centralized Deployment Model"
+        summary: "STDIO requires per-user installation with local resource use; SSE enables centralized single-server deployment serving multiple concurrent users over HTTP/HTTPS with server-side resource consumption."
+        source_ref: "https://docs.cline.bot/mcp/mcp-transport-mechanisms"
+        graduation_candidate: true
+        conversion: not-portable
+    loading_model: >
+      MCP server configuration is stored in cline_mcp_settings.json (edited via the MCP
+      Servers > Configure tab). STDIO servers are spawned as child processes (command + args
+      + env) using JSON-RPC 2.0 over newline-delimited stdin/stdout streams. SSE servers are
+      accessed over HTTP/HTTPS via a persistent connection for server-to-client events plus
+      separate POST requests for client-to-server messages. Both transports support an
+      alwaysAllow tool list and a disabled flag. Cline auto-detects available tools from
+      each connected server and surfaces them in chat. Per-server enable/disable toggles and
+      restart controls are available in the UI. Network timeout is configurable per server
+      (30s–1h, default 1 minute).
+    notes: "Config file is cline_mcp_settings.json. STDIO servers use command/args/env keys; SSE servers use url/headers keys. The disabled field can be set to true to deactivate without deleting. Windows requires PowerShell available on PATH for STDIO hook execution (hooks and MCP are separate, but same PowerShell dependency applies)."
+
+  commands:
+    status: supported
+    sources:
+      - uri: "https://docs.cline.bot/customization/workflows.md"
+        type: documentation
+        fetch_method: readability
+        content_hash: "sha256:b0366d5f0127c883589b4a77238e0c6c80965a25053d57b3771c189cf1ad95b5"
+        fetched_at: "2026-05-06T00:00:00Z"
+      - uri: "https://docs.cline.bot/core-workflows/using-commands"
+        type: documentation
+        fetch_method: http
+        content_hash: "sha256:b825b520ece51cb1df960fffadcf58b7b2a96028e64c20d42e71733f52f62d8a"
+        fetched_at: "2026-05-06T00:00:00Z"
+    canonical_mappings:
+      argument_substitution:
+        supported: false
+        mechanism: "Workflow markdown files are plain prompt templates with no documented argument-substitution placeholder (no {{args}} or equivalent)"
+        confidence: inferred
+      builtin_commands:
+        supported: true
+        mechanism: "Built-in slash commands (e.g., /newtask, /smol alias /compact, /newrule, /deep-planning, /explain-changes in VS Code, /reportbug) are hardcoded and not user-modifiable; user-authored workflows are additive, invoked alongside built-ins"
+        confidence: confirmed
+    provider_extensions:
+      - id: filename_as_command_name
+        name: Filename as Command Name (Workflows)
+        summary: "Markdown filenames under the workflows directory become the invocation trigger; users type /<filename>.md including the .md extension in chat."
+        source_ref: "https://docs.cline.bot/customization/workflows.md"
+        graduation_candidate: true
+        conversion: preserved
+      - id: two_scope_loading
+        name: Two-Scope Workflow Loading (Project and Global)
+        summary: "Project workflows in .clinerules/workflows/ and global workflows in ~/Documents/Cline/Workflows/ are both discovered; project scope wins on name collision."
+        source_ref: "https://docs.cline.bot/customization/workflows.md"
+        graduation_candidate: true
+        conversion: not-portable
+      - id: plain_markdown_body
+        name: Plain Markdown Instruction Body (No Frontmatter)
+        summary: "Workflow files have no documented frontmatter schema; the entire markdown body is instruction text for the agent to execute as a multi-step workflow."
+        source_ref: "https://docs.cline.bot/customization/workflows.md"
+        graduation_candidate: false
+        conversion: preserved
+      - id: xml_tool_syntax_in_workflows
+        name: XML Tool Syntax in Workflow Bodies
+        summary: "Workflow markdown bodies can include XML tool syntax (e.g., <execute_command>, <read_file>, <ask_followup_question>) for precise tool invocation control alongside natural language steps."
+        source_ref: "https://docs.cline.bot/customization/workflows.md"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: builtin_slash_commands
+        name: Built-In Slash Commands
+        summary: "Hardcoded slash commands including /newtask, /smol (alias /compact), /newrule, /deep-planning, /explain-changes (VS Code only), /reportbug; separate from user-authored workflows."
+        source_ref: "https://docs.cline.bot/core-workflows/using-commands#slash-commands"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: newtask_context_distillation
+        name: /newtask Context Distillation for Long Sessions
+        summary: "Built-in /newtask command AI-distills the current conversation's plan, files, and next steps into a fresh task with clean context."
+        source_ref: "https://docs.cline.bot/core-workflows/using-commands#newtask"
+        graduation_candidate: true
+        conversion: not-portable
+      - id: deep_planning_command
+        name: /deep-planning Four-Phase Implementation Planning
+        summary: "Built-in /deep-planning command runs investigate -> clarify -> plan -> task phases and writes implementation_plan.md to the workspace."
+        source_ref: "https://docs.cline.bot/core-workflows/using-commands#deep-planning"
+        graduation_candidate: true
+        conversion: not-portable
+    loading_model: >
+      Cline discovers user-authored workflows as plain markdown files in two locations:
+      .clinerules/workflows/ (project scope) and ~/Documents/Cline/Workflows/ (global scope).
+      Each file's basename becomes the invocation trigger — the user types /<filename>.md in
+      the chat input (extension included) to run the workflow. Workflow bodies are plain
+      markdown instructions with no frontmatter schema; Cline injects the body as a prompt
+      template when invoked. Workflows can combine natural language steps, XML tool syntax
+      (<execute_command>, <read_file>, <ask_followup_question>), CLI tool invocations, and
+      MCP tool calls. Workflows are not pre-loaded into context — they execute on demand.
+      Built-in slash commands (/newtask, /smol, /newrule, /deep-planning, /explain-changes
+      in VS Code, /reportbug) coexist with user workflows and are also accessible via the /
+      command picker.
+    notes: >
+      Global workflows path is ~/Documents/Cline/Workflows on macOS/Linux and maps to
+      %USERPROFILE%\\Documents\\Cline\\Workflows on Windows because Cline resolves the OS
+      Documents folder. Workflow files are plain markdown — no frontmatter schema is defined
+      and none is required. Invocation includes the .md extension (e.g., /deploy.md, not
+      /deploy). Project workflows take precedence over global workflows on name collision.
+      Built-in slash commands are not user-modifiable; /explain-changes is VS Code-only.
+
+  agents:
+    status: unsupported
+    sources: []
+    canonical_mappings: {}
+    provider_extensions: []
+    notes: "Cline ships read-only research subagents inside the harness but exposes no user-definable agent file format — there is no on-disk way to author custom agents with their own system prompts, tool restrictions, or scopes. Per syllago's provider-eligibility rule, harness-owned subagents do not count as native support for the agents content type. See docs/providers/cline/skills-agents.md for the full caveat."
