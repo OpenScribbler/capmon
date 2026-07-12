@@ -1,6 +1,7 @@
 package capmon
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/fs"
 	"os"
@@ -349,6 +350,72 @@ func TestExportTreeRealData(t *testing.T) {
 		pm := mustMap(t, pv)
 		if pm["status"] != "tracked" {
 			t.Errorf("provider %v status = %v, want \"tracked\"", pm["slug"], pm["status"])
+		}
+	}
+}
+
+// TestSpecArtifactsCopiedVerbatim stages the fixture tree with the committed
+// publish assets (docs/publish) and asserts every asset — each schema under
+// v1/schemas/ and v1/spec/field-semantics.md — lands byte-identical to its
+// committed source. The published schemas and spec are contract artifacts:
+// export copies them verbatim, it never regenerates them.
+func TestSpecArtifactsCopiedVerbatim(t *testing.T) {
+	assetsDir := filepath.Join(docsRoot(t), "docs", "publish")
+	opts := newExportFixture(t)
+	opts.PublishAssetsDir = assetsDir
+	dst := t.TempDir()
+	if err := writeExportTree(dst, opts); err != nil {
+		t.Fatalf("writeExportTree: %v", err)
+	}
+
+	seen := 0
+	found := make(map[string]bool)
+	err := filepath.WalkDir(assetsDir, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		rel, err := filepath.Rel(assetsDir, p)
+		if err != nil {
+			return err
+		}
+		src, err := os.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		staged, err := os.ReadFile(filepath.Join(dst, "v1", rel))
+		if err != nil {
+			t.Errorf("staged asset v1/%s missing: %v", filepath.ToSlash(rel), err)
+			return nil
+		}
+		if !bytes.Equal(src, staged) {
+			t.Errorf("staged v1/%s differs from committed docs/publish/%s", filepath.ToSlash(rel), filepath.ToSlash(rel))
+		}
+		seen++
+		found[filepath.ToSlash(rel)] = true
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("walk publish assets: %v", err)
+	}
+	if seen == 0 {
+		t.Fatalf("no publish assets found under %s", assetsDir)
+	}
+	// The acceptance-named artifacts must exist by their exact relative paths;
+	// without this the walk passes vacuously against an incomplete docs/publish.
+	for _, rel := range []string{
+		"schemas/provider-capabilities.json",
+		"schemas/all-providers.json",
+		"schemas/by-content-type.json",
+		"schemas/index.json",
+		"schemas/advisories.json",
+		"schemas/canonical-keys.json",
+		"spec/field-semantics.md",
+	} {
+		if !found[rel] {
+			t.Errorf("committed publish asset missing: docs/publish/%s", rel)
 		}
 	}
 }

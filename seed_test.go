@@ -40,9 +40,9 @@ func TestSeedProviderCapabilities_PreservesExclusive(t *testing.T) {
 	initial := `schema_version: "1"
 slug: test-provider
 provider_exclusive:
-  events:
-    - native_name: CustomEvent
-      description: a custom event
+  hooks.custom_event:
+    supported: true
+    mechanism: 'CustomEvent: a custom event'
 `
 	if err := os.WriteFile(filepath.Join(capsDir, "test-provider.yaml"), []byte(initial), 0644); err != nil {
 		t.Fatal(err)
