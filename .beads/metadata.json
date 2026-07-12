@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "capmon",
+  "project_id": "49116678-9e3e-4f3f-9d32-229879b406e5"
+}
