@@ -43,7 +43,7 @@ The [capmon](https://github.com/OpenScribbler/capmon) pipeline manages these fil
 | `capmon run --stage report` | Stages 3–4 only (reads cached data, creates PRs) |
 | `capmon seed --provider <slug>` | Bootstrap or re-seed a single provider's baseline |
 | `capmon verify` | Validate all YAML files against the schema |
-| `capmon generate` | Regenerate by-content-type views and spec tables |
+| `capmon generate` | Regenerate by-content-type views |
 
 ## Pausing the Pipeline
 
@@ -61,4 +61,4 @@ The `schema_version` field follows a strict evolution policy:
 - Current version: `"1"`
 - `capmon verify` validates files against the current schema
 - `capmon verify --migration-window` also accepts the immediately previous version (for gradual rollouts)
-- Never edit `schema.json` or `schema_version` without a corresponding change to the `ValidateAgainstSchema` function in `cli/internal/capmon/capyaml/validate.go`
+- Never edit `schema.json` or `schema_version` without a corresponding change to the `ValidateAgainstSchema` function in `capyaml/validate.go`

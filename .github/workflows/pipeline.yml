@@ -36,13 +36,30 @@ jobs:
   fetch-extract:
     name: Fetch + Extract (Stage 1-2)
     runs-on: ubuntu-latest
-    permissions: {}
+    # Stage 1 can propose heal PRs when a source fetch fails (reactive
+    # healing), so this job needs write access, a git identity, and the gh
+    # CLI (the chromedp container image ships without git or gh).
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     container:
       image: chromedp/headless-shell@sha256:01b37545a4e91a53ceb52e6f88ae1be375dbeb7e2148797d4b400989ea123d3a # 148.0.7778.97
       options: --shm-size=1gb
     outputs:
       artifact-sha256: ${{ steps.sha.outputs.sha256 }}
     steps:
+      - name: Install git, curl, and gh
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq ca-certificates curl git
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+            -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+            > /etc/apt/sources.list.d/github-cli.list
+          apt-get update -qq
+          apt-get install -y -qq gh
+
       - name: Checkout capmon
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -51,16 +68,19 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Install build tools
-        run: apt-get update -qq && apt-get install -y -qq ca-certificates
-
       - name: Build capmon
         run: go build -o capmon-bin ./cmd/capmon
+
+      - name: Configure git identity for heal branches
+        run: |
+          git config --global user.name "capmon-bot"
+          git config --global user.email "capmon-bot@users.noreply.github.com"
 
       - name: Run fetch-extract stage
         run: ./capmon-bin run --stage fetch-extract
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHROMEDP_URL: ""
 
       - name: Compute artifact SHA-256
@@ -136,6 +156,7 @@ jobs:
     needs: [fetch-extract, report]
     if: always()
     permissions:
+      contents: read
       issues: write
     steps:
       - name: Checkout capmon
@@ -172,6 +193,7 @@ jobs:
     name: Content Hash Check
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       issues: write
     steps:
       - name: Checkout capmon
@@ -189,11 +211,15 @@ jobs:
         if: ${{ github.event_name == 'schedule' || github.event.inputs.provider == '' }}
         run: ./capmon-bin check --all
         env:
+          # check gates its CI behavior (warning issues + dedup) on
+          # GITHUB_TOKEN; gh reads GH_TOKEN. Set both.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run capmon check (single provider)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.provider != '' }}
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CAPMON_PROVIDER: ${{ github.event.inputs.provider }}
           CAPMON_DRY_RUN: ${{ github.event.inputs.dry_run }}
