@@ -273,9 +273,10 @@ MUST ignore unknown fields and entries. On a freeze, the frozen entry gains
 ## Publish mechanics
 
 - **Primary trigger: push to `main` that changes `docs/`** (from `ci.yml`).
-  The daily pipeline run re-stamps freshness; it **skips deploy entirely
-  when `data_revision` is unchanged**, so the cron never churns bytes for
-  no reason.
+  The daily pipeline run re-stamps freshness and **always deploys** (ADR
+  0012): a data-identical export differs only in `v1/index.json`, and
+  shipping that one file daily is what makes `generated_at` a truthful
+  liveness heartbeat under the `max_staleness_hours` contract.
 - **Fail closed.** `capmon export` writes to a temp dir, validates every
   output file against the published schemas, and asserts the provider set
   matches the source manifest (count + slugs). Any deviation fails the job

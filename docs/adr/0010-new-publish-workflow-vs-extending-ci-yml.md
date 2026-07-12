@@ -1,7 +1,7 @@
 # 0010. New publish workflow vs extending ci.yml
 
 Date: 2026-07-12
-Status: Accepted
+Status: Superseded by ADR-0012
 Feature: publish-layer
 
 ## Context

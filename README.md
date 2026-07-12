@@ -130,9 +130,10 @@ through the Actions API so GitHub's 60-day-inactivity rule never disables the
 schedule — no scheduled job holds `contents` write on `main` (ADR 0005).
 
 `.github/workflows/publish.yml` exports the `/v1/` tree, attests it, and
-deploys it to GitHub Pages on any push to `main` under `docs/` (and re-runs
-the fail-closed gate daily, skipping the deploy when `data_revision` is
-unchanged).
+deploys it to GitHub Pages on any push to `main` under `docs/`. A daily cron
+re-runs the fail-closed gate and always deploys, so the re-stamped
+`generated_at` keeps the published index a truthful liveness heartbeat
+(ADR 0012); `data_revision` remains the change-detection signal.
 
 `.github/workflows/ci.yml` builds, vets, and tests on every push and PR.
 Drift-guard tests compare the recognizers and format docs against the data
