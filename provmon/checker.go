@@ -12,8 +12,14 @@ import (
 	"time"
 )
 
-// httpClient is overridable for tests.
-var httpClient = &http.Client{Timeout: 15 * time.Second}
+// httpClient is overridable for tests. It carries its own Transport rather
+// than sharing http.DefaultTransport: httptest.Server.Close (in parallel
+// tests of packages that use provmon) closes DefaultTransport's idle
+// connections, which can kill an in-flight request on a shared transport.
+var httpClient = &http.Client{
+	Timeout:   15 * time.Second,
+	Transport: http.DefaultTransport.(*http.Transport).Clone(),
+}
 
 // URLResult holds the outcome of checking a single URL.
 type URLResult struct {
