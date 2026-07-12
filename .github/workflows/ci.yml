@@ -29,10 +29,14 @@ jobs:
           fi
 
       - name: Legacy-name gate
-        # The working tree must not mention the old downstream project name.
-        # The pattern is split so this workflow file does not match itself.
+        # Code, workflows, and data must not mention the old downstream
+        # project name. Decision and design prose legitimately names it as
+        # the downstream CONSUMER (ADR 0004/0012, the design doc, lexicon,
+        # ship artifacts), so those paths are excluded. The pattern is split
+        # so this workflow file does not match itself.
         run: |
-          if grep -ri 'syl''lago' --exclude-dir=.git .; then
+          if grep -ri 'syl''lago' --exclude-dir=.git --exclude-dir=.ship \
+               --exclude-dir=adr --exclude-dir=design --exclude=lexicon.md .; then
             echo "legacy project name found in working tree (see matches above)"
             exit 1
           fi
