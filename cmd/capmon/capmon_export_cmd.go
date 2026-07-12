@@ -23,6 +23,13 @@ var exportCmd = &cobra.Command{
 	Use:   "export",
 	Short: "Export the deterministic /v1/ capability JSON tree",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		verify, _ := cmd.Flags().GetString("verify")
+		if verify != "" {
+			// Verify mode ignores --out entirely: no output tree is staged.
+			baseURL, _ := cmd.Flags().GetString("base-url")
+			return capmon.RunExportVerify(verify, baseURL)
+		}
+
 		out, _ := cmd.Flags().GetString("out")
 		sourceCommit, _ := cmd.Flags().GetString("source-commit")
 		generatedAt, _ := cmd.Flags().GetString("generated-at")
@@ -56,5 +63,7 @@ func init() {
 	exportCmd.Flags().String("out", "dist", "Output directory for the exported /v1/ tree")
 	exportCmd.Flags().String("source-commit", "", "Source commit SHA to embed in v1/index.json (omitted when empty)")
 	exportCmd.Flags().String("generated-at", "", "Pinned RFC 3339 UTC generated_at (Z offset); default: current time")
+	exportCmd.Flags().String("verify", "", "Verify the live published site against a rebuild of this commit (ignores --out)")
+	exportCmd.Flags().String("base-url", "https://openscribbler.github.io/capmon/", "Base URL of the published site to verify against")
 	capmonCmd.AddCommand(exportCmd)
 }

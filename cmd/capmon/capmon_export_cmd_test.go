@@ -1,8 +1,11 @@
 package main
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/OpenScribbler/capmon/internal/output"
@@ -113,6 +116,86 @@ func TestExportCmdFlags(t *testing.T) {
 		}
 		if _, err := os.Stat(filepath.Join(outDir, "v1", "index.json")); err != nil {
 			t.Errorf("export did not produce %s/v1/index.json: %v", outDir, err)
+		}
+	})
+}
+
+// TestExportVerifyFlagWiring proves the export subcommand's two-mode surface:
+// --verify <commit> switches to conformance-verification mode (RunExportVerify),
+// --base-url is passed through, --out is ignored, and normal export mode is
+// unaffected when --verify is absent. Mode switching is proven without a full
+// verify success: a --base-url pointed at a server that 404s everything makes
+// verify mode fail on the index fetch (an error naming the base URL), and the
+// --out dir is never created — the signature of export mode.
+func TestExportVerifyFlagWiring(t *testing.T) {
+	t.Run("--verify and --base-url flags registered", func(t *testing.T) {
+		if exportCmd.Flags().Lookup("verify") == nil {
+			t.Error("--verify flag not registered on export command")
+		}
+		baseURL := exportCmd.Flags().Lookup("base-url")
+		if baseURL == nil {
+			t.Fatal("--base-url flag not registered on export command")
+		}
+		if baseURL.DefValue != "https://openscribbler.github.io/capmon/" {
+			t.Errorf("--base-url default = %q, want %q", baseURL.DefValue, "https://openscribbler.github.io/capmon/")
+		}
+	})
+
+	t.Run("--verify routes to verify mode; --out ignored", func(t *testing.T) {
+		output.SetForTest(t)
+
+		// A server that 404s every path, so the first thing verify mode does —
+		// fetch v1/index.json — fails with an error that names the base URL.
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.NotFound(w, r)
+		}))
+		defer srv.Close()
+
+		outDir := filepath.Join(t.TempDir(), "should-not-exist")
+		exportCmd.Flags().Set("out", outDir)
+		exportCmd.Flags().Set("verify", "HEAD")
+		exportCmd.Flags().Set("base-url", srv.URL+"/")
+		defer func() {
+			exportCmd.Flags().Set("out", "dist")
+			exportCmd.Flags().Set("verify", "")
+			exportCmd.Flags().Set("base-url", "https://openscribbler.github.io/capmon/")
+		}()
+
+		err := exportCmd.RunE(exportCmd, []string{})
+		if err == nil {
+			t.Fatal("expected verify-mode fetch error against a 404 server, got nil")
+		}
+		// A verify-mode error names the base URL it failed to fetch. An
+		// export-mode error would instead complain about source dirs and never
+		// mention the httptest URL — this is what distinguishes the two modes.
+		if !strings.Contains(err.Error(), srv.URL) {
+			t.Errorf("error does not look like a verify-mode fetch failure naming %s: %v", srv.URL, err)
+		}
+		// --out is ignored in verify mode: no output tree is ever staged.
+		if _, statErr := os.Stat(outDir); !os.IsNotExist(statErr) {
+			t.Errorf("--out dir was created in verify mode (export ran instead of verify): %v", statErr)
+		}
+	})
+
+	t.Run("normal mode unaffected when --verify absent", func(t *testing.T) {
+		output.SetForTest(t)
+		setExportOverrides(t)
+
+		outDir := filepath.Join(t.TempDir(), "dist")
+		exportCmd.Flags().Set("out", outDir)
+		exportCmd.Flags().Set("generated-at", "2026-01-01T00:00:00Z")
+		exportCmd.Flags().Set("source-commit", "0000000000000000000000000000000000000000")
+		defer func() {
+			exportCmd.Flags().Set("out", "dist")
+			exportCmd.Flags().Set("generated-at", "")
+			exportCmd.Flags().Set("source-commit", "")
+		}()
+
+		if err := exportCmd.RunE(exportCmd, []string{}); err != nil {
+			t.Fatalf("normal export mode (no --verify) failed: %v", err)
+		}
+		if _, err := os.Stat(filepath.Join(outDir, "v1", "index.json")); err != nil {
+			t.Errorf("normal mode did not produce %s/v1/index.json: %v", outDir, err)
 		}
 	})
 }
