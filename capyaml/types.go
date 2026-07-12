@@ -10,9 +10,12 @@ type ProviderCapabilities struct {
 	SourceManifest  string `yaml:"source_manifest,omitempty"`
 	FormatReference string `yaml:"format_reference,omitempty"`
 	// References is auto-maintained by the pipeline. Maps reference ID → ReferenceEntry.
-	References        map[string]ReferenceEntry   `yaml:"references,omitempty"`
-	ContentTypes      map[string]ContentTypeEntry `yaml:"content_types"`
-	ProviderExclusive map[string]interface{}      `yaml:"provider_exclusive,omitempty"`
+	References   map[string]ReferenceEntry   `yaml:"references,omitempty"`
+	ContentTypes map[string]ContentTypeEntry `yaml:"content_types"`
+	// ProviderExclusive holds capabilities unique to this provider that do not
+	// map to a canonical key. Nodes are ordinary recursive CapabilityEntry trees,
+	// so graduating one to a canonical key is a data move, not a shape change.
+	ProviderExclusive map[string]CapabilityEntry `yaml:"provider_exclusive,omitempty"`
 }
 
 // ReferenceEntry tracks provenance for a source URL used in capability extraction.

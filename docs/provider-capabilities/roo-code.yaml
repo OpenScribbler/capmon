@@ -44,21 +44,6 @@ content_types:
         supported: true
         mechanism: 'yaml frontmatter key: name'
         confidence: confirmed
-      frontmatter_compatibility:
-        supported: true
-        mechanism: 'yaml key: compatibility'
-      frontmatter_description:
-        supported: true
-        mechanism: 'yaml key: description'
-      frontmatter_license:
-        supported: true
-        mechanism: 'yaml key: license'
-      frontmatter_metadata:
-        supported: true
-        mechanism: 'yaml key: metadata'
-      frontmatter_name:
-        supported: true
-        mechanism: 'yaml key: name'
       global_scope:
         supported: true
         mechanism: user-global ~/.roo/skills/ directory
@@ -75,3 +60,19 @@ content_types:
         supported: true
         mechanism: per-project .roo/skills/ directory
         confidence: confirmed
+provider_exclusive:
+  skills.frontmatter_compatibility:
+    supported: true
+    mechanism: 'yaml key: compatibility'
+  skills.frontmatter_description:
+    supported: true
+    mechanism: 'yaml key: description'
+  skills.frontmatter_license:
+    supported: true
+    mechanism: 'yaml key: license'
+  skills.frontmatter_metadata:
+    supported: true
+    mechanism: 'yaml key: metadata'
+  skills.frontmatter_name:
+    supported: true
+    mechanism: 'yaml key: name'

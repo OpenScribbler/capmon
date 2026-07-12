@@ -1,0 +1,68 @@
+{
+  "content_type": "agents",
+  "providers": {
+    "alpha": {
+      "capabilities": {
+        "invocation_patterns": {
+          "capabilities": {
+            "at_mention": {
+              "confidence": "inferred",
+              "mechanism": "@-mention syntax",
+              "supported": true
+            }
+          },
+          "key": {
+            "description": "How subagents are invoked.",
+            "spec_ref": "ACIF-AGENT §9.1 (DERIVABLE)",
+            "type": "object"
+          },
+          "key_path": "agents.invocation_patterns",
+          "supported": true
+        },
+        "model_selection": {
+          "confidence": "inferred",
+          "key": {
+            "description": "Per-agent model override.",
+            "spec_ref": "ACIF-AGENT §9.2 (DERIVABLE)",
+            "type": "bool"
+          },
+          "key_path": "agents.model_selection",
+          "mechanism": "per-subagent override",
+          "supported": false
+        }
+      },
+      "supported": true
+    },
+    "synthetic": {
+      "capabilities": {
+        "invocation_patterns": {
+          "capabilities": {
+            "slash_command": {
+              "supported": true
+            }
+          },
+          "key": {
+            "description": "How subagents are invoked.",
+            "spec_ref": "ACIF-AGENT §9.1 (DERIVABLE)",
+            "type": "object"
+          },
+          "key_path": "agents.invocation_patterns",
+          "refs": [
+            "spec_doc"
+          ],
+          "supported": true
+        }
+      },
+      "supported": true,
+      "tools": {
+        "search": {
+          "native": "grep_tool",
+          "refs": [
+            "spec_doc"
+          ]
+        }
+      }
+    }
+  },
+  "schema_version": "1"
+}

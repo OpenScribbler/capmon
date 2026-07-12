@@ -61,12 +61,79 @@ go build -o capmon ./cmd/capmon
 for rename/deprecation/URL drift; it finds `docs/provider-sources/` from the
 working directory, or point it elsewhere with `CAPMON_ROOT` or `--dir`.
 
+## Consuming the published data
+
+The `/v1/` contract tree is published to GitHub Pages at
+`https://openscribbler.github.io/capmon/`. It is a **live view of current
+data**, not an archive — the URL major (`/v1/`) versions the contract
+(document shapes, paths, field semantics), never the data.
+
+### Fetch flow
+
+1. `GET /index.json` (unversioned root) → read `latest` and the `majors`
+   array; follow the live major's `index` (`v1/index.json`).
+2. `GET /v1/index.json` → compare `data_revision` against your last-known
+   value. It is a hash over provider data only and changes **only when data
+   changes**, so "did anything change?" is one field compare. If unchanged,
+   you already have the current data.
+3. On a change, use the per-file `sha256` values under `providers[]` and
+   `files{}` to fetch only the documents that changed.
+4. Fetch each `capabilities/<slug>.json` (and any pivots you need).
+
+### Integrity — verify before use
+
+The `sha256` values in `index.json` are **change and corruption detection,
+not authenticity**: they share an origin and a fate with the files they
+hash. Authenticity comes from build-provenance attestation bound to the
+publishing workflow's identity.
+
+Integrity-sensitive consumers — anything that acts automatically on the
+data — **MUST** verify the attestation over `v1/index.json`, then each
+file's `sha256` against it, and **MUST fail closed**: any mismatch aborts
+the fetch and triggers nothing downstream.
+
+```bash
+gh attestation verify v1-index.json --repo OpenScribbler/capmon
+```
+
+### Staleness and polling
+
+- `v1/index.json` carries `generated_at`, `cadence: "daily"`, and
+  `max_staleness_hours`. If `generated_at` is older than
+  `max_staleness_hours`, treat the feed as stale and keep your
+  last-known-good copy. The feed is best-effort with no SLA.
+- Poll **at most daily**, and use HTTP conditional GET (`If-None-Match` /
+  `If-Modified-Since` — Pages serves ETags and returns `304`).
+- Deploys are not atomic at the CDN edge. On an `index.json`-vs-file hash
+  mismatch, re-fetch after the propagation window (minutes) before treating
+  it as an integrity failure.
+
+### Reading dispositions
+
+- `supported` **absent means unknown — never treat it as false.**
+  `"supported": true` is verified/inferred support (see `confidence`);
+  `"supported": false` is affirmatively not supported.
+- Treat every enum-valued field (`confidence`, `status`, `conversion`, …)
+  as **open**: an unrecognized value is "unknown/other", never an error.
+- Ignore unknown fields, unknown canonical keys, and unknown files —
+  producers may add any of these within a major.
+
+Field and canonical-key semantics are specified in
+`v1/spec/field-semantics.md`; the JSON Schemas live under `v1/schemas/`.
+
 ## CI
 
 `.github/workflows/pipeline.yml` runs the full pipeline daily against the
 data in this repo. Heal PRs and drift issues are opened here using the
-workflow's own `GITHUB_TOKEN`. Each scheduled run commits a heartbeat file
-so GitHub's 60-day-inactivity rule never disables the schedule.
+workflow's own `GITHUB_TOKEN`. A scheduled keepalive re-enables the workflow
+through the Actions API so GitHub's 60-day-inactivity rule never disables the
+schedule — no scheduled job holds `contents` write on `main` (ADR 0005).
+
+`.github/workflows/publish.yml` exports the `/v1/` tree, attests it, and
+deploys it to GitHub Pages on any push to `main` under `docs/`. A daily cron
+re-runs the fail-closed gate and always deploys, so the re-stamped
+`generated_at` keeps the published index a truthful liveness heartbeat
+(ADR 0012); `data_revision` remains the change-detection signal.
 
 `.github/workflows/ci.yml` builds, vets, and tests on every push and PR.
 Drift-guard tests compare the recognizers and format docs against the data

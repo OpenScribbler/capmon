@@ -1,0 +1,93 @@
+name: publish
+
+# Publishes the deterministic /v1/ contract tree to GitHub Pages with a
+# fail-closed export gate and build-provenance attestation (ADR 0004).
+#
+# The push trigger is the primary path: any change under docs/ on main
+# republishes. The daily cron re-runs the full gate and always deploys,
+# carrying the re-stamped generated_at so the published index doubles as a
+# liveness heartbeat under the 48h staleness contract (ADR 0012). Nothing
+# here holds contents: write — the source of truth only changes through
+# reviewed PRs on main (ADR 0005).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+  schedule:
+    # Daily at 09:00 UTC — offset from the pipeline cron (06:00) so the
+    # health-check publish runs after the day's fetch/report has settled.
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One in-flight Pages deploy at a time; never cancel a deploy mid-flight —
+# a half-applied deploy has no rollback.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Export, attest, and deploy to Pages
+    runs-on: ubuntu-latest
+    # Only ever run against main. push is already branch-filtered and schedule
+    # runs on the default branch, but workflow_dispatch can target any ref that
+    # carries this file — without this guard a manual dispatch from a topic
+    # branch could reach the deploy permissions below (ADR 0005 posture).
+    if: github.ref == 'refs/heads/main'
+    # The publish triad plus contents: read. Job-level permissions replace
+    # the top-level block entirely, so read access must be re-granted here —
+    # checkout and attest-build-provenance need it. No write scope beyond
+    # the triad ever reaches this job.
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      attestations: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # Full history so `git log -- docs/` can resolve the last commit
+          # that changed source data (never HEAD, which moves on every run).
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build capmon
+        run: go build -o capmon-bin ./cmd/capmon
+
+      - name: Resolve source commit
+        id: source
+        run: |
+          SOURCE_COMMIT=$(git log -1 --format=%H -- docs/)
+          echo "commit=${SOURCE_COMMIT}" >> "$GITHUB_OUTPUT"
+
+      - name: Export /v1/ tree (fail-closed gate)
+        run: ./capmon-bin export --out dist --source-commit "${{ steps.source.outputs.commit }}"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v4.0.0
+        with:
+          path: dist
+
+      - name: Attest build provenance over both discovery indexes
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        with:
+          subject-path: |
+            dist/index.json
+            dist/v1/index.json
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

@@ -1,0 +1,41 @@
+{
+  "content_type": "skills",
+  "providers": {
+    "alpha": {
+      "capabilities": {
+        "display_name": {
+          "confidence": "confirmed",
+          "key": {
+            "description": "Human-readable display name for the skill.",
+            "spec_ref": "ACIF-SKILL §10.2 (OUT-OF-SCOPE-AT-L1)",
+            "type": "string"
+          },
+          "key_path": "skills.display_name",
+          "mechanism": "frontmatter name field",
+          "supported": true
+        }
+      },
+      "supported": true
+    },
+    "synthetic": {
+      "capabilities": {
+        "compatibility": {
+          "capabilities": {
+            "claude_code": {
+              "supported": true
+            }
+          },
+          "key": {
+            "description": "Cross-provider skill compatibility.",
+            "spec_ref": "ACIF-SKILL §2.1 (DERIVABLE)",
+            "type": "object"
+          },
+          "key_path": "skills.compatibility",
+          "supported": true
+        }
+      },
+      "supported": true
+    }
+  },
+  "schema_version": "1"
+}

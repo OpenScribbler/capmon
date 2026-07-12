@@ -1,0 +1,149 @@
+{
+  "providers": {
+    "alpha": {
+      "content_types": {
+        "agents": {
+          "capabilities": {
+            "invocation_patterns": {
+              "capabilities": {
+                "at_mention": {
+                  "confidence": "inferred",
+                  "mechanism": "@-mention syntax",
+                  "supported": true
+                }
+              },
+              "key": {
+                "description": "How subagents are invoked.",
+                "spec_ref": "ACIF-AGENT §9.1 (DERIVABLE)",
+                "type": "object"
+              },
+              "key_path": "agents.invocation_patterns",
+              "supported": true
+            },
+            "model_selection": {
+              "confidence": "inferred",
+              "key": {
+                "description": "Per-agent model override.",
+                "spec_ref": "ACIF-AGENT §9.2 (DERIVABLE)",
+                "type": "bool"
+              },
+              "key_path": "agents.model_selection",
+              "mechanism": "per-subagent override",
+              "supported": false
+            }
+          },
+          "supported": true
+        },
+        "skills": {
+          "capabilities": {
+            "display_name": {
+              "confidence": "confirmed",
+              "key": {
+                "description": "Human-readable display name for the skill.",
+                "spec_ref": "ACIF-SKILL §10.2 (OUT-OF-SCOPE-AT-L1)",
+                "type": "string"
+              },
+              "key_path": "skills.display_name",
+              "mechanism": "frontmatter name field",
+              "supported": true
+            }
+          },
+          "supported": true
+        }
+      },
+      "display_name": "Alpha",
+      "last_verified": "2026-07-10",
+      "schema_version": "1",
+      "slug": "alpha",
+      "status": "live"
+    },
+    "synthetic": {
+      "content_types": {
+        "agents": {
+          "capabilities": {
+            "invocation_patterns": {
+              "capabilities": {
+                "slash_command": {
+                  "supported": true
+                }
+              },
+              "key": {
+                "description": "How subagents are invoked.",
+                "spec_ref": "ACIF-AGENT §9.1 (DERIVABLE)",
+                "type": "object"
+              },
+              "key_path": "agents.invocation_patterns",
+              "refs": [
+                "spec_doc"
+              ],
+              "supported": true
+            }
+          },
+          "supported": true,
+          "tools": {
+            "search": {
+              "native": "grep_tool",
+              "refs": [
+                "spec_doc"
+              ]
+            }
+          }
+        },
+        "hooks": {
+          "events": {
+            "pre_tool": {
+              "blocking": "deny",
+              "native_name": "PreToolUse",
+              "refs": [
+                "spec_doc"
+              ]
+            }
+          },
+          "supported": true
+        },
+        "skills": {
+          "capabilities": {
+            "compatibility": {
+              "capabilities": {
+                "claude_code": {
+                  "supported": true
+                }
+              },
+              "key": {
+                "description": "Cross-provider skill compatibility.",
+                "spec_ref": "ACIF-SKILL §2.1 (DERIVABLE)",
+                "type": "object"
+              },
+              "key_path": "skills.compatibility",
+              "supported": true
+            }
+          },
+          "supported": true
+        }
+      },
+      "display_name": "synthetic",
+      "provider_exclusive": {
+        "skills.custom_thing": {
+          "capabilities": {
+            "nested_detail": {
+              "supported": false
+            }
+          },
+          "confidence": "confirmed",
+          "mechanism": "bespoke skills loader",
+          "supported": true
+        }
+      },
+      "references": {
+        "spec_doc": {
+          "url": "https://example.com/spec",
+          "verified_at": "2026-01-02"
+        }
+      },
+      "schema_version": "1",
+      "slug": "synthetic",
+      "status": "live"
+    }
+  },
+  "schema_version": "1"
+}

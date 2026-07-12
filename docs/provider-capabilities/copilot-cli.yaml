@@ -69,10 +69,6 @@ content_types:
         supported: true
         mechanism: SKILL.md
         confidence: confirmed
-      cli_management:
-        supported: true
-        mechanism: skill management commands documented under 'Skills commands in the CLI' heading
-        confidence: inferred
       global_scope:
         supported: true
         mechanism: skill directory under ~/.copilot/skills/<name>/, ~/.claude/skills/<name>/, or ~/.agents/skills/<name>/
@@ -81,3 +77,8 @@ content_types:
         supported: true
         mechanism: skill directory under .github/skills/<name>/, .claude/skills/<name>/, or .agents/skills/<name>/ in project repository
         confidence: confirmed
+provider_exclusive:
+  skills.cli_management:
+    supported: true
+    mechanism: skill management commands documented under 'Skills commands in the CLI' heading
+    confidence: inferred

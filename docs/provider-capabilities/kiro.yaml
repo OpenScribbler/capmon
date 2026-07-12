@@ -90,35 +90,36 @@ content_types:
         supported: true
         mechanism: POWER.md (fixed, all caps)
         confidence: confirmed
-      directory_structure:
-        supported: true
-        mechanism: documented under 'Directory structure' heading
-        confidence: inferred
-      frontmatter:
-        supported: true
-        mechanism: 'documented under ''Frontmatter: When to activate'' heading'
-        confidence: inferred
-      mcp_integration:
-        supported: true
-        mechanism: documented under 'Adding MCP servers' heading
-        confidence: inferred
-      onboarding_instructions:
-        supported: true
-        mechanism: documented under 'Onboarding instructions' heading
-        confidence: inferred
       project_scope:
         supported: true
         mechanism: Self-contained directory installed via Kiro Powers panel (UI installation, no fixed filesystem path)
         confidence: confirmed
-      sharing:
-        supported: true
-        mechanism: documented under 'Sharing your power' heading
-        confidence: inferred
-      steering_instructions:
-        supported: true
-        mechanism: documented under 'Steering instructions' heading
-        confidence: inferred
-      testing:
-        supported: true
-        mechanism: documented under 'Testing locally' heading
-        confidence: inferred
+provider_exclusive:
+  skills.directory_structure:
+    supported: true
+    mechanism: documented under 'Directory structure' heading
+    confidence: inferred
+  skills.frontmatter:
+    supported: true
+    mechanism: 'documented under ''Frontmatter: When to activate'' heading'
+    confidence: inferred
+  skills.mcp_integration:
+    supported: true
+    mechanism: documented under 'Adding MCP servers' heading
+    confidence: inferred
+  skills.onboarding_instructions:
+    supported: true
+    mechanism: documented under 'Onboarding instructions' heading
+    confidence: inferred
+  skills.sharing:
+    supported: true
+    mechanism: documented under 'Sharing your power' heading
+    confidence: inferred
+  skills.steering_instructions:
+    supported: true
+    mechanism: documented under 'Steering instructions' heading
+    confidence: inferred
+  skills.testing:
+    supported: true
+    mechanism: documented under 'Testing locally' heading
+    confidence: inferred

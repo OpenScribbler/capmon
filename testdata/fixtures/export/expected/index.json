@@ -1,0 +1,10 @@
+{
+  "latest": "v1",
+  "majors": [
+    {
+      "index": "v1/index.json",
+      "prefix": "v1",
+      "status": "live"
+    }
+  ]
+}

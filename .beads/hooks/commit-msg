@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# ADR Immutability Hook (commit-msg)
+#
+# Blocks body edits to accepted or superseded ADRs. Allowed changes:
+#   - Whitespace-only
+#   - Frontmatter `status:` line
+#   - Body line additions matching "Superseded by ADR-NNNN"
+#   - Removal of isolated status keywords (Accepted, Proposed, Deprecated, Rejected)
+#
+# Bypass: include `ADR-EDIT-REASON: <reason>` anywhere in the commit message.
+#
+# Install: copy to .git/hooks/commit-msg, chmod +x.
+
+set -euo pipefail
+
+COMMIT_MSG_FILE="${1:-}"
+if [ -z "$COMMIT_MSG_FILE" ] || [ ! -f "$COMMIT_MSG_FILE" ]; then
+    exit 0
+fi
+
+# Staged modified files under docs/adr/NNNN-*.md
+adr_files=$(git diff --cached --name-only --diff-filter=M 2>/dev/null \
+    | grep -E '^docs/adr/[0-9]{4}-.*\.md$' || true)
+
+if [ -z "$adr_files" ]; then
+    exit 0
+fi
+
+violations=()
+
+while IFS= read -r file; do
+    [ -z "$file" ] && continue
+
+    # HEAD version (skip if file is new — diff-filter=M should exclude it, but be safe)
+    if ! git cat-file -e "HEAD:$file" 2>/dev/null; then
+        continue
+    fi
+
+    head_status=$(git show "HEAD:$file" 2>/dev/null \
+        | awk 'BEGIN{c=0} /^---[[:space:]]*$/{c++; next} c==1 && /^status:/{print; exit}' \
+        | sed -E 's/^status:[[:space:]]*//; s/[[:space:]]*$//' \
+        | tr -d '"'"'")
+
+    # Only enforce on accepted or superseded
+    case "$head_status" in
+        accepted) ;;
+        "superseded by"*) ;;
+        superseded) ;;
+        *) continue ;;
+    esac
+
+    # Walk the diff line-by-line; flag anything not in the allow-list
+    while IFS= read -r line; do
+        case "$line" in
+            ---*|+++*|@@*|"diff "*|"index "*|"new file"*|"deleted file"*|"rename "*|"similarity"*) continue ;;
+        esac
+
+        prefix="${line:0:1}"
+        content="${line:1}"
+
+        if [ "$prefix" != "+" ] && [ "$prefix" != "-" ]; then
+            continue
+        fi
+
+        # Whitespace only
+        stripped=$(printf '%s' "$content" | tr -d '[:space:]')
+        if [ -z "$stripped" ]; then
+            continue
+        fi
+
+        # Frontmatter status line
+        if printf '%s' "$content" | grep -qE '^status:[[:space:]]'; then
+            continue
+        fi
+
+        # Added body link to successor
+        if [ "$prefix" = "+" ] && printf '%s' "$content" | grep -qiE 'Superseded by ADR-[0-9]{4}'; then
+            continue
+        fi
+
+        # Isolated status keyword (allows body "## Status" section transitions)
+        case "$stripped" in
+            Accepted|Proposed|Deprecated|Rejected|Superseded) continue ;;
+        esac
+
+        violations+=("$file: $line")
+    done < <(git diff --cached HEAD --unified=0 -- "$file")
+
+done <<< "$adr_files"
+
+if [ ${#violations[@]} -eq 0 ]; then
+    exit 0
+fi
+
+# Bypass check: ADR-EDIT-REASON anywhere in the commit message
+if grep -qE '^[[:space:]]*ADR-EDIT-REASON:' "$COMMIT_MSG_FILE"; then
+    exit 0
+fi
+
+{
+    echo "ERROR: Accepted ADRs are immutable."
+    echo
+    echo "Body changes detected on accepted or superseded ADRs:"
+    for v in "${violations[@]}"; do
+        echo "  $v"
+    done
+    echo
+    echo "To change a decision, create a supersession ADR:"
+    echo "  /adr supersede NNNN \"New Decision Title\""
+    echo
+    echo "If this edit is a genuine typo or formatting fix, add a trailer to your"
+    echo "commit message:"
+    echo "  ADR-EDIT-REASON: <brief reason>"
+} >&2
+
+exit 1

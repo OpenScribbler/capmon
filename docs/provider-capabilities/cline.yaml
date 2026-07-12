@@ -61,47 +61,48 @@ content_types:
   skills:
     supported: true
     capabilities:
-      bundled_files:
-        supported: true
-        mechanism: documented under 'Bundling Supporting Files' heading
-        confidence: inferred
       canonical_filename:
         supported: true
         mechanism: SKILL.md
         confidence: confirmed
-      creation_workflow:
-        supported: true
-        mechanism: documented under 'Creating a Skill' heading
-        confidence: inferred
-      description_guidance:
-        supported: true
-        mechanism: documented under 'Writing Effective Descriptions' heading
-        confidence: inferred
-      directory_structure:
-        supported: true
-        mechanism: documented under 'Skill Structure' heading
-        confidence: inferred
-      file_references:
-        supported: true
-        mechanism: documented under 'Referencing Bundled Files' heading
-        confidence: inferred
-      frontmatter:
-        supported: true
-        mechanism: frontmatter format documented under 'Writing Your SKILL.md' heading
-        confidence: inferred
       global_scope:
         supported: true
         mechanism: Skills stored in ~/.cline/skills/<name>/SKILL.md
         confidence: confirmed
-      naming_conventions:
-        supported: true
-        mechanism: documented under 'Naming Conventions' heading
-        confidence: inferred
       project_scope:
         supported: true
         mechanism: Skills stored in .cline/skills/<name>/SKILL.md (recommended), .clinerules/skills/<name>/SKILL.md, or .claude/skills/<name>/SKILL.md
         confidence: confirmed
-      toggling:
-        supported: true
-        mechanism: per-skill enable/disable documented under 'Toggling Skills' heading
-        confidence: inferred
+provider_exclusive:
+  skills.bundled_files:
+    supported: true
+    mechanism: documented under 'Bundling Supporting Files' heading
+    confidence: inferred
+  skills.creation_workflow:
+    supported: true
+    mechanism: documented under 'Creating a Skill' heading
+    confidence: inferred
+  skills.description_guidance:
+    supported: true
+    mechanism: documented under 'Writing Effective Descriptions' heading
+    confidence: inferred
+  skills.directory_structure:
+    supported: true
+    mechanism: documented under 'Skill Structure' heading
+    confidence: inferred
+  skills.file_references:
+    supported: true
+    mechanism: documented under 'Referencing Bundled Files' heading
+    confidence: inferred
+  skills.frontmatter:
+    supported: true
+    mechanism: frontmatter format documented under 'Writing Your SKILL.md' heading
+    confidence: inferred
+  skills.naming_conventions:
+    supported: true
+    mechanism: documented under 'Naming Conventions' heading
+    confidence: inferred
+  skills.toggling:
+    supported: true
+    mechanism: per-skill enable/disable documented under 'Toggling Skills' heading
+    confidence: inferred

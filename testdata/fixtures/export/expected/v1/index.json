@@ -1,0 +1,74 @@
+{
+  "cadence": "daily",
+  "data_revision": "9bed42972791aa2eae575e9c4c21fccd033eeae0b521d085758d66bb4592ec6d",
+  "files": {
+    "advisories.json": {
+      "sha256": "deddbb22674d330c52383b1fc7022118e76d597abca1b7fb69e446151b352851"
+    },
+    "by-content-type/agents.json": {
+      "sha256": "be876ee02bf53829f443d16f8b150ff808eda750f4000ae454fe38247ea2c4e9"
+    },
+    "by-content-type/commands.json": {
+      "sha256": "12534c2ec097dbfce763265c9e1cd3d6ee5b0642e773face25cb785130e5ad90"
+    },
+    "by-content-type/hooks.json": {
+      "sha256": "160e3117bbf238d9513ebb76aa38c1f83ffd953d756ac765df90a3f34ebd6b51"
+    },
+    "by-content-type/mcp.json": {
+      "sha256": "286662339f78623676096071e37690ef21f1d1517bff65f74262cde8714f7ddf"
+    },
+    "by-content-type/rules.json": {
+      "sha256": "00f5a77a51030a5ceff31a82707c51f59cde372fb349919ee118b2b0f975eff1"
+    },
+    "by-content-type/skills.json": {
+      "sha256": "eb9459c9acbee3c2593469410c2a791c9ecfe3af0652031c528a6c8ea0c86e8f"
+    },
+    "capabilities/all.json": {
+      "sha256": "9bed42972791aa2eae575e9c4c21fccd033eeae0b521d085758d66bb4592ec6d"
+    },
+    "schemas/advisories.json": {
+      "sha256": "dbd838d3b788a32875591a4397b775d0db80bb38b39e1bbb40d57ac72a2664c0"
+    },
+    "schemas/all-providers.json": {
+      "sha256": "d5fcadb994af29d9cc0dbaa7a3d95663eabe4fb949afda66d7739f7d0748bb9b"
+    },
+    "schemas/by-content-type.json": {
+      "sha256": "52946e1ac3e3fd9c33045186e24a3c5357c49dc2467d66703adae5d91eb2b6d9"
+    },
+    "schemas/canonical-keys.json": {
+      "sha256": "e0c293be6f75b1018e2b99fe5e8f78f7bb7ae4598d5a88a38824c510c91def38"
+    },
+    "schemas/index.json": {
+      "sha256": "7030a7fc064eedf1b1366fcea88ba383b0d3578fb2ab4a1fb4d4ca4df665a916"
+    },
+    "schemas/provider-capabilities.json": {
+      "sha256": "72ffa98d3e40a89c072af6ee7fff204fb63fc1b7569ee8cf726d5a7830233d65"
+    },
+    "spec/canonical-keys.json": {
+      "sha256": "2224ad6005678f8af2b608689c6af8973fb9ce697de94c6bf6e5082dd3ede379"
+    },
+    "spec/field-semantics.md": {
+      "sha256": "2f10a4853cc7c0171359d321a502760fc29a42e543f254983506004b649512bb"
+    }
+  },
+  "generated_at": "2026-01-01T00:00:00Z",
+  "max_staleness_hours": 48,
+  "providers": [
+    {
+      "last_verified": "2026-07-10",
+      "path": "capabilities/alpha.json",
+      "sha256": "ba53a1e876979aba7c87a2eed008dc70576870827eef9f2a0032a42b142b0082",
+      "slug": "alpha",
+      "status": "tracked"
+    },
+    {
+      "path": "capabilities/synthetic.json",
+      "sha256": "f237b0c66dbf9277ff152ec0e802918f73149944fa778b3d867bb9764602f3cd",
+      "slug": "synthetic",
+      "status": "tracked"
+    }
+  ],
+  "schema_version": "1",
+  "source_commit": "0000000000000000000000000000000000000000",
+  "status": "live"
+}
