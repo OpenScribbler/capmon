@@ -46,6 +46,11 @@ func writeExportTree(dst string, opts ExportOptions) error {
 	staged := map[string][]byte{}
 
 	stage := func(rel string, doc map[string]any) error {
+		// rel embeds source-data values (provider slugs, registry content
+		// types); a path-traversal value must fail closed before any write.
+		if !filepath.IsLocal(filepath.FromSlash(rel)) {
+			return fmt.Errorf("staged path %q escapes the export tree", rel)
+		}
 		b, err := canonicalJSON(doc)
 		if err != nil {
 			return err

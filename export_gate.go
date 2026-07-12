@@ -204,6 +204,7 @@ func sourceManifestSlugs(sourcesDir string) ([]string, error) {
 		return nil, fmt.Errorf("read source manifests dir: %w", err)
 	}
 	var slugs []string
+	seen := map[string]string{}
 	for _, e := range entries {
 		name := e.Name()
 		if e.IsDir() || filepath.Ext(name) != ".yaml" || name == "_template.yaml" {
@@ -219,9 +220,16 @@ func sourceManifestSlugs(sourcesDir string) ([]string, error) {
 		if err := yaml.Unmarshal(data, &m); err != nil {
 			return nil, fmt.Errorf("parse source manifest %s: %w", name, err)
 		}
-		if m.Slug != "" {
-			slugs = append(slugs, m.Slug)
+		if m.Slug == "" {
+			continue
 		}
+		// Two manifests with one slug would collapse into a single set member
+		// and slip past the count check — fail closed instead.
+		if prev, dup := seen[m.Slug]; dup {
+			return nil, fmt.Errorf("duplicate source manifest slug %q in %s and %s", m.Slug, prev, name)
+		}
+		seen[m.Slug] = name
+		slugs = append(slugs, m.Slug)
 	}
 	return slugs, nil
 }

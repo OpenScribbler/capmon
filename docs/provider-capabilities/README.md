@@ -9,7 +9,6 @@ docs/provider-capabilities/
 ├── <slug>.yaml              # Per-provider capability baseline (one file per provider)
 ├── by-content-type/         # Generated views grouped by content type (do not edit)
 ├── compatibility-matrix.md  # Human-readable summary matrix (maintained by hand)
-├── schema.json              # JSON Schema for validating *.yaml files
 └── README.md                # This file
 ```
 
@@ -61,4 +60,5 @@ The `schema_version` field follows a strict evolution policy:
 - Current version: `"1"`
 - `capmon verify` validates files against the current schema
 - `capmon verify --migration-window` also accepts the immediately previous version (for gradual rollouts)
-- Never edit `schema.json` or `schema_version` without a corresponding change to the `ValidateAgainstSchema` function in `capyaml/validate.go`
+- Never change `schema_version` semantics without a corresponding change to the `ValidateAgainstSchema` function in `capyaml/validate.go`
+- There is no source-side JSON Schema file: the machine-enforced contract lives in the published schemas under `docs/publish/schemas/` (ADR 0011)

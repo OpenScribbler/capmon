@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -122,4 +123,72 @@ func TestRunExportFailClosedPreservesOut(t *testing.T) {
 		requireStructured(t, err, "EXPORT_003")
 		assertSentinelUntouched(t, outDir, before)
 	})
+}
+
+// TestRunExportTrailingSeparatorOutDir pins the OutDir normalization: with a
+// trailing separator, filepath.Dir would otherwise resolve the parent to
+// OutDir itself, staging the temp dir inside the live tree and making the
+// final rename target its own child.
+func TestRunExportTrailingSeparatorOutDir(t *testing.T) {
+	outDir, _ := sentinelOutDir(t)
+
+	opts := committedFixtureOpts(t)
+	opts.OutDir = outDir + string(os.PathSeparator)
+	opts.GeneratedAt = "2026-01-01T00:00:00Z"
+	if err := RunExport(opts); err != nil {
+		t.Fatalf("RunExport with trailing-separator OutDir: %v", err)
+	}
+
+	got := readFileBytes(t, filepath.Join(outDir, "v1", "index.json"))
+	if bytes.Contains(got, []byte("SENTINEL")) {
+		t.Error("OutDir still holds the sentinel site after a successful export")
+	}
+}
+
+// TestReplaceOutDirRestoresOnRenameFailure covers the one window where the
+// atomic-replace contract could break: the old tree has been renamed aside and
+// the stage→OutDir rename then fails. The old tree must come back.
+func TestReplaceOutDirRestoresOnRenameFailure(t *testing.T) {
+	outDir, before := sentinelOutDir(t)
+	parent := filepath.Dir(outDir)
+
+	err := replaceOutDir(filepath.Join(parent, "no-such-stage"), outDir, parent)
+	if err == nil {
+		t.Fatal("replaceOutDir with a missing staging dir: want error, got nil")
+	}
+	assertSentinelUntouched(t, outDir, before)
+}
+
+// escapingSlugBaseline is a loadable baseline whose slug is a path-traversal
+// value; staging must fail closed before any byte is written outside the
+// staging tree.
+const escapingSlugBaseline = `schema_version: "1"
+slug: ../../../../escape
+display_name: Escape
+`
+
+// TestRunExportEscapingSlugFailsClosed proves a traversal slug can never write
+// outside the staging tree or touch a pre-existing OutDir.
+func TestRunExportEscapingSlugFailsClosed(t *testing.T) {
+	base := committedFixtureOpts(t)
+
+	corruptCaps := t.TempDir()
+	if err := os.WriteFile(filepath.Join(corruptCaps, "escape.yaml"), []byte(escapingSlugBaseline), 0644); err != nil {
+		t.Fatalf("write escaping baseline: %v", err)
+	}
+	outDir, before := sentinelOutDir(t)
+
+	opts := ExportOptions{
+		CapsDir:           corruptCaps,
+		CanonicalKeysPath: base.CanonicalKeysPath,
+		SourcesDir:        base.SourcesDir,
+		PublishAssetsDir:  base.PublishAssetsDir,
+		OutDir:            outDir,
+		GeneratedAt:       "2026-01-01T00:00:00Z",
+	}
+	err := RunExport(opts)
+	if err == nil || !strings.Contains(err.Error(), "escapes the export tree") {
+		t.Fatalf("RunExport with escaping slug: want staging-escape error, got %v", err)
+	}
+	assertSentinelUntouched(t, outDir, before)
 }

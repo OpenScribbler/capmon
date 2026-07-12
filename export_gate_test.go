@@ -177,3 +177,19 @@ func TestFreezeFieldsOptionalFromLaunch(t *testing.T) {
 		t.Fatalf("validateExportTree with freeze fields present: %v", err)
 	}
 }
+
+// TestSourceManifestDuplicateSlugFailsClosed: two manifests declaring one slug
+// would collapse into a single set member and slip past the count check, so
+// the gate must reject the sources dir itself.
+func TestSourceManifestDuplicateSlugFailsClosed(t *testing.T) {
+	dir := writeSourceManifests(t, "alpha")
+	dup := "schema_version: \"1\"\nslug: alpha\n"
+	if err := os.WriteFile(filepath.Join(dir, "alpha-copy.yaml"), []byte(dup), 0644); err != nil {
+		t.Fatalf("write duplicate manifest: %v", err)
+	}
+
+	err := assertProviderSet([]string{"alpha"}, dir)
+	if err == nil || !strings.Contains(err.Error(), "duplicate source manifest slug") {
+		t.Fatalf("assertProviderSet with duplicate manifest slugs: want duplicate error, got %v", err)
+	}
+}

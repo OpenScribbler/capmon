@@ -33,6 +33,11 @@ jobs:
   publish:
     name: Export, attest, and deploy to Pages
     runs-on: ubuntu-latest
+    # Only ever run against main. push is already branch-filtered and schedule
+    # runs on the default branch, but workflow_dispatch can target any ref that
+    # carries this file — without this guard a manual dispatch from a topic
+    # branch could reach the deploy permissions below (ADR 0005 posture).
+    if: github.ref == 'refs/heads/main'
     # The publish triad plus contents: read. Job-level permissions replace
     # the top-level block entirely, so read access must be re-granted here —
     # checkout and attest-build-provenance need it. No write scope beyond

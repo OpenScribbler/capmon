@@ -1,6 +1,7 @@
 package capmon
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,6 +30,10 @@ func RunExport(opts ExportOptions) error {
 	if opts.OutDir == "" {
 		opts.OutDir = "dist"
 	}
+	// Clean strips any trailing separator so Dir below yields the true parent —
+	// "dist/" would otherwise stage the temp dir inside the live tree it is
+	// about to replace, and the final rename would target its own child.
+	opts.OutDir = filepath.Clean(opts.OutDir)
 	if opts.GeneratedAt == "" {
 		// The only permitted time.Now() in the export path; confined to
 		// v1/index.json via buildV1Index.
@@ -108,6 +113,14 @@ func replaceOutDir(stageDir, outDir, parent string) error {
 	}
 
 	if err := os.Rename(stageDir, outDir); err != nil {
+		if oldDir != "" {
+			// The aside rename just succeeded on the same filesystem, so the
+			// restore should too; if even that fails, name both errors — the
+			// old tree is still intact under oldDir.
+			if rerr := os.Rename(oldDir, outDir); rerr != nil {
+				return fmt.Errorf("replace %s failed (%v) and restoring the previous tree from %s also failed: %w", outDir, err, oldDir, rerr)
+			}
+		}
 		return err
 	}
 	if oldDir != "" {

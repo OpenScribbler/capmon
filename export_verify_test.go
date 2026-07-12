@@ -1,6 +1,7 @@
 package capmon
 
 import (
+	"archive/tar"
 	"bytes"
 	"net/http"
 	"net/http/httptest"
@@ -193,5 +194,37 @@ func TestExportVerifyMismatchFailsClosed(t *testing.T) {
 	se := requireStructured(t, err, "EXPORT_004")
 	if !strings.Contains(se.Message, "synthetic.json") {
 		t.Errorf("EXPORT_004 does not name the divergent file synthetic.json: %v", se)
+	}
+}
+
+// TestExtractTarRejectsEscapingEntry pins the extractor's own traversal guard:
+// git archive of a committed tree can't emit such an entry, but the extractor
+// must reject one regardless of where the stream came from.
+func TestExtractTarRejectsEscapingEntry(t *testing.T) {
+	var buf bytes.Buffer
+	tw := tar.NewWriter(&buf)
+	body := []byte("evil")
+	if err := tw.WriteHeader(&tar.Header{
+		Name:     "../evil.txt",
+		Typeflag: tar.TypeReg,
+		Mode:     0644,
+		Size:     int64(len(body)),
+	}); err != nil {
+		t.Fatalf("write tar header: %v", err)
+	}
+	if _, err := tw.Write(body); err != nil {
+		t.Fatalf("write tar body: %v", err)
+	}
+	if err := tw.Close(); err != nil {
+		t.Fatalf("close tar writer: %v", err)
+	}
+
+	dst := t.TempDir()
+	err := extractTar(&buf, dst)
+	if err == nil || !strings.Contains(err.Error(), "escapes the extraction dir") {
+		t.Fatalf("extractTar with ../ entry: want escape error, got %v", err)
+	}
+	if _, statErr := os.Stat(filepath.Join(filepath.Dir(dst), "evil.txt")); !os.IsNotExist(statErr) {
+		t.Errorf("escaping tar entry was written outside the extraction dir (stat: %v)", statErr)
 	}
 }

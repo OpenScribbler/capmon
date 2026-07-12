@@ -20,6 +20,11 @@ import (
 // server can never wedge the verifier.
 const verifyHTTPTimeout = 30 * time.Second
 
+// verifyMaxBodyBytes caps every fetched body so a misbehaving endpoint can
+// never balloon the verifier's memory; the largest published document is
+// orders of magnitude smaller.
+const verifyMaxBodyBytes = 64 << 20
+
 // RunExportVerify rebuilds the /v1/ tree from a source commit and diffs it
 // byte-for-byte against the live published site under baseURL, returning nil on
 // total byte-identity and EXPORT_004 naming the first divergent path otherwise.
@@ -124,7 +129,14 @@ func verifyFetch(client *http.Client, url string) ([]byte, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status %s", resp.Status)
 	}
-	return io.ReadAll(resp.Body)
+	b, err := io.ReadAll(io.LimitReader(resp.Body, verifyMaxBodyBytes+1))
+	if err != nil {
+		return nil, err
+	}
+	if len(b) > verifyMaxBodyBytes {
+		return nil, fmt.Errorf("response body exceeds %d bytes", verifyMaxBodyBytes)
+	}
+	return b, nil
 }
 
 // archiveDocs materializes the docs/ subtree at commit into dst via git archive,
@@ -152,6 +164,12 @@ func extractTar(r io.Reader, dst string) error {
 		}
 		if err != nil {
 			return err
+		}
+		// git archive of a committed tree can't produce these, but the
+		// extractor must not rely on its caller: reject any entry that would
+		// land outside dst.
+		if !filepath.IsLocal(filepath.FromSlash(hdr.Name)) {
+			return fmt.Errorf("tar entry %q escapes the extraction dir", hdr.Name)
 		}
 		target := filepath.Join(dst, filepath.FromSlash(hdr.Name))
 		switch hdr.Typeflag {

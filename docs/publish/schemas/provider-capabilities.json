@@ -46,13 +46,19 @@
       }
     },
     "providerExclusiveNode": {
-      "description": "A provider-exclusive capability node: the same shape as capabilityNode, but definitionally never a registered canonical key, so it MUST NOT carry key or key_path.",
+      "description": "A provider-exclusive capability node: the same shape as capabilityNode, but definitionally never a registered canonical key, so it MUST NOT carry key or key_path. The constraint is recursive — every descendant under a provider-exclusive root is itself provider-exclusive.",
       "allOf": [{"$ref": "#/$defs/capabilityNode"}],
       "not": {
         "anyOf": [
           {"required": ["key"]},
           {"required": ["key_path"]}
         ]
+      },
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/providerExclusiveNode"}
+        }
       }
     },
     "keyMeta": {
