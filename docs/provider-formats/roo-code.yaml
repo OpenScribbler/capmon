@@ -356,7 +356,7 @@ content_types:
         conversion: embedded
         provider_field: source
     loading_model: "Custom modes are defined as entries in a YAML array. Project-scope modes live in .roomodes at the project root; global-scope modes live in custom_modes.yaml within Roo Code's settings directory. Each entry declares slug (unique identifier), name (display label), roleDefinition (system prompt), groups (tool-group allowlist), and optional whenToUse, description, customInstructions, and source fields. Roo Code merges project and global entries at load, with project slugs taking precedence. Mode-scoped rules under .roo/rules-<slug>/ extend a mode's behavior with additional Markdown content activated only when that mode is selected."
-    notes: "Roo Code refers to these as 'Custom Modes'. Syllago uses 'agents' as the public-facing term. Unlike Claude Code subagents, modes are not spawned as children of a main-thread agent — they are user-switched personas. A custom mode slug may be paired with a .roo/rules-<slug>/ directory to ship additional context alongside the mode definition."
+    notes: "Roo Code refers to these as 'Custom Modes'. Capmon uses 'agents' as the canonical term. Unlike Claude Code subagents, modes are not spawned as children of a main-thread agent — they are user-switched personas. A custom mode slug may be paired with a .roo/rules-<slug>/ directory to ship additional context alongside the mode definition."
 
   commands:
     status: supported

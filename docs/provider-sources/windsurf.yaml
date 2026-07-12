@@ -24,7 +24,6 @@ content_types:
   #   commands (Cascade Workflows — .windsurf/workflows/ + global_workflows/)
   # Not supported: user-definable agent harness (AGENTS.md is rules delivery,
   #   not an agent format — tracked under rules.cross_provider_recognition).
-  # Syllago: rules ✓, skills ✓, hooks ✓, mcp ✓, commands ✓ | agents ✗
   # ─────────────────────────────────────────────────────────────────────
 
   rules:

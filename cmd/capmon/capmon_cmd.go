@@ -30,7 +30,7 @@ import (
 var capmonCapabilitiesDirOverride string
 
 // capmonFetchDryRunEntry is the per-provider dry-run summary emitted by
-// 'syllago capmon fetch --dry-run'.
+// 'capmon fetch --dry-run'.
 // Sources is populated only when --verbose is also set.
 type capmonFetchDryRunEntry struct {
 	Provider    string               `json:"provider"`
@@ -46,7 +46,7 @@ type capmonSourceResult struct {
 }
 
 // capmonFetchLiveEntry is the per-provider live-fetch summary emitted by
-// 'syllago capmon fetch' (no --dry-run) in JSON mode.
+// 'capmon fetch' (no --dry-run) in JSON mode.
 // Sources is populated only when --verbose is also set.
 type capmonFetchLiveEntry struct {
 	Provider string               `json:"provider"`
@@ -168,7 +168,7 @@ var capmonFetchCmd = &cobra.Command{
 			if !found {
 				return output.NewStructuredError(output.ErrInputInvalid,
 					fmt.Sprintf("unknown provider %q; valid providers: %s", provider, strings.Join(validSlugs, ", ")),
-					"Run 'syllago capmon fetch --dry-run' to list available providers")
+					"Run 'capmon fetch --dry-run' to list available providers")
 			}
 		}
 
@@ -351,13 +351,10 @@ var capmonRunCmd = &cobra.Command{
 
 var capmonGenerateCmd = &cobra.Command{
 	Use:   "generate",
-	Short: "Regenerate per-content-type views and spec tables from provider-capabilities YAML",
+	Short: "Regenerate per-content-type views from provider-capabilities YAML",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		capsDir := "docs/provider-capabilities"
-		if err := capmon.GenerateContentTypeViews(capsDir, capsDir+"/by-content-type"); err != nil {
-			return err
-		}
-		return capmon.GenerateHooksSpecTables(capsDir, "docs/spec/hooks")
+		return capmon.GenerateContentTypeViews(capsDir, capsDir+"/by-content-type")
 	},
 }
 

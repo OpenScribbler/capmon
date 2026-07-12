@@ -32,7 +32,6 @@ content_types:
   # ── Support summary ───────────────────────────────────────────────────
   # Crush supports: rules, skills, mcp
   # Not supported: hooks (issue #2038 open, not implemented), agents (no user-definable agent format), commands (no command system)
-  # Syllago: rules ✓, skills ✓, mcp ✓ | hooks ✗, agents ✗, commands ✗
   #   No hooks yet — see charmbracelet/crush#2038.
   # ─────────────────────────────────────────────────────────────────────
 

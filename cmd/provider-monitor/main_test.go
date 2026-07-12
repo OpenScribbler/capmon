@@ -179,16 +179,16 @@ func TestDaysSinceVerified(t *testing.T) {
 	}
 }
 
-// TestFindManifestDir_Discovers ensures SYLLAGO_ROOT resolution finds the
-// docs/provider-sources directory inside a syllago checkout.
+// TestFindManifestDir_Discovers ensures CAPMON_ROOT resolution finds the
+// docs/provider-sources directory inside a capmon checkout.
 func TestFindManifestDir_Discovers(t *testing.T) {
-	// Cannot run parallel: mutates SYLLAGO_ROOT via t.Setenv.
+	// Cannot run parallel: mutates CAPMON_ROOT via t.Setenv.
 	root := t.TempDir()
 	want := filepath.Join(root, "docs", "provider-sources")
 	if err := os.MkdirAll(want, 0755); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
-	t.Setenv("SYLLAGO_ROOT", root)
+	t.Setenv("CAPMON_ROOT", root)
 
 	dir := findManifestDir()
 	if dir != want {

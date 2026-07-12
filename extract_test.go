@@ -105,8 +105,8 @@ func TestFixtures_WindsurfLLMSTxt(t *testing.T) {
 }
 
 func TestFixtures_LiveNetwork(t *testing.T) {
-	if os.Getenv("SYLLAGO_TEST_NETWORK") == "" {
-		t.Skip("set SYLLAGO_TEST_NETWORK=1 to run live network tests")
+	if os.Getenv("CAPMON_TEST_NETWORK") == "" {
+		t.Skip("set CAPMON_TEST_NETWORK=1 to run live network tests")
 	}
 	// Live test placeholder — requires network access and valid HTTPS sources
 	t.Log("live network test would fetch from real provider URLs")

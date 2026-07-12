@@ -19,7 +19,6 @@ var capmonCheckCmd = &cobra.Command{
 		formatsDir, _ := cmd.Flags().GetString("formats-dir")
 		sourcesDir, _ := cmd.Flags().GetString("sources-dir")
 		cacheRoot, _ := cmd.Flags().GetString("cache-root")
-		providersJSON, _ := cmd.Flags().GetString("providers-json")
 		canonicalKeys, _ := cmd.Flags().GetString("canonical-keys")
 
 		// Mutual exclusion: --all and --provider are incompatible.
@@ -37,7 +36,6 @@ var capmonCheckCmd = &cobra.Command{
 		}
 
 		opts := capmon.CapmonCheckOptions{
-			ProvidersJSON:     providersJSON,
 			FormatsDir:        formatsDir,
 			SourcesDir:        sourcesDir,
 			CacheRoot:         cacheRoot,
@@ -56,7 +54,6 @@ func init() {
 	capmonCheckCmd.Flags().String("formats-dir", "docs/provider-formats", "Directory containing provider format docs")
 	capmonCheckCmd.Flags().String("sources-dir", "docs/provider-sources", "Directory containing provider source manifests")
 	capmonCheckCmd.Flags().String("cache-root", ".capmon-cache", "Root directory for capmon cache")
-	capmonCheckCmd.Flags().String("providers-json", "providers.json", "Path to providers.json")
 	capmonCheckCmd.Flags().String("canonical-keys", "docs/spec/canonical-keys.yaml", "Path to canonical-keys.yaml")
 
 	capmonCmd.AddCommand(capmonCheckCmd)

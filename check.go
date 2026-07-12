@@ -2,7 +2,6 @@ package capmon
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,8 +13,6 @@ import (
 
 // CapmonCheckOptions configures a RunCapmonCheck run.
 type CapmonCheckOptions struct {
-	// ProvidersJSON is the path to providers.json (default: "providers.json").
-	ProvidersJSON string
 	// FormatsDir is the directory containing provider format doc YAML files
 	// (default: "docs/provider-formats").
 	FormatsDir string
@@ -31,13 +28,6 @@ type CapmonCheckOptions struct {
 	ProviderFilter string
 	// DryRun logs actions but makes no GitHub API calls.
 	DryRun bool
-}
-
-// providersDoc is the minimal shape of providers.json needed for orphan detection.
-type providersDoc struct {
-	Providers []struct {
-		Slug string `json:"slug"`
-	} `json:"providers"`
 }
 
 // sourceChange records a single content-hash change event for accumulation.
@@ -131,37 +121,16 @@ func flushProviderBatch(ctx context.Context, opts CapmonCheckOptions, provider s
 	return err
 }
 
-// loadProviderSlugs parses providers.json and returns the set of known slugs.
-func loadProviderSlugs(path string) (map[string]bool, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("read providers.json %s: %w", path, err)
-	}
-	var doc providersDoc
-	if err := json.Unmarshal(data, &doc); err != nil {
-		return nil, fmt.Errorf("parse providers.json: %w", err)
-	}
-	slugs := make(map[string]bool, len(doc.Providers))
-	for _, p := range doc.Providers {
-		slugs[p.Slug] = true
-	}
-	return slugs, nil
-}
-
 // RunCapmonCheck runs the capmon check pipeline over all (or one filtered) provider
 // format docs. It validates infrastructure, detects content drift, and creates or
 // updates GitHub issues for each changed source.
 //
 // Pipeline:
-//  0. Load providers.json; warn on orphan format docs (non-blocking)
 //  1. ValidateSources for each provider (blocking)
 //  2. ValidateFormatDoc for each format doc (blocking)
 //  3. Fetch each source, compare hash, create/append issue on change
 func RunCapmonCheck(ctx context.Context, opts CapmonCheckOptions) error {
 	// Apply defaults.
-	if opts.ProvidersJSON == "" {
-		opts.ProvidersJSON = "providers.json"
-	}
 	if opts.FormatsDir == "" {
 		opts.FormatsDir = "docs/provider-formats"
 	}
@@ -173,12 +142,6 @@ func RunCapmonCheck(ctx context.Context, opts CapmonCheckOptions) error {
 	}
 	if opts.CanonicalKeysPath == "" {
 		opts.CanonicalKeysPath = "docs/spec/canonical-keys.yaml"
-	}
-
-	// Load known slugs for orphan detection.
-	knownSlugs, err := loadProviderSlugs(opts.ProvidersJSON)
-	if err != nil {
-		return err
 	}
 
 	// Enumerate format doc files.
@@ -205,11 +168,6 @@ func RunCapmonCheck(ctx context.Context, opts CapmonCheckOptions) error {
 	ciMode := os.Getenv("GITHUB_TOKEN") != ""
 
 	for _, provider := range providers {
-		// Step 0: Orphan detection (non-blocking warning).
-		if !knownSlugs[provider] {
-			fmt.Fprintf(os.Stderr, "warning: format doc for %q has no entry in providers.json (orphan)\n", provider)
-		}
-
 		// Step 1: Validate source manifest (blocking).
 		if err := ValidateSources(opts.SourcesDir, provider); err != nil {
 			return fmt.Errorf("capmon check: %w", err)
@@ -336,7 +294,7 @@ func fetchForCheck(ctx context.Context, rawURL string) (body []byte, contentType
 	if err != nil {
 		return nil, "", "", fmt.Errorf("create request: %w", err)
 	}
-	req.Header.Set("User-Agent", "syllago-capmon/1.0")
+	req.Header.Set("User-Agent", "capmon/1.0")
 	resp, err := httpDoer.Do(req)
 	if err != nil {
 		return nil, "", "", err

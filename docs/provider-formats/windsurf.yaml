@@ -295,7 +295,7 @@ content_types:
       communicates back via exit code and stdout/stderr. No model context is consumed.
     notes: >
       Windsurf hooks use snake_case event names (pre_read_code, post_write_code, etc.) that
-      map naturally to syllago's canonical hook event naming conventions. The config key is
+      map naturally to the canonical hook event naming conventions. The config key is
       `hooks` inside the JSON file, with each event key mapping to an array of hook objects.
       Each hook object has `command` (required on macOS/Linux), `powershell` (optional; Windows
       command, takes priority over `command` on Windows), `show_output` (boolean, optional), and

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/OpenScribbler/syllago/docs/provider-capabilities/schema.json",
+  "$id": "https://github.com/OpenScribbler/capmon/docs/provider-capabilities/schema.json",
   "title": "ProviderCapabilities",
   "description": "Schema for docs/provider-capabilities/<slug>.yaml capability documents",
   "type": "object",

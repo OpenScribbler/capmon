@@ -16,7 +16,7 @@ import (
 // Catches schema drift: if the SeederSpec struct changes in a way that breaks
 // existing specs, this test fails before capmon pipelines break silently.
 func TestSeederSpecs_AllLoad(t *testing.T) {
-	specsDir := filepath.Join(syllagoRoot(t), ".develop", "seeder-specs")
+	specsDir := filepath.Join(docsRoot(t), ".develop", "seeder-specs")
 	entries, err := os.ReadDir(specsDir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -75,7 +75,7 @@ func TestSeederSpecs_AllLoad(t *testing.T) {
 // refactor so future regressions surface immediately instead of polluting
 // capmon-process PRs.
 func TestDeriveOutputMatchesCommitted(t *testing.T) {
-	repoRoot := syllagoRoot(t)
+	repoRoot := docsRoot(t)
 	formatsDir := filepath.Join(repoRoot, "docs", "provider-formats")
 	capsDir := filepath.Join(repoRoot, "docs", "provider-capabilities")
 	canonicalKeysPath := filepath.Join(repoRoot, "docs", "spec", "canonical-keys.yaml")
@@ -119,7 +119,7 @@ func TestDeriveOutputMatchesCommitted(t *testing.T) {
 			}
 
 			if !bytes.Equal(gotBytes, wantBytes) {
-				t.Errorf("%s/%s: drift detected — derive output does not match committed %s\nRun: syllago capmon derive --provider=%s --output-dir docs/provider-capabilities", provider, spec.ContentType, committedPath, provider)
+				t.Errorf("%s/%s: drift detected — derive output does not match committed %s\nRun: capmon derive --provider=%s --output-dir docs/provider-capabilities", provider, spec.ContentType, committedPath, provider)
 			}
 			checked++
 		}

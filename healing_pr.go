@@ -147,7 +147,7 @@ func BuildHealPRBody(in HealPRInputs) string {
 	}
 	b.WriteString("---\n")
 	b.WriteString("Auto-opened by capmon. **The healed URL must be reviewed before merge** — ")
-	b.WriteString("content passed syllago's readability gate (min body size, text content-type, same-host) ")
+	b.WriteString("content passed capmon's readability gate (min body size, text content-type, same-host) ")
 	b.WriteString("but a human should confirm this is the correct replacement for the originating source.\n")
 	return b.String()
 }
@@ -219,9 +219,9 @@ func SetGitRunnerForTest(fn func(dir string, args ...string) ([]byte, error)) {
 // already open for this (provider, contentType, sourceIndex), the
 // existing PR URL is returned and no new work is done.
 //
-// The repoDir must be the root of the syllago repo (the directory
-// containing docs/provider-sources/). The manifestPath in HealPRInputs
-// is expected to be absolute.
+// The repoDir must be the root of the repo containing the capability data
+// (the directory containing docs/provider-sources/). The manifestPath in
+// HealPRInputs is expected to be absolute.
 func ProposeManifestHealPR(ctx context.Context, repoDir string, in HealPRInputs) (string, error) {
 	slug, err := SanitizeSlug(in.Provider)
 	if err != nil {

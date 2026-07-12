@@ -7,53 +7,15 @@ import (
 	"testing"
 )
 
-func TestDocsURL_Format(t *testing.T) {
-	got := docsURL("CATALOG_001")
-	want := "https://syllago.dev/errors/catalog-001/"
-	if got != want {
-		t.Errorf("docsURL(%q) = %q, want %q", "CATALOG_001", got, want)
-	}
-}
-
-func TestDocsURL_OtherCategories(t *testing.T) {
-	tests := []struct {
-		code string
-		want string
-	}{
-		{"REGISTRY_001", "https://syllago.dev/errors/registry-001/"},
-		{"INSTALL_003", "https://syllago.dev/errors/install-003/"},
-		{"CONVERT_002", "https://syllago.dev/errors/convert-002/"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.code, func(t *testing.T) {
-			got := docsURL(tt.code)
-			if got != tt.want {
-				t.Errorf("docsURL(%q) = %q, want %q", tt.code, got, tt.want)
-			}
-		})
-	}
-}
-
-func TestNewStructuredError_PopulatesDocsURL(t *testing.T) {
-	se := NewStructuredError(ErrCatalogNotFound, "catalog not found", "run syllago init")
-	if se.DocsURL == "" {
-		t.Error("DocsURL should be populated automatically")
-	}
-	want := "https://syllago.dev/errors/catalog-001/"
-	if se.DocsURL != want {
-		t.Errorf("DocsURL = %q, want %q", se.DocsURL, want)
-	}
-}
-
 func TestNewStructuredError_Fields(t *testing.T) {
-	se := NewStructuredError(ErrProviderNotFound, "unknown provider: foo", "try bar instead")
-	if se.Code != ErrProviderNotFound {
-		t.Errorf("Code = %q, want %q", se.Code, ErrProviderNotFound)
+	se := NewStructuredError(ErrInputInvalid, "invalid --provider: bad slug", "use a lowercase kebab-case slug")
+	if se.Code != ErrInputInvalid {
+		t.Errorf("Code = %q, want %q", se.Code, ErrInputInvalid)
 	}
-	if se.Message != "unknown provider: foo" {
+	if se.Message != "invalid --provider: bad slug" {
 		t.Errorf("Message = %q", se.Message)
 	}
-	if se.Suggestion != "try bar instead" {
+	if se.Suggestion != "use a lowercase kebab-case slug" {
 		t.Errorf("Suggestion = %q", se.Suggestion)
 	}
 	if se.Details != "" {
@@ -61,26 +23,13 @@ func TestNewStructuredError_Fields(t *testing.T) {
 	}
 }
 
-func TestNewStructuredErrorDetail_Fields(t *testing.T) {
-	se := NewStructuredErrorDetail(ErrCatalogScanFailed, "scan failed", "check permissions", "stat /some/path: permission denied")
-	if se.Code != ErrCatalogScanFailed {
-		t.Errorf("Code = %q, want %q", se.Code, ErrCatalogScanFailed)
-	}
-	if se.Details != "stat /some/path: permission denied" {
-		t.Errorf("Details = %q", se.Details)
-	}
-	if se.DocsURL == "" {
-		t.Error("DocsURL should be populated automatically")
-	}
-}
-
 func TestStructuredError_ErrorInterface(t *testing.T) {
-	se := NewStructuredError(ErrProviderNotFound, "unknown provider: foo", "")
+	se := NewStructuredError(ErrInputInvalid, "invalid --provider: bad slug", "")
 	got := se.Error()
-	if !strings.Contains(got, "PROVIDER_001") {
-		t.Errorf("Error() = %q, want code PROVIDER_001 in output", got)
+	if !strings.Contains(got, "INPUT_003") {
+		t.Errorf("Error() = %q, want code INPUT_003 in output", got)
 	}
-	if !strings.Contains(got, "unknown provider: foo") {
+	if !strings.Contains(got, "invalid --provider: bad slug") {
 		t.Errorf("Error() = %q, want message in output", got)
 	}
 }
@@ -88,24 +37,18 @@ func TestStructuredError_ErrorInterface(t *testing.T) {
 func TestPrintStructuredError_PlainText(t *testing.T) {
 	_, stderr := SetForTest(t)
 
-	se := NewStructuredError(ErrCatalogNotFound, "catalog not found", "run syllago init")
+	se := NewStructuredError(ErrInputMissing, "missing required flag", "pass --provider")
 	PrintStructuredError(se)
 
 	out := stderr.String()
-	if !strings.Contains(out, "CATALOG_001") {
+	if !strings.Contains(out, "INPUT_001") {
 		t.Errorf("plain text output missing code, got:\n%s", out)
 	}
-	if !strings.Contains(out, "catalog not found") {
+	if !strings.Contains(out, "missing required flag") {
 		t.Errorf("plain text output missing message, got:\n%s", out)
 	}
-	if !strings.Contains(out, "run syllago init") {
+	if !strings.Contains(out, "pass --provider") {
 		t.Errorf("plain text output missing suggestion, got:\n%s", out)
-	}
-	if !strings.Contains(out, "https://syllago.dev/errors/catalog-001/") {
-		t.Errorf("plain text output missing docs URL, got:\n%s", out)
-	}
-	if !strings.Contains(out, "Run 'syllago explain CATALOG_001' for details") {
-		t.Errorf("plain text output missing explain hint, got:\n%s", out)
 	}
 }
 
@@ -113,7 +56,7 @@ func TestPrintStructuredError_JSON(t *testing.T) {
 	_, stderr := SetForTest(t)
 	JSON = true
 
-	se := NewStructuredError(ErrRegistryClone, "clone failed", "check network")
+	se := NewStructuredError(ErrInputConflict, "flags conflict", "pass only one")
 	PrintStructuredError(se)
 
 	out := stderr.String()
@@ -121,77 +64,55 @@ func TestPrintStructuredError_JSON(t *testing.T) {
 	if err := json.Unmarshal([]byte(out), &result); err != nil {
 		t.Fatalf("output is not valid JSON: %v\noutput: %s", err, out)
 	}
-	if result["code"] != ErrRegistryClone {
-		t.Errorf("JSON code = %v, want %q", result["code"], ErrRegistryClone)
+	if result["code"] != ErrInputConflict {
+		t.Errorf("JSON code = %v, want %q", result["code"], ErrInputConflict)
 	}
-	if result["message"] != "clone failed" {
+	if result["message"] != "flags conflict" {
 		t.Errorf("JSON message = %v", result["message"])
 	}
-	if result["suggestion"] != "check network" {
+	if result["suggestion"] != "pass only one" {
 		t.Errorf("JSON suggestion = %v", result["suggestion"])
-	}
-	if result["docs_url"] == "" || result["docs_url"] == nil {
-		t.Error("JSON docs_url should be present")
 	}
 }
 
 func TestPrintStructuredError_NoSuggestion(t *testing.T) {
 	_, stderr := SetForTest(t)
 
-	se := NewStructuredError(ErrExportNotSupported, "export not supported", "")
+	se := NewStructuredError(ErrInputTerminal, "requires interactive terminal", "")
 	PrintStructuredError(se)
 
 	out := stderr.String()
 	if strings.Contains(out, "Suggestion:") {
 		t.Errorf("output should omit Suggestion line when empty, got:\n%s", out)
 	}
-	if !strings.Contains(out, "EXPORT_001") {
+	if !strings.Contains(out, "INPUT_004") {
 		t.Errorf("output missing code, got:\n%s", out)
 	}
 }
 
-func TestPrintStructuredError_NoDocsURL(t *testing.T) {
+func TestPrintStructuredError_Details(t *testing.T) {
 	_, stderr := SetForTest(t)
 
-	// Construct a StructuredError with no DocsURL directly (bypassing constructor)
 	se := StructuredError{
-		Code:    "CUSTOM_001",
-		Message: "custom error",
+		Code:    ErrInputInvalid,
+		Message: "invalid value",
+		Details: "line one\nline two",
 	}
 	PrintStructuredError(se)
 
 	out := stderr.String()
-	if strings.Contains(out, "Docs:") {
-		t.Errorf("output should omit Docs line when DocsURL is empty, got:\n%s", out)
-	}
-	if !strings.Contains(out, "Run 'syllago explain CUSTOM_001' for details") {
-		t.Errorf("output should still show explain hint when Code is set, got:\n%s", out)
-	}
-}
-
-func TestPrintStructuredError_NoCode(t *testing.T) {
-	_, stderr := SetForTest(t)
-
-	se := StructuredError{
-		Message: "something went wrong",
-	}
-	PrintStructuredError(se)
-
-	out := stderr.String()
-	if strings.Contains(out, "syllago explain") {
-		t.Errorf("output should omit explain hint when Code is empty, got:\n%s", out)
+	if !strings.Contains(out, "  line one\n") || !strings.Contains(out, "  line two\n") {
+		t.Errorf("output should indent each detail line, got:\n%s", out)
 	}
 }
 
 func TestAllErrorCodes_UniqueValues(t *testing.T) {
-	codes := AllErrorCodes()
-	seen := make(map[string]string)
-	for _, name := range codes {
-		val := errorCodeValue(name)
-		if prev, exists := seen[val]; exists {
-			t.Errorf("duplicate error code value %q: used by both %q and %q", val, prev, name)
+	seen := make(map[string]bool)
+	for _, val := range AllErrorCodes() {
+		if seen[val] {
+			t.Errorf("duplicate error code value %q", val)
 		}
-		seen[val] = name
+		seen[val] = true
 	}
 }
 

@@ -42,12 +42,10 @@ content_types:
   # ── Support summary ───────────────────────────────────────────────────
   # OpenCode supports: rules (via contextPaths config), agents (4 built-in, not
   #   user-definable), commands, mcp
-  # Not supported: hooks (no hook system), skills (no native format; syllago can
-  #   install via cross-provider convention)
-  # Syllago: rules ✓, skills ✓ (cross-provider convention), agents ✓, commands ✓,
-  #   mcp ✓ | hooks ✗
-  # Note: OpenCode has no native skill format — syllago uses cross-provider SKILL.md
-  #   convention. 'agents' are 4 built-in types (coder/summarizer/task/title), not
+  # Not supported: hooks (no hook system), skills (no native format; coverable
+  #   via cross-provider convention)
+  # Note: OpenCode has no native skill format — the cross-provider SKILL.md
+  #   convention applies. 'agents' are 4 built-in types (coder/summarizer/task/title), not
   #   user-definable. Crush fork adds slightly different MCP config format.
   # ─────────────────────────────────────────────────────────────────────
 
@@ -88,7 +86,7 @@ content_types:
   skills:
     supported: true
     convention: cross-provider-skill-md
-    # OpenCode has no native skill documentation to monitor. Syllago installs
+    # OpenCode has no native skill documentation to monitor. Installers place
     # skills using the cross-provider Agent Skills convention (SKILL.md with
     # YAML frontmatter) at .opencode/skills/ (project) and ~/.config/opencode/skills/
     # (user), plus the cross-provider .agents/skills/ location.

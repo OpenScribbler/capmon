@@ -128,7 +128,6 @@ type StructuredError struct {
 	Code       string `json:"code"`
 	Message    string `json:"message"`
 	Suggestion string `json:"suggestion,omitempty"`
-	DocsURL    string `json:"docs_url,omitempty"`
 	Details    string `json:"details,omitempty"`
 }
 
@@ -149,16 +148,10 @@ func PrintStructuredError(e StructuredError) {
 	if e.Suggestion != "" {
 		fmt.Fprintf(ErrWriter, "  Suggestion: %s\n", e.Suggestion)
 	}
-	if e.DocsURL != "" {
-		fmt.Fprintf(ErrWriter, "  Docs: %s\n", e.DocsURL)
-	}
 	if e.Details != "" {
 		// Indent each detail line for readability.
 		for _, line := range strings.Split(e.Details, "\n") {
 			fmt.Fprintf(ErrWriter, "  %s\n", line)
 		}
-	}
-	if e.Code != "" {
-		fmt.Fprintf(ErrWriter, "  Run 'syllago explain %s' for details\n", e.Code)
 	}
 }

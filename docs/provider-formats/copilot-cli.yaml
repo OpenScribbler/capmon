@@ -310,7 +310,7 @@ content_types:
       Multiple hooks for the same event execute in declaration order.
     notes: >
       Copilot CLI hooks are structurally similar to Claude Code hooks but use different
-      event names and JSON schema. The canonical syllago event names (before_tool_execute,
+      event names and JSON schema. The canonical event names (before_tool_execute,
       after_tool_execute, etc.) do not have a direct 1:1 mapping to Copilot's camelCase
       event names (preToolUse, postToolUse, sessionStart, sessionEnd,
       userPromptSubmitted, errorOccurred). Only preToolUse supports permission gating;
@@ -614,5 +614,5 @@ content_types:
       /fleet, /pr, /remote, /rename, /research, /session, /share, /statusline, /tasks,
       and /terminal-setup. Tool permission patterns (Kind(argument) syntax for --allow-tool
       and --deny-tool) and OpenTelemetry monitoring are newly documented in this source.
-      Syllago should treat plugin install/management as the primary unit of
+      Installers should treat plugin install/management as the primary unit of
       commands-equivalent distribution for Copilot CLI until further documentation emerges.

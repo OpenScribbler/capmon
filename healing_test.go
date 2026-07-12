@@ -204,7 +204,7 @@ func TestAttemptHeal_RedirectStrategySucceedsOnPermanent(t *testing.T) {
 }
 
 func TestAttemptHeal_VariantRejectsRedirectedCandidate(t *testing.T) {
-	// Regression for syllago-qc7yf / ampcode #92: variant generates
+	// Regression for ampcode #92: variant generates
 	// /manual/hooks/index.md, which 302-redirects to /auth/sign-in on the
 	// same host. After Impl-3, ANY redirect on a heal candidate is drift,
 	// regardless of where it lands or what the final body looks like.
@@ -479,7 +479,7 @@ func TestAttemptHeal_FailReasonDerivedSummary(t *testing.T) {
 }
 
 func TestAttemptHeal_StrategyDeclinesPopulatedAlongsideOutcomes(t *testing.T) {
-	// Regression for syllago-dm1zr / ampcode #92: when redirect strategy
+	// Regression for ampcode #92: when redirect strategy
 	// declines AND a later strategy probes candidates, the decline reasons
 	// must surface on result.StrategyDeclines so humans triaging drift can
 	// see what each strategy turned up. Previously, declineReasons was

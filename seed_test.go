@@ -99,7 +99,7 @@ func TestSeedCrushAndRooCodeE2E(t *testing.T) {
 	// This test exercises the full pipeline:
 	// cache extraction → recognition → capability YAML writing
 	// It uses the real .capmon-cache directory relative to the project root.
-	cacheRoot := filepath.Join(syllagoRoot(t), ".capmon-cache")
+	cacheRoot := filepath.Join(docsRoot(t), ".capmon-cache")
 	if _, err := os.Stat(cacheRoot); os.IsNotExist(err) {
 		t.Skip("no .capmon-cache directory — run capmon fetch first")
 	}

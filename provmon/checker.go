@@ -110,7 +110,7 @@ func checkOneURL(ctx context.Context, url string) URLResult {
 		return URLResult{URL: url, Error: fmt.Errorf("creating request: %w", err)}
 	}
 	// GitHub API requires a User-Agent header.
-	req.Header.Set("User-Agent", "syllago-provider-monitor/1.0")
+	req.Header.Set("User-Agent", "capmon-provider-monitor/1.0")
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -164,7 +164,7 @@ func checkGithubReleases(ctx context.Context, m *Manifest) (*VersionDrift, error
 	if err != nil {
 		return nil, fmt.Errorf("creating request: %w", err)
 	}
-	req.Header.Set("User-Agent", "syllago-provider-monitor/1.0")
+	req.Header.Set("User-Agent", "capmon-provider-monitor/1.0")
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
 
 	resp, err := httpClient.Do(req)

@@ -21,7 +21,7 @@ func TestCapmonVerify_EmptyDir(t *testing.T) {
 }
 
 // TestCapmonVerify_SkipsSeederSpecs is a regression test for the bug where
-// `syllago capmon verify` failed on per-content-type seeder specs in
+// `capmon verify` failed on per-content-type seeder specs in
 // docs/provider-capabilities/. Seeder specs use `provider:` not `slug:` and
 // have no `schema_version` field, so the schema validator rejects them.
 // Verify must skip them (mirrors the Slug=="" pattern in

@@ -26,7 +26,6 @@ content_types:
   # ── Support summary ───────────────────────────────────────────────────
   # Copilot CLI supports: rules, skills, agents, commands, mcp, hooks
   # Not supported: (all content types supported)
-  # Syllago: all ✓
   #   Docs use Liquid template variables ({% data %}) that need stripping during extraction. commands = 'plugins' in copilot terminology.
   # ─────────────────────────────────────────────────────────────────────
 

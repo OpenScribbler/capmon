@@ -32,7 +32,7 @@ func (s *stubFetcher) Fetch(_ context.Context, uri, fetchMethod string) ([]byte,
 	return body, nil
 }
 
-// TestBackfillFormatDoc_FillsMissingHash is the B1 RED test for syllago-73k9a.
+// TestBackfillFormatDoc_FillsMissingHash is the B1 RED test for the format-doc hash backfill.
 // It asserts that BackfillFormatDoc:
 //  1. Populates content_hash for sources where it was empty.
 //  2. Skips sources whose content_hash is already populated (Force=false).

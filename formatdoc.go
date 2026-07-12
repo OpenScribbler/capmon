@@ -24,7 +24,8 @@ type FormatDoc struct {
 
 // ValidProviderCategories enumerates the allowed values for FormatDoc.Category.
 // Changes here must stay in sync with the category validator in
-// formatdoc_validate.go and the category_label map in syllago-docs.
+// formatdoc_validate.go. Downstream consumers of the published data may also
+// maintain category label maps keyed by these values.
 var ValidProviderCategories = []string{
 	"cli",
 	"ide-extension",

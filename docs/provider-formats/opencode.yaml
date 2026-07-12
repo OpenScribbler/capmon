@@ -57,7 +57,7 @@ content_types:
         confidence: confirmed
     provider_extensions: []
     loading_model: ""
-    notes: "OpenCode (sst/opencode, opencode.ai) has no native skill implementation — syllago uses the cross-provider SKILL.md convention. All mappings are inferred from community convention and the human format doc, not from OpenCode's own source."
+    notes: "OpenCode (sst/opencode, opencode.ai) has no native skill implementation — the cross-provider SKILL.md convention applies. All mappings are inferred from community convention and the human format doc, not from OpenCode's own source."
 
   rules:
     status: supported

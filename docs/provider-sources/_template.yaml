@@ -4,7 +4,7 @@
 schema_version: "1" # Manifest format version — bump when the schema changes
 last_verified: "YYYY-MM-DD" # When URLs and data were last confirmed accurate
 
-slug: provider-slug # Lowercase kebab-case, matches syllago provider ID
+slug: provider-slug # Lowercase kebab-case provider identifier
 display_name: Provider Name
 vendor: Vendor Name
 status: active # active | archived | beta
@@ -31,14 +31,14 @@ changelog:
     label: ""
 
 # Provider-specific URL conventions used by the heal pipeline and the
-# syllago-capmon-process skill. All fields are optional. Add only the
+# operator tooling. All fields are optional. Add only the
 # conventions this provider actually has — the schema is designed to
 # accrete new fields per-provider as quirks surface.
 #
 # docs_conventions:
 #   # Literal query-string fragment (e.g. "?internal") that must be
 #   # present on every doc URL fetched from this provider. Currently
-#   # informational — read by the syllago-capmon-process skill when
+#   # informational — read by operator tooling when
 #   # proposing replacement URLs. Not auto-applied at fetch time;
 #   # manifest URLs stay literal.
 #   query_param_required: ""

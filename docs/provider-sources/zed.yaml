@@ -35,7 +35,6 @@ content_types:
   # ── Support summary ───────────────────────────────────────────────────
   # Zed supports: rules (.rules file), mcp, agents (builtin profiles: write/ask/minimal — not user-definable), commands (builtin slash commands only — not user-definable)
   # Not supported: hooks, skills
-  # Syllago: rules ✓, mcp ✓ | hooks ✗, skills ✗, agents ✗, commands ✗
   # Zed's 'agent profiles' are builtin (write/ask/minimal) — not user-definable files.
   # Slash commands are builtin too. hooks and skills stubs are correct.
   # ─────────────────────────────────────────────────────────────────────

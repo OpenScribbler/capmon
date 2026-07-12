@@ -120,17 +120,6 @@ func RunPipeline(ctx context.Context, opts PipelineOptions) (exitClass int, err 
 		}
 	}
 
-	// Final visibility pass: record provider coverage drift in the run manifest.
-	// This is observation-only — coverage drift never changes exit class because
-	// the test suite (TestCoverageInternalGoConsistency + TestCoverageNoDrift) is
-	// the authoritative CI gate. Surfacing drift here makes it visible in capmon
-	// run summaries so operators notice YAML ↔ Go mismatches during routine runs.
-	if drifts, cerr := CheckCoverage(opts.RepoRoot); cerr == nil {
-		for _, d := range drifts {
-			manifest.CoverageDrifts = append(manifest.CoverageDrifts, d.String())
-		}
-	}
-
 	manifest.FinishedAt = time.Now().UTC()
 	WriteRunManifest(opts.CacheRoot, manifest) //nolint:errcheck // best-effort write at pipeline end; error cannot be surfaced to caller
 	return manifest.ExitClass, nil
@@ -147,7 +136,7 @@ func generateRunID() string {
 }
 
 // RunFetchStage executes Stage 1 (fetch) only, populating manifest.Providers.
-// Used by 'syllago capmon fetch' to run the fetch stage without triggering extraction.
+// Used by 'capmon fetch' to run the fetch stage without triggering extraction.
 func RunFetchStage(ctx context.Context, opts PipelineOptions, manifest *RunManifest) error {
 	if opts.CacheRoot == "" {
 		opts.CacheRoot = ".capmon-cache"

@@ -106,7 +106,7 @@ func TestValidateContentResponse_NonHTMLSmallPasses(t *testing.T) {
 	// served from raw.githubusercontent.com (Content-Type: text/plain).
 	// A 200-byte text/plain body must pass — the 512-byte threshold was an
 	// HTML-stub heuristic and shouldn't false-positive on legitimate small
-	// source files. See bead syllago-soagt.
+	// source files.
 	cases := []struct {
 		name        string
 		contentType string

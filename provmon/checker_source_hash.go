@@ -166,7 +166,7 @@ func findSourceRef(doc *capmon.FormatDoc, url string) (capmon.SourceRef, bool) {
 // provmon's ephemeral drift reports do not need.
 func fetchSourceBytes(ctx context.Context, fetchMethod, slug, rawURL string) ([]byte, string, string, error) {
 	if fetchMethod == "chromedp" {
-		tmpCache, err := os.MkdirTemp("", "syllago-provmon-chromedp-*")
+		tmpCache, err := os.MkdirTemp("", "capmon-provmon-chromedp-*")
 		if err != nil {
 			return nil, "", "", fmt.Errorf("chromedp temp cache: %w", err)
 		}
@@ -182,7 +182,7 @@ func fetchSourceBytes(ctx context.Context, fetchMethod, slug, rawURL string) ([]
 	if err != nil {
 		return nil, "", "", fmt.Errorf("create request: %w", err)
 	}
-	req.Header.Set("User-Agent", "syllago-provider-monitor/1.0")
+	req.Header.Set("User-Agent", "capmon-provider-monitor/1.0")
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, "", "", err

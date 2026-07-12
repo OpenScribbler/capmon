@@ -3,7 +3,7 @@
 /provider-monitor
 *.test
 
-# Pipeline cache (written when running against a local syllago checkout)
+# Pipeline cache (written by local pipeline runs)
 .capmon-cache/
 
 # Coverage

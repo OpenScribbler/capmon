@@ -54,7 +54,7 @@ In April 2026, a recognizer pass produced six won't-fix decisions across cursor,
 This rule is enforced in three layers:
 
 1. **This rule** — codifies the principle (you are reading it).
-2. **`syllago capmon doctor` subcommand** (planned) — automated CI gate that fails on 4xx URLs, redirects to different hosts, and thin caches where format YAML claims `status: supported`. Tracked in its own bead.
+2. **`capmon doctor` subcommand** (planned) — automated CI gate that fails on 4xx URLs, redirects to different hosts, and thin caches where format YAML claims `status: supported`. Tracked in its own bead.
 3. **Buglog entry `bug-554`** — surfaces the incident pattern at session start via `.wolf/buglog.json` lookup, before any new won't-fix code is written.
 
 ## Quick Reference

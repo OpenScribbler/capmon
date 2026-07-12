@@ -1,4 +1,4 @@
-// Package capmon implements the syllago capability monitor pipeline.
+// Package capmon implements the capability monitor pipeline.
 // Four-stage pipeline: fetch → extract → diff → review.
 package capmon
 
@@ -115,5 +115,4 @@ type RunManifest struct {
 	Providers                     map[string]ProviderStatus `json:"providers"`
 	Warnings                      []string                  `json:"warnings"`
 	FingerprintDivergenceWarnings []string                  `json:"fingerprint_divergence_warnings"`
-	CoverageDrifts                []string                  `json:"coverage_drifts,omitempty"`
 }

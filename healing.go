@@ -215,7 +215,7 @@ func validateHealCandidate(ctx context.Context, originalURL, candidateURL, strat
 		out.Detail = fmt.Sprintf("create heal GET: %v", err)
 		return out
 	}
-	req.Header.Set("User-Agent", "syllago-capmon/1.0")
+	req.Header.Set("User-Agent", "capmon/1.0")
 	resp, err := client.Do(req)
 	if err != nil {
 		out.Outcome = OutcomeConnectError

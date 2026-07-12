@@ -135,7 +135,7 @@ func ProbeVariants(ctx context.Context, variants []VariantCandidate) (VariantCan
 		if err != nil {
 			return VariantCandidate{}, false, fmt.Errorf("create HEAD for %q: %w", v.URL, err)
 		}
-		req.Header.Set("User-Agent", "syllago-capmon/1.0")
+		req.Header.Set("User-Agent", "capmon/1.0")
 		resp, err := noFollow.Do(req)
 		if err != nil {
 			// Network errors — skip this candidate, try the next.

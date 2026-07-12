@@ -86,7 +86,7 @@ func FollowRedirectChain(ctx context.Context, rawURL string) (*RedirectChain, er
 		if err != nil {
 			return nil, fmt.Errorf("create HEAD request for %q: %w", current, err)
 		}
-		req.Header.Set("User-Agent", "syllago-capmon/1.0")
+		req.Header.Set("User-Agent", "capmon/1.0")
 
 		resp, err := noFollow.Do(req)
 		if err != nil {

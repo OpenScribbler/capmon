@@ -128,7 +128,7 @@ func doHTTPFetch(ctx context.Context, rawURL string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
-	req.Header.Set("User-Agent", "syllago-capmon/1.0")
+	req.Header.Set("User-Agent", "capmon/1.0")
 	resp, err := httpDoer.Do(req)
 	if err != nil {
 		return nil, err

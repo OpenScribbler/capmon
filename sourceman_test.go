@@ -304,7 +304,7 @@ content_types:
 // auth-gate diagnostic and re-introduces the /manual/hooks/index.md
 // variant-generation bug.
 func TestAmpManifest_DocsConventions_Populated(t *testing.T) {
-	path := filepath.Join(syllagoRoot(t), "docs", "provider-sources", "amp.yaml")
+	path := filepath.Join(docsRoot(t), "docs", "provider-sources", "amp.yaml")
 	m, err := capmon.LoadSourceManifest(path)
 	if err != nil {
 		t.Fatalf("LoadSourceManifest(amp.yaml): %v", err)

@@ -25,8 +25,7 @@ content_types:
   # ── Support summary ───────────────────────────────────────────────────
   # Factory Droid supports: rules, skills, agents, commands, mcp, hooks
   # Not supported: (none)
-  # Syllago support: rules ✓, skills ✓, agents ✓, commands ✓, mcp ✓, hooks ✓
-  # Not yet implemented in syllago Go provider code (factory-droid is a future/planned provider). Hook schema matches Claude Code's format.
+  # Hook schema matches Claude Code's format.
   # ─────────────────────────────────────────────────────────────────────
 
   # docs.factory.ai is a Mintlify Next.js SPA — JS-rendered. All docs.factory.ai

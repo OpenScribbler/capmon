@@ -1,19 +1,18 @@
 name: capmon — capability monitor pipeline
 
-# Runs the full pipeline against a fresh checkout of OpenScribbler/syllago.
-# Migrated from syllago's .github/workflows/capmon.yml during the capmon
-# extraction; stage semantics and flags are unchanged.
+# Runs the full pipeline against the capability data under docs/ in this
+# repo. Heal PRs and drift issues are opened on this repo using the
+# workflow's own GITHUB_TOKEN — no cross-repo access is needed.
 #
-# Cross-repo access: the SYLLAGO_TOKEN repository secret (fine-grained PAT
-# scoped to OpenScribbler/syllago; contents/pull-requests/issues read-write)
-# authenticates the syllago checkout (so heal-branch pushes work) and the
-# gh CLI (PRs + issues on syllago). This repo's own GITHUB_TOKEN only writes
-# the heartbeat commit.
+# Note: PRs created with GITHUB_TOKEN do not trigger this repo's other
+# workflows (GitHub prevents recursive workflow runs), so CI does not run
+# automatically on heal PRs. Re-run CI manually or push an empty commit to
+# the heal branch if a CI result is needed before merge.
 
 on:
   schedule:
-    # Every 4 days at 06:00 UTC (day-of-month based: 1,5,9,...,29)
-    - cron: '0 6 */4 * *'
+    # Daily at 06:00 UTC
+    - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       stage:
@@ -47,12 +46,6 @@ jobs:
       - name: Checkout capmon
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Checkout syllago
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: OpenScribbler/syllago
-          path: syllago
-
       - name: Set up Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
         with:
@@ -65,8 +58,7 @@ jobs:
         run: go build -o capmon-bin ./cmd/capmon
 
       - name: Run fetch-extract stage
-        working-directory: syllago
-        run: ../capmon-bin run --stage fetch-extract
+        run: ./capmon-bin run --stage fetch-extract
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHROMEDP_URL: ""
@@ -74,7 +66,7 @@ jobs:
       - name: Compute artifact SHA-256
         id: sha
         run: |
-          tar -czf .capmon-cache.tar.gz -C syllago .capmon-cache/
+          tar -czf .capmon-cache.tar.gz .capmon-cache/
           SHA=$(sha256sum .capmon-cache.tar.gz | awk '{print $1}')
           echo "sha256=${SHA}" >> "$GITHUB_OUTPUT"
           echo "## capmon artifact SHA-256" >> "$GITHUB_STEP_SUMMARY"
@@ -94,33 +86,30 @@ jobs:
     runs-on: ubuntu-latest
     needs: fetch-extract
     continue-on-error: false
-    permissions: {}
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout capmon
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Checkout syllago (writable)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: OpenScribbler/syllago
-          path: syllago
-          token: ${{ secrets.SYLLAGO_TOKEN }}
 
       - name: Download cache artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: capmon-cache
+          path: .artifact
 
       - name: Verify artifact SHA-256
         env:
           EXPECTED_SHA: ${{ needs.fetch-extract.outputs.artifact-sha256 }}
         run: |
-          ACTUAL=$(sha256sum .capmon-cache.tar.gz | awk '{print $1}')
+          ACTUAL=$(sha256sum .artifact/.capmon-cache.tar.gz | awk '{print $1}')
           if [ "$EXPECTED_SHA" != "$ACTUAL" ]; then
             echo "SHA-256 mismatch: expected $EXPECTED_SHA, got $ACTUAL"
             exit 1
           fi
-          tar -xzf .capmon-cache.tar.gz -C syllago
+          tar -xzf .artifact/.capmon-cache.tar.gz
 
       - name: Set up Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
@@ -131,33 +120,26 @@ jobs:
         run: go build -o capmon-bin ./cmd/capmon
 
       - name: Configure git identity for heal branches
-        working-directory: syllago
         run: |
           git config user.name "capmon-bot"
           git config user.email "capmon-bot@users.noreply.github.com"
 
       - name: Run report stage
-        working-directory: syllago
-        run: ../capmon-bin run --stage report
+        run: ./capmon-bin run --stage report
         env:
-          GITHUB_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
-          GH_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   staleness-check:
     name: Staleness Check
     runs-on: ubuntu-latest
     needs: [fetch-extract, report]
     if: always()
-    permissions: {}
+    permissions:
+      issues: write
     steps:
       - name: Checkout capmon
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Checkout syllago
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: OpenScribbler/syllago
-          path: syllago
 
       - name: Set up Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
@@ -171,34 +153,29 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: capmon-cache
+          path: .artifact
         continue-on-error: true
 
       - name: Extract cache (if present)
-        run: tar -xzf .capmon-cache.tar.gz -C syllago 2>/dev/null || true
+        run: tar -xzf .artifact/.capmon-cache.tar.gz 2>/dev/null || true
 
       - name: Check staleness
-        working-directory: syllago
         run: |
-          ../capmon-bin verify \
+          ./capmon-bin verify \
             --staleness-check \
-            --threshold-hours 108
+            --threshold-hours 36
         env:
-          GH_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   hash-check:
     name: Content Hash Check
     runs-on: ubuntu-latest
-    permissions: {}
+    permissions:
+      issues: write
     steps:
       - name: Checkout capmon
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Checkout syllago
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: OpenScribbler/syllago
-          path: syllago
 
       - name: Set up Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
@@ -210,16 +187,14 @@ jobs:
 
       - name: Run capmon check (all providers)
         if: ${{ github.event_name == 'schedule' || github.event.inputs.provider == '' }}
-        working-directory: syllago
-        run: ../capmon-bin check --all --providers-json=cli/providers.json
+        run: ./capmon-bin check --all
         env:
-          GH_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run capmon check (single provider)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.provider != '' }}
-        working-directory: syllago
         env:
-          GH_TOKEN: ${{ secrets.SYLLAGO_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CAPMON_PROVIDER: ${{ github.event.inputs.provider }}
           CAPMON_DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
@@ -227,12 +202,12 @@ jobs:
           if [ "$CAPMON_DRY_RUN" = "true" ]; then
             FLAGS="--dry-run"
           fi
-          ../capmon-bin check --provider="$CAPMON_PROVIDER" --providers-json=cli/providers.json $FLAGS
+          ./capmon-bin check --provider="$CAPMON_PROVIDER" $FLAGS
 
   heartbeat:
-    # Commits a last-run marker to THIS repo so GitHub's 60-day-inactivity
-    # rule never auto-disables the schedule (pipeline output lands in
-    # syllago, so this repo would otherwise look dormant).
+    # Commits a last-run marker so GitHub's 60-day-inactivity rule never
+    # auto-disables the schedule (a quiet stretch with no drift would
+    # otherwise leave the repo without commits).
     name: Heartbeat
     runs-on: ubuntu-latest
     needs: [fetch-extract, report, staleness-check, hash-check]

@@ -226,12 +226,12 @@ func daysSinceVerified(dateStr string) int {
 	return int(time.Since(t).Hours() / 24)
 }
 
-// findManifestDir locates a syllago checkout's docs/provider-sources/.
-// Resolution order: $SYLLAGO_ROOT, then the current working directory and
-// its parent (covers running the tool from inside a syllago checkout).
+// findManifestDir locates a capmon checkout's docs/provider-sources/.
+// Resolution order: $CAPMON_ROOT, then the current working directory and
+// its parent (covers running the tool from inside a capmon checkout).
 // The --dir flag overrides all of this.
 func findManifestDir() string {
-	if root := os.Getenv("SYLLAGO_ROOT"); root != "" {
+	if root := os.Getenv("CAPMON_ROOT"); root != "" {
 		dir := filepath.Join(root, "docs", "provider-sources")
 		if info, err := os.Stat(dir); err == nil && info.IsDir() {
 			return dir

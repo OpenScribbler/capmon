@@ -2,7 +2,6 @@ package capmon_test
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -36,34 +35,15 @@ func newCheckTestEnv(t *testing.T) *checkTestEnv {
       type: string
 `), 0644)
 
-	providersJSON := filepath.Join(dir, "providers.json")
-
 	return &checkTestEnv{
 		Dir: dir,
 		opts: capmon.CapmonCheckOptions{
-			ProvidersJSON:     providersJSON,
 			FormatsDir:        formatsDir,
 			SourcesDir:        sourcesDir,
 			CacheRoot:         filepath.Join(dir, "cache"),
 			CanonicalKeysPath: canonicalKeysPath,
 		},
 	}
-}
-
-func (e *checkTestEnv) writeProviders(t *testing.T, slugs []string) {
-	t.Helper()
-	type entry struct {
-		Slug string `json:"slug"`
-	}
-	type doc struct {
-		Providers []entry `json:"providers"`
-	}
-	d := doc{}
-	for _, s := range slugs {
-		d.Providers = append(d.Providers, entry{Slug: s})
-	}
-	b, _ := json.Marshal(d)
-	os.WriteFile(e.opts.ProvidersJSON, b, 0644)
 }
 
 func (e *checkTestEnv) writeSourceManifest(t *testing.T, provider string) {
@@ -159,7 +139,6 @@ func TestRunCapmonCheck_NoChange(t *testing.T) {
 	testContent := []byte(strings.Repeat("x", 1000))
 	expectedHash := capmon.SHA256Hex(testContent)
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 	env.writeFormatDoc(t, "test-provider", "https://example.com/skills.md", expectedHash)
 	env.setHTTPResponse(t, testContent, "text/html")
@@ -180,7 +159,6 @@ func TestRunCapmonCheck_Changed(t *testing.T) {
 
 	testContent := []byte(strings.Repeat("y", 1000))
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 	// Store a different (stale) hash in the format doc.
 	env.writeFormatDoc(t, "test-provider", "https://example.com/skills.md", "sha256:stale_hash_not_matching")
@@ -200,7 +178,6 @@ func TestRunCapmonCheck_Changed(t *testing.T) {
 func TestRunCapmonCheck_FetchError(t *testing.T) {
 	env := newCheckTestEnv(t)
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 	env.writeFormatDoc(t, "test-provider", "https://example.com/skills.md", "")
 	// HTTP returns an error.
@@ -238,7 +215,6 @@ func TestRunCapmonCheck_ContentValidityFailure(t *testing.T) {
 	// Body too small — should trigger fetch-error.
 	tinyContent := []byte("tiny")
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 	env.writeFormatDoc(t, "test-provider", "https://example.com/skills.md", "")
 	env.setHTTPResponse(t, tinyContent, "text/html")
@@ -264,37 +240,6 @@ func TestRunCapmonCheck_ContentValidityFailure(t *testing.T) {
 	}
 }
 
-func TestRunCapmonCheck_OrphanDetection(t *testing.T) {
-	env := newCheckTestEnv(t)
-
-	testContent := []byte(strings.Repeat("z", 1000))
-	expectedHash := capmon.SHA256Hex(testContent)
-
-	// providers.json does NOT include "orphan-provider".
-	env.writeProviders(t, []string{})
-	env.writeSourceManifest(t, "orphan-provider")
-	env.writeFormatDoc(t, "orphan-provider", "https://example.com/skills.md", expectedHash)
-	env.setHTTPResponse(t, testContent, "text/html")
-	env.captureGHCalls(t)
-
-	// Capture stderr to verify warning.
-	oldStderr := os.Stderr
-	r, w, _ := os.Pipe()
-	os.Stderr = w
-	defer func() { os.Stderr = oldStderr }()
-
-	err := capmon.RunCapmonCheck(context.Background(), env.opts)
-	w.Close()
-	stderrOut, _ := io.ReadAll(r)
-
-	if err != nil {
-		t.Fatalf("RunCapmonCheck: %v (orphan should be non-blocking)", err)
-	}
-	if !strings.Contains(string(stderrOut), "orphan-provider") {
-		t.Errorf("expected orphan warning mentioning 'orphan-provider', got: %q", string(stderrOut))
-	}
-}
-
 // TestRunCapmonCheck_FormatDocWarningLoggedToStderr verifies that non-blocking
 // allow-list warnings from ValidateFormatDocWithWarnings surface on stderr with
 // the DeduplicationKey and field path, and that the pipeline continues normally.
@@ -305,7 +250,6 @@ func TestRunCapmonCheck_FormatDocWarningLoggedToStderr(t *testing.T) {
 	testContent := []byte(strings.Repeat("a", 1000))
 	expectedHash := capmon.SHA256Hex(testContent)
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 
 	// Format doc passes blocking validation but carries a non-allow-listed
@@ -374,7 +318,6 @@ func TestRunCapmonCheck_CIModeCreatesWarningIssues(t *testing.T) {
 	testContent := []byte(strings.Repeat("a", 1000))
 	expectedHash := capmon.SHA256Hex(testContent)
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 
 	// Format doc with a non-allow-listed value_type to trigger a warning.
@@ -460,7 +403,6 @@ func TestRunCapmonCheck_CIModeDryRunSkipsIssues(t *testing.T) {
 	testContent := []byte(strings.Repeat("b", 1000))
 	expectedHash := capmon.SHA256Hex(testContent)
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 
 	docWithWarning := `provider: test-provider
@@ -517,7 +459,6 @@ func TestRunCapmonCheck_DryRun(t *testing.T) {
 
 	testContent := []byte(strings.Repeat("w", 1000))
 	// Different hash → would normally create issue.
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 	env.writeFormatDoc(t, "test-provider", "https://example.com/skills.md", "sha256:old_hash")
 	env.setHTTPResponse(t, testContent, "text/html")
@@ -547,7 +488,6 @@ func TestRunCapmonCheck_BatchFlush_OpenIssueExists(t *testing.T) {
 	env := newCheckTestEnv(t)
 
 	testContent := []byte(strings.Repeat("p", 1000))
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 	env.writeFormatDoc(t, "test-provider", "https://example.com/skills.md", "sha256:stale_hash")
 	env.setHTTPResponse(t, testContent, "text/html")
@@ -581,7 +521,6 @@ func TestRunCapmonCheck_BatchFlush_OpenIssueExists(t *testing.T) {
 func TestRunCapmonCheck_FetchErrorOnly_ProducesIssue(t *testing.T) {
 	env := newCheckTestEnv(t)
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 	env.writeFormatDoc(t, "test-provider", "https://example.com/skills.md", "")
 	// HTTP returns an error so no hash change occurs — only a fetch error.
@@ -632,7 +571,6 @@ func TestRunCapmonCheck_FlushError_Aborts(t *testing.T) {
 	env := newCheckTestEnv(t)
 
 	testContent := []byte(strings.Repeat("r", 1000))
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 	env.writeFormatDoc(t, "test-provider", "https://example.com/skills.md", "sha256:stale_hash")
 	env.setHTTPResponse(t, testContent, "text/html")
@@ -663,7 +601,6 @@ func TestRunCapmonCheck_MultiContentType_SingleIssue(t *testing.T) {
 
 	testContent := []byte(strings.Repeat("q", 1000))
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 
 	// Format doc with two content types (skills + hooks) each having a stale hash.
@@ -752,7 +689,6 @@ content_types:
 func TestRunCapmonCheck_LocalFileSource_Skipped(t *testing.T) {
 	env := newCheckTestEnv(t)
 
-	env.writeProviders(t, []string{"test-provider"})
 	env.writeSourceManifest(t, "test-provider")
 
 	// Format doc with a local_file source that has a stale hash.

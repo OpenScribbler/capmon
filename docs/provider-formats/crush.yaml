@@ -310,7 +310,7 @@ content_types:
         graduation_candidate: false
         conversion: not-portable
     loading_model: "Hooks are configured in crush.json under the hooks key as an object keyed by event name (e.g. PreToolUse). Each key maps to an array of HookConfig objects. Each HookConfig specifies a command (required shell command), an optional matcher (regex against tool name; empty matches all tools), and an optional timeout (seconds, default 30). At tool execution time, Crush fires matching hooks in order, passing JSON on stdin (tool name and parameters). The hook may return JSON with a decision (allow/deny/none) and optional context. Exit code 2 blocks the tool call. Hooks run before Crush's built-in permission checks."
-    notes: "Hook event key naming follows provider-native conventions (e.g. PreToolUse) in the crush.json config. Canonical syllago event names (before_tool_execute) must be translated to provider-native keys during install/export. The hookedTool implementation is in internal/agent/hooked_tool.go."
+    notes: "Hook event key naming follows provider-native conventions (e.g. PreToolUse) in the crush.json config. Canonical event names (before_tool_execute) must be translated to provider-native keys during install/export. The hookedTool implementation is in crush's internal/agent/hooked_tool.go."
 
   agents:
     status: unsupported

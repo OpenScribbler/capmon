@@ -84,7 +84,7 @@ func TestRecognitionConformance_KindTagged(t *testing.T) {
 // recognize_registry_test.go to keep coverage automatic.
 func registeredProviderSlugs(t *testing.T) []string {
 	t.Helper()
-	sourcesDir := filepath.Join(syllagoRoot(t), "docs", "provider-sources")
+	sourcesDir := filepath.Join(docsRoot(t), "docs", "provider-sources")
 	entries, err := os.ReadDir(sourcesDir)
 	if err != nil {
 		t.Fatalf("cannot read docs/provider-sources/: %v", err)

@@ -1,6 +1,6 @@
 # Provider Capabilities
 
-This directory contains the authoritative capability baseline for each AI coding tool provider that syllago supports. These files are maintained by the [capmon](https://github.com/OpenScribbler/capmon) pipeline.
+This directory contains the authoritative capability baseline for each AI coding tool provider tracked in this repository. These files are maintained by the [capmon](https://github.com/OpenScribbler/capmon) pipeline.
 
 ## Directory Structure
 

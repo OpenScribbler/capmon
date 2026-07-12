@@ -28,7 +28,6 @@ content_types:
   #   at .cline/skills/, .clinerules/skills/, .claude/skills/, ~/.cline/skills/),
   #   commands (Workflows at .clinerules/workflows/ + ~/Documents/Cline/Workflows)
   # Not supported: agents (no agent file format)
-  # Syllago: rules ✓, hooks ✓, mcp ✓, skills ✓, commands ✓ | agents ✗
   # ─────────────────────────────────────────────────────────────────────
 
   rules:
@@ -90,6 +89,6 @@ content_types:
         type: docs
         format: markdown
         extracts: [file_format, file_locations, features]
-    # Syllago maps cline Workflows to the Commands content type. Format: plain
+    # Cline Workflows map to the Commands content type. Format: plain
     # markdown files at .clinerules/workflows/ (project) and
     # ~/Documents/Cline/Workflows/ (global). Invoked via /<workflow-name>.

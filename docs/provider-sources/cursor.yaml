@@ -25,8 +25,7 @@ content_types:
   # ── Support summary ───────────────────────────────────────────────────
   # Cursor supports: rules, skills, hooks, mcp, agents (Cursor 2.4 custom
   #   agents at .cursor/agents/).
-  # Syllago: rules ✓, skills ✓, hooks ✓, mcp ✓, agents ✓
-  # Commands (Cursor 1.6 .cursor/commands/*.md) were removed from syllago's
+  # Commands (Cursor 1.6 .cursor/commands/*.md) were removed from the
   # matrix when Cursor replaced the dedicated docs page with a "migrate
   # commands to skills" help redirect — the format no longer has an
   # authoritative source page to track.

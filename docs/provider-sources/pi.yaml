@@ -29,8 +29,6 @@ content_types:
   #   format), commands (prompt templates in .pi/prompts/)
   # Not supported: mcp (no built-in MCP; users implement via extensions),
   #   agents (no user-definable agent definition format)
-  # Syllago: not yet implemented in syllago Go provider code (pi is a
-  #   future/planned provider)
   # Note: Pi hooks are programmatic TypeScript — no declarative hook JSON.
   #   MCP stub is correct.
   # ─────────────────────────────────────────────────────────────────────

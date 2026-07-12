@@ -638,12 +638,12 @@ content_types:
       hooks, their types, sources, and handler details. Identical handlers are deduplicated:
       command hooks by command string, HTTP hooks by URL.
     notes: >
-      Syllago's canonical hook spec is in docs/spec/hooks.md. Claude Code's native hook event names
-      (PreToolUse, PostToolUse, SessionStart, etc.) are Pascal-case. Claude Code's native tool names
-      in matchers are the internal tool identifiers (Bash, Edit, Write, Read, Glob, Grep, Agent,
-      WebFetch, WebSearch, AskUserQuestion, ExitPlanMode, mcp__<server>__<tool>). Syllago's canonical
-      format uses snake_case event names and descriptive tool names; the toolmap.go translation layer
-      handles the conversion.
+      The canonical hook vocabulary is owned by the ACIF-HOOK spec. Claude Code's native hook event
+      names (PreToolUse, PostToolUse, SessionStart, etc.) are Pascal-case. Claude Code's native tool
+      names in matchers are the internal tool identifiers (Bash, Edit, Write, Read, Glob, Grep, Agent,
+      WebFetch, WebSearch, AskUserQuestion, ExitPlanMode, mcp__<server>__<tool>). The canonical
+      format uses snake_case event names and descriptive tool names; installers translate between
+      the two.
 
   mcp:
     status: supported
@@ -831,7 +831,7 @@ content_types:
     notes: >
       Hooks are stored in settings files (JSON), MCP server configs are stored in ~/.claude.json
       (local/user scope) or .mcp.json (project scope). These are JSON merge targets, not filesystem
-      paths — syllago handles them via JSON merge rather than symlink installation. Scope terminology
+      paths — installers handle them via JSON merge rather than symlink installation. Scope terminology
       changed in a recent CC release: "local" (was "project"), "project" (shared via .mcp.json),
       "user" (was "global").
 
@@ -1010,7 +1010,7 @@ content_types:
       name, the highest-priority scope wins. Agents receive only their own system prompt plus basic
       environment details (working directory) at startup, not the parent session's context.
     notes: >
-      Claude Code calls these "subagents" internally. Syllago uses "agents" as the public-facing term.
+      Claude Code calls these "subagents" internally. Capmon uses "agents" as the canonical term.
       Agent files are .md files with YAML frontmatter, stored in .claude/agents/ (project) or
       ~/.claude/agents/ (user). They use filesystem installation (not JSON merge). Agent teams
       (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS) are a separate feature enabling multi-agent

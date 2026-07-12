@@ -21,7 +21,7 @@ type SourceManifest struct {
 }
 
 // DocsConventions carries provider-specific URL hints used by the heal
-// pipeline and the syllago-capmon-process skill. All fields are optional;
+// pipeline and operator tooling. All fields are optional;
 // the schema is designed to accrete new fields per-provider as quirks
 // surface (Cursor docs versioning, Cline auth-gated changelog, etc.).
 //
@@ -30,8 +30,8 @@ type SourceManifest struct {
 type DocsConventions struct {
 	// QueryParamRequired is the literal query-string fragment (e.g.
 	// "?internal") that must be present on every doc URL fetched from this
-	// provider. Currently informational — read by the syllago-capmon-process
-	// skill when proposing replacement URLs. Not auto-applied at fetch time;
+	// provider. Currently informational — read by operator tooling when
+	// proposing replacement URLs. Not auto-applied at fetch time;
 	// manifest URLs stay literal.
 	QueryParamRequired string `yaml:"query_param_required,omitempty"`
 

@@ -16,12 +16,6 @@ jobs:
       - name: Checkout capmon
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Checkout syllago (drift-guard fixture)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: OpenScribbler/syllago
-          path: syllago
-
       - name: Set up Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
         with:
@@ -29,9 +23,18 @@ jobs:
 
       - name: gofmt check
         run: |
-          UNFORMATTED=$(gofmt -l . | grep -v '^syllago/' || true)
+          UNFORMATTED=$(gofmt -l .)
           if [ -n "$UNFORMATTED" ]; then
             echo "gofmt needed on:"; echo "$UNFORMATTED"; exit 1
+          fi
+
+      - name: Legacy-name gate
+        # The working tree must not mention the old downstream project name.
+        # The pattern is split so this workflow file does not match itself.
+        run: |
+          if grep -ri 'syl''lago' --exclude-dir=.git .; then
+            echo "legacy project name found in working tree (see matches above)"
+            exit 1
           fi
 
       - name: Build (CGO on, all extractors)
@@ -44,6 +47,4 @@ jobs:
         run: go vet ./...
 
       - name: Test
-        env:
-          SYLLAGO_ROOT: ${{ github.workspace }}/syllago
         run: go test -race ./...

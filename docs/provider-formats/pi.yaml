@@ -379,11 +379,11 @@ content_types:
     sources: []
     canonical_mappings: {}
     provider_extensions: []
-    notes: "Pi's author explicitly rejects native sub-agent support — pi exposes no on-disk file format for user-defined agents with their own system prompts, tool restrictions, or scopes. Community extensions (pi-subagents, oh-my-pi) exist but per syllago's provider-eligibility rule do not count toward native support. See bead syllago-gfg2t for the open question of whether community extensions should graduate to a separate provider entry."
+    notes: "Pi's author explicitly rejects native sub-agent support — pi exposes no on-disk file format for user-defined agents with their own system prompts, tool restrictions, or scopes. Community extensions (pi-subagents, oh-my-pi) exist but per capmon's provider-eligibility rule do not count toward native support. Whether community extensions should graduate to a separate provider entry is an open question."
 
   mcp:
     status: unsupported
     sources: []
     canonical_mappings: {}
     provider_extensions: []
-    notes: "Pi's author explicitly rejects native MCP support — pi has no on-disk MCP configuration surface, no transport configuration, and no built-in MCP client. Community extensions (pi-mcp-adapter) exist but per syllago's provider-eligibility rule do not count toward native support."
+    notes: "Pi's author explicitly rejects native MCP support — pi has no on-disk MCP configuration surface, no transport configuration, and no built-in MCP client. Community extensions (pi-mcp-adapter) exist but per capmon's provider-eligibility rule do not count toward native support."
