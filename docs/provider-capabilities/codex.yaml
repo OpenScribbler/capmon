@@ -77,29 +77,9 @@ content_types:
   skills:
     supported: true
     capabilities:
-      allow_implicit_invocation:
-        supported: true
-        mechanism: 'yaml frontmatter key: allow_implicit_invocation'
-        confidence: confirmed
-      brand_color:
-        supported: true
-        mechanism: 'yaml frontmatter key: brand_color'
-        confidence: confirmed
       canonical_filename:
         supported: true
         mechanism: SKILL.md (SKILLS_FILENAME constant)
-        confidence: confirmed
-      command:
-        supported: true
-        mechanism: 'yaml frontmatter key: command'
-        confidence: confirmed
-      default_prompt:
-        supported: true
-        mechanism: 'yaml frontmatter key: default_prompt'
-        confidence: confirmed
-      dependencies:
-        supported: true
-        mechanism: 'yaml frontmatter key: dependencies'
         confidence: confirmed
       description:
         supported: true
@@ -113,59 +93,80 @@ content_types:
         supported: true
         mechanism: ~/.agents/skills/<name>/ (SkillScope::User)
         confidence: confirmed
-      icon_large:
-        supported: true
-        mechanism: 'yaml frontmatter key: icon_large'
-        confidence: confirmed
-      icon_small:
-        supported: true
-        mechanism: 'yaml frontmatter key: icon_small'
-        confidence: confirmed
-      interface:
-        supported: true
-        mechanism: 'yaml frontmatter key: interface'
-        confidence: confirmed
-      path_to_skills_md:
-        supported: true
-        mechanism: 'yaml frontmatter key: path_to_skills_md'
-        confidence: confirmed
-      policy:
-        supported: true
-        mechanism: 'yaml frontmatter key: policy'
-        confidence: confirmed
-      products:
-        supported: true
-        mechanism: 'yaml frontmatter key: products'
-        confidence: confirmed
       project_scope:
         supported: true
         mechanism: .agents/skills/<name>/ under project config folder or between project root and cwd (SkillScope::Repo)
         confidence: confirmed
-      r#type:
-        supported: true
-        mechanism: 'yaml frontmatter key: r#type'
-        confidence: confirmed
-      scope:
-        supported: true
-        mechanism: 'yaml frontmatter key: scope'
-        confidence: confirmed
-      short_description:
-        supported: true
-        mechanism: 'yaml frontmatter key: short_description'
-        confidence: confirmed
-      tools:
-        supported: true
-        mechanism: 'yaml frontmatter key: tools'
-        confidence: confirmed
-      transport:
-        supported: true
-        mechanism: 'yaml frontmatter key: transport'
-        confidence: confirmed
-      url:
-        supported: true
-        mechanism: 'yaml frontmatter key: url'
-        confidence: confirmed
-      value:
-        supported: true
-        mechanism: 'yaml frontmatter key: value'
-        confidence: confirmed
+provider_exclusive:
+  skills.allow_implicit_invocation:
+    supported: true
+    mechanism: 'yaml frontmatter key: allow_implicit_invocation'
+    confidence: confirmed
+  skills.brand_color:
+    supported: true
+    mechanism: 'yaml frontmatter key: brand_color'
+    confidence: confirmed
+  skills.command:
+    supported: true
+    mechanism: 'yaml frontmatter key: command'
+    confidence: confirmed
+  skills.default_prompt:
+    supported: true
+    mechanism: 'yaml frontmatter key: default_prompt'
+    confidence: confirmed
+  skills.dependencies:
+    supported: true
+    mechanism: 'yaml frontmatter key: dependencies'
+    confidence: confirmed
+  skills.icon_large:
+    supported: true
+    mechanism: 'yaml frontmatter key: icon_large'
+    confidence: confirmed
+  skills.icon_small:
+    supported: true
+    mechanism: 'yaml frontmatter key: icon_small'
+    confidence: confirmed
+  skills.interface:
+    supported: true
+    mechanism: 'yaml frontmatter key: interface'
+    confidence: confirmed
+  skills.path_to_skills_md:
+    supported: true
+    mechanism: 'yaml frontmatter key: path_to_skills_md'
+    confidence: confirmed
+  skills.policy:
+    supported: true
+    mechanism: 'yaml frontmatter key: policy'
+    confidence: confirmed
+  skills.products:
+    supported: true
+    mechanism: 'yaml frontmatter key: products'
+    confidence: confirmed
+  skills.r#type:
+    supported: true
+    mechanism: 'yaml frontmatter key: r#type'
+    confidence: confirmed
+  skills.scope:
+    supported: true
+    mechanism: 'yaml frontmatter key: scope'
+    confidence: confirmed
+  skills.short_description:
+    supported: true
+    mechanism: 'yaml frontmatter key: short_description'
+    confidence: confirmed
+  skills.tools:
+    supported: true
+    mechanism: 'yaml frontmatter key: tools'
+    confidence: confirmed
+  skills.transport:
+    supported: true
+    mechanism: 'yaml frontmatter key: transport'
+    confidence: confirmed
+  skills.url:
+    supported: true
+    mechanism: 'yaml frontmatter key: url'
+    confidence: confirmed
+  skills.value:
+    supported: true
+    mechanism: 'yaml frontmatter key: value'
+    confidence: confirmed

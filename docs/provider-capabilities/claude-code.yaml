@@ -143,51 +143,52 @@ content_types:
   skills:
     supported: true
     capabilities:
-      additional_directories:
-        supported: true
-        mechanism: documented under 'Skills from additional directories' heading
-        confidence: inferred
-      arguments:
-        supported: true
-        mechanism: documented under 'Pass arguments to skills' heading
-        confidence: inferred
       canonical_filename:
         supported: true
         mechanism: SKILL.md
         confidence: confirmed
-      dynamic_context:
-        supported: true
-        mechanism: documented under 'Inject dynamic context' heading
-        confidence: inferred
-      frontmatter:
-        supported: true
-        mechanism: documented under 'Frontmatter reference' heading
-        confidence: inferred
       global_scope:
         supported: true
         mechanism: ~/.claude/skills/<skill-name>/SKILL.md in user home directory
         confidence: confirmed
-      invoker_control:
-        supported: true
-        mechanism: documented under 'Control who invokes a skill' heading
-        confidence: inferred
-      live_reload:
-        supported: true
-        mechanism: documented under 'Live change detection' heading
-        confidence: inferred
-      nested_directories:
-        supported: true
-        mechanism: documented under 'Automatic discovery from nested directories' heading
-        confidence: inferred
       project_scope:
         supported: true
         mechanism: .claude/skills/<skill-name>/SKILL.md committed to version control
         confidence: confirmed
-      subagent_invocation:
-        supported: true
-        mechanism: documented under 'Run skills in a subagent' heading
-        confidence: inferred
-      tool_preapproval:
-        supported: true
-        mechanism: documented under 'Pre-approve tools for a skill' heading
-        confidence: inferred
+provider_exclusive:
+  skills.additional_directories:
+    supported: true
+    mechanism: documented under 'Skills from additional directories' heading
+    confidence: inferred
+  skills.arguments:
+    supported: true
+    mechanism: documented under 'Pass arguments to skills' heading
+    confidence: inferred
+  skills.dynamic_context:
+    supported: true
+    mechanism: documented under 'Inject dynamic context' heading
+    confidence: inferred
+  skills.frontmatter:
+    supported: true
+    mechanism: documented under 'Frontmatter reference' heading
+    confidence: inferred
+  skills.invoker_control:
+    supported: true
+    mechanism: documented under 'Control who invokes a skill' heading
+    confidence: inferred
+  skills.live_reload:
+    supported: true
+    mechanism: documented under 'Live change detection' heading
+    confidence: inferred
+  skills.nested_directories:
+    supported: true
+    mechanism: documented under 'Automatic discovery from nested directories' heading
+    confidence: inferred
+  skills.subagent_invocation:
+    supported: true
+    mechanism: documented under 'Run skills in a subagent' heading
+    confidence: inferred
+  skills.tool_preapproval:
+    supported: true
+    mechanism: documented under 'Pre-approve tools for a skill' heading
+    confidence: inferred
