@@ -1,0 +1,18 @@
+{
+  "content_type": "hooks",
+  "providers": {
+    "synthetic": {
+      "events": {
+        "pre_tool": {
+          "blocking": "deny",
+          "native_name": "PreToolUse",
+          "refs": [
+            "spec_doc"
+          ]
+        }
+      },
+      "supported": true
+    }
+  },
+  "schema_version": "1"
+}

@@ -1,0 +1,50 @@
+schema_version: "1"
+slug: synthetic
+display_name: ""
+last_verified: ""
+references:
+  spec_doc:
+    url: https://example.com/spec
+    fetch_method: chromedp
+    verified_at: "2026-01-02"
+    last_content_hash: "abc123def456abc123def456abc123def456abc123def456abc123def456abcd"
+content_types:
+  hooks:
+    supported: true
+    events:
+      pre_tool:
+        native_name: PreToolUse
+        blocking: deny
+        refs:
+          - spec_doc
+  agents:
+    supported: true
+    tools:
+      search:
+        native: grep_tool
+        refs:
+          - spec_doc
+    capabilities:
+      invocation_patterns:
+        supported: true
+        refs:
+          - spec_doc
+        capabilities:
+          slash_command:
+            supported: true
+  skills:
+    supported: true
+    capabilities:
+      compatibility:
+        supported: true
+        capabilities:
+          claude_code:
+            supported: true
+provider_exclusive:
+  skills.custom_thing:
+    supported: true
+    mechanism: bespoke skills loader
+    confidence: confirmed
+    capabilities:
+      nested_detail:
+        supported: false

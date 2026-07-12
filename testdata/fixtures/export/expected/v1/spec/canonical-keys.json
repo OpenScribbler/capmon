@@ -1,0 +1,57 @@
+{
+  "content_types": {
+    "agents": {
+      "invocation_patterns": {
+        "description": "How subagents are invoked.",
+        "spec_ref": "ACIF-AGENT §9.1 (DERIVABLE)",
+        "type": "object"
+      },
+      "model_selection": {
+        "description": "Per-agent model override.",
+        "spec_ref": "ACIF-AGENT §9.2 (DERIVABLE)",
+        "type": "bool"
+      }
+    },
+    "commands": {
+      "argument_hint": {
+        "description": "Hint text for command arguments.",
+        "spec_ref": "ACIF-COMMAND §4.1 (DERIVABLE)",
+        "type": "string"
+      }
+    },
+    "hooks": {
+      "handler_types": {
+        "description": "Types of hook handlers a provider recognizes.",
+        "spec_ref": "ACIF-HOOK §1.1 (DERIVABLE)",
+        "type": "string"
+      }
+    },
+    "mcp": {
+      "transport_types": {
+        "description": "Supported MCP transport mechanisms.",
+        "spec_ref": "ACIF-MCP §3.1 (DERIVABLE)",
+        "type": "object"
+      }
+    },
+    "rules": {
+      "file_imports": {
+        "description": "Whether rules files may import other files.",
+        "spec_ref": "ACIF-RULE §2.1 (DERIVABLE)",
+        "type": "bool"
+      }
+    },
+    "skills": {
+      "compatibility": {
+        "description": "Cross-provider skill compatibility.",
+        "spec_ref": "ACIF-SKILL §2.1 (DERIVABLE)",
+        "type": "object"
+      },
+      "display_name": {
+        "description": "Human-readable display name for the skill.",
+        "spec_ref": "ACIF-SKILL §10.2 (OUT-OF-SCOPE-AT-L1)",
+        "type": "string"
+      }
+    }
+  },
+  "schema_version": "1"
+}

@@ -1,0 +1,87 @@
+{
+  "content_types": {
+    "agents": {
+      "capabilities": {
+        "invocation_patterns": {
+          "capabilities": {
+            "slash_command": {
+              "supported": true
+            }
+          },
+          "key": {
+            "description": "How subagents are invoked.",
+            "spec_ref": "ACIF-AGENT §9.1 (DERIVABLE)",
+            "type": "object"
+          },
+          "key_path": "agents.invocation_patterns",
+          "refs": [
+            "spec_doc"
+          ],
+          "supported": true
+        }
+      },
+      "supported": true,
+      "tools": {
+        "search": {
+          "native": "grep_tool",
+          "refs": [
+            "spec_doc"
+          ]
+        }
+      }
+    },
+    "hooks": {
+      "events": {
+        "pre_tool": {
+          "blocking": "deny",
+          "native_name": "PreToolUse",
+          "refs": [
+            "spec_doc"
+          ]
+        }
+      },
+      "supported": true
+    },
+    "skills": {
+      "capabilities": {
+        "compatibility": {
+          "capabilities": {
+            "claude_code": {
+              "supported": true
+            }
+          },
+          "key": {
+            "description": "Cross-provider skill compatibility.",
+            "spec_ref": "ACIF-SKILL §2.1 (DERIVABLE)",
+            "type": "object"
+          },
+          "key_path": "skills.compatibility",
+          "supported": true
+        }
+      },
+      "supported": true
+    }
+  },
+  "display_name": "synthetic",
+  "provider_exclusive": {
+    "skills.custom_thing": {
+      "capabilities": {
+        "nested_detail": {
+          "supported": false
+        }
+      },
+      "confidence": "confirmed",
+      "mechanism": "bespoke skills loader",
+      "supported": true
+    }
+  },
+  "references": {
+    "spec_doc": {
+      "url": "https://example.com/spec",
+      "verified_at": "2026-01-02"
+    }
+  },
+  "schema_version": "1",
+  "slug": "synthetic",
+  "status": "live"
+}

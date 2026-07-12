@@ -1,0 +1,26 @@
+schema_version: "1"
+slug: alpha
+display_name: Alpha
+last_verified: "2026-07-10"
+content_types:
+  agents:
+    supported: true
+    capabilities:
+      invocation_patterns:
+        supported: true
+        capabilities:
+          at_mention:
+            supported: true
+            mechanism: "@-mention syntax"
+            confidence: inferred
+      model_selection:
+        supported: false
+        mechanism: per-subagent override
+        confidence: inferred
+  skills:
+    supported: true
+    capabilities:
+      display_name:
+        supported: true
+        mechanism: frontmatter name field
+        confidence: confirmed
