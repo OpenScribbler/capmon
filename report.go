@@ -3,6 +3,7 @@ package capmon
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -15,10 +16,22 @@ import (
 
 var slugRegex = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*[a-z0-9]$`)
 
-// ghRunner is the function used to invoke the gh CLI. Overridable in tests.
-var ghRunner = func(args ...string) ([]byte, error) {
-	return exec.Command("gh", args...).Output()
+// runGH invokes the real gh CLI. Output() stores gh's stderr on the
+// ExitError; surfacing it in the returned error is the difference between
+// "gh issue create: exit status 1" and knowing the label didn't exist.
+func runGH(args ...string) ([]byte, error) {
+	out, err := exec.Command("gh", args...).Output()
+	if err != nil {
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) && len(exitErr.Stderr) > 0 {
+			return out, fmt.Errorf("%w: %s", err, strings.TrimSpace(string(exitErr.Stderr)))
+		}
+	}
+	return out, err
 }
+
+// ghRunner is the function used to invoke the gh CLI. Overridable in tests.
+var ghRunner = runGH
 
 // GHRunner invokes the gh CLI with the given arguments, returning combined output.
 // Exported for use by Stage 4 PR/issue creation (Task 9.2).
@@ -31,9 +44,7 @@ func GHRunner(args ...string) ([]byte, error) {
 // Must only be called from test code.
 func SetGHCommandForTest(fn func(args ...string) ([]byte, error)) {
 	if fn == nil {
-		ghRunner = func(args ...string) ([]byte, error) {
-			return exec.Command("gh", args...).Output()
-		}
+		ghRunner = runGH
 		return
 	}
 	ghRunner = fn
