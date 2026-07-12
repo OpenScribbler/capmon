@@ -21,6 +21,6 @@ content_types:
         refs: [cc_hooks_docs]
 
 provider_exclusive:
-  events:
-    - native_name: InstructionsLoaded
-      description: Fires when CLAUDE.md and rule files are loaded
+  InstructionsLoaded:
+    supported: true
+    mechanism: Fires when CLAUDE.md and rule files are loaded

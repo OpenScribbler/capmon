@@ -22,7 +22,7 @@ func LoadCapabilityYAML(path string) (*ProviderCapabilities, error) {
 }
 
 // WriteCapabilityYAML serializes a ProviderCapabilities to the writer.
-// provider_exclusive is preserved as-is (round-trip safe via map[string]interface{}).
+// provider_exclusive nodes round-trip as CapabilityEntry values.
 func WriteCapabilityYAML(w io.Writer, caps *ProviderCapabilities) error {
 	enc := yaml.NewEncoder(w)
 	enc.SetIndent(2)
