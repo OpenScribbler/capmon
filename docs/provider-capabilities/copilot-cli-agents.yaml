@@ -10,7 +10,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: definition_format
       supported: true
-      mechanism: .agent.md files with YAML frontmatter (description required); up to 30,000 chars of Markdown instructions as agent system prompt
+      mechanism: .agent.md files with YAML frontmatter (description required; optional name, target, tools, model, disable-model-invocation, user-invocable, mcp-servers, metadata) documented under 'YAML frontmatter properties'; up to 30,000 chars of Markdown instructions as agent system prompt. The legacy `infer` property is now marked retired (superseded by disable-model-invocation/user-invocable).
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -28,7 +28,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: per_agent_mcp
       supported: true
-      mechanism: mcp-servers inline config in frontmatter; available for cloud agent only; workspace MCP config shared by default
+      mechanism: mcp-servers object in agent frontmatter adds MCP servers/tools for the agent (documented under 'MCP server configuration details'); the config spec marks mcp-servers as used by the github.com cloud agent and Copilot CLI but NOT by VS Code / IDE agents. Env-var/secret expansion in these configs supports $VAR, ${VAR}, ${VAR:-default} (Claude Code syntax) plus ${{ secrets.X }} / ${{ vars.X }} (Actions syntax).
       source_field: ""
       source_value: ""
       confidence: inferred

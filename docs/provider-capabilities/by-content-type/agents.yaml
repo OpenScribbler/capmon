@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-13T06:52:00Z
+# Generated at: 2026-07-13T18:50:48Z
 
 content_type: agents
 providers:
@@ -32,7 +32,7 @@ providers:
                         confidence: inferred
             model_selection:
                 supported: true
-                mechanism: per-subagent model override (sonnet/opus/haiku alias, full model ID, or inherit) documented under 'Choose a model' heading; resolution order via CLAUDE_CODE_SUBAGENT_MODEL env var, --model flag, frontmatter, or main session
+                mechanism: per-subagent model override (sonnet/opus/haiku/fable alias, full model ID, or inherit) documented under 'Choose a model' heading; resolution order via CLAUDE_CODE_SUBAGENT_MODEL env var, --model flag, frontmatter, or main session
                 confidence: inferred
             per_agent_mcp:
                 supported: true
@@ -124,9 +124,13 @@ providers:
                 supported: true
                 mechanism: single-file .md droids with system prompt, model preference, and tooling policy documented under 'Configuration' heading
                 confidence: inferred
+            per_agent_mcp:
+                supported: true
+                mechanism: per-droid MCP scoping via the mcpServers frontmatter field documented under 'Selecting MCP servers' heading
+                confidence: inferred
             tool_restrictions:
                 supported: true
-                mechanism: categorical tool policy using named categories (filesystem, shell, search, browser, web_fetch) documented under 'Tool categories → concrete tools' heading
+                mechanism: categorical tool policy using named categories (read-only, edit, execute, web, mcp) documented under 'Tool categories → concrete tools' heading
                 confidence: inferred
     gemini-cli:
         supported: true

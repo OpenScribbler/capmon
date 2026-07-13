@@ -1,16 +1,33 @@
 # Roo Code — Provider Source Manifest
 # Good sources: Cline fork with significant divergence. Has custom modes (unique), no hooks.
+#
+# ⚠ SUNSET: Roo Code shut down 2026-05-15 (announced 2026-04-20; the team bet
+# on Roomote, a Slack-first cloud agent). The GitHub repo is archived
+# read-only (verified 2026-07-13: archived=true, last push 2026-05-15), so
+# capability data below describes the frozen final extension, which still
+# functions but receives no updates. Official migration guidance points
+# open-source extension users to Cline. Org also renamed RooVetGit →
+# RooCodeInc; old URLs still redirect.
 
 schema_version: "1"
-last_verified: "2026-03-27"
+last_verified: "2026-07-13"
 
 slug: roo-code
 display_name: Roo Code
 vendor: RooVet
-status: active
+status: archived
 fetch_tier: gh-api
 repo: RooVetGit/Roo-Code
 repo_branch: main
+
+successor:
+  slug: cline
+  display_name: Cline
+  repo: cline/cline
+  repo_branch: main
+  status: active
+  # Roo Code is a Cline fork; the official sunset post directs extension
+  # users to Cline ("have incorporated much of what we built").
 
 change_detection:
   method: github-releases

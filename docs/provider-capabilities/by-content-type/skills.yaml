@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-13T06:52:00Z
+# Generated at: 2026-07-13T18:50:48Z
 
 content_type: skills
 providers:
@@ -13,7 +13,7 @@ providers:
                 confidence: confirmed
             global_scope:
                 supported: true
-                mechanism: skill directory placed under ~/.config/agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/
+                mechanism: skill directory placed under ~/.config/agents/skills/<name>/, ~/.agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/
                 confidence: confirmed
             project_scope:
                 supported: true
@@ -102,6 +102,10 @@ providers:
                 supported: true
                 mechanism: 'yaml frontmatter key: description'
                 confidence: confirmed
+            disable_model_invocation:
+                supported: true
+                mechanism: 'yaml frontmatter key: disable-model-invocation'
+                confidence: confirmed
             display_name:
                 supported: true
                 mechanism: 'yaml frontmatter key: name'
@@ -121,6 +125,10 @@ providers:
             project_scope:
                 supported: true
                 mechanism: per-project .crush/skills/ directory
+                confidence: confirmed
+            user_invocable:
+                supported: true
+                mechanism: 'yaml frontmatter key: user-invocable'
                 confidence: confirmed
     cursor:
         supported: true

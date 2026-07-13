@@ -25,7 +25,7 @@ func geminiCliRulesLandmarkOptions() LandmarkOptions {
 		RulesLandmarkPattern("file_imports", "Modularize context with imports",
 			"GEMINI.md supports importing other markdown files (documented under 'Modularize context with imports' heading)", required),
 		RulesLandmarkPattern("auto_memory", "Manage context with the /memory command",
-			"/memory show / add / reload slash commands manage hierarchical memory (documented under 'Manage context with the /memory command')", required),
+			"/memory show / reload slash commands manage the hierarchical GEMINI.md memory (documented under 'Manage context with the /memory command'); the /memory add append subcommand was removed upstream", required),
 		RulesLandmarkPattern("hierarchical_loading", "Understand the context hierarchy",
 			"three-tier hierarchy: global ~/.gemini/GEMINI.md + workspace + JIT ancestor scan up to trusted root (documented under 'Understand the context hierarchy')", required),
 	)

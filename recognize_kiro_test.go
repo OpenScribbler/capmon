@@ -105,22 +105,28 @@ var realKiroAgentsLandmarks = []string{
 	"Next steps",
 }
 
-// realKiroHooksLandmarks is a snapshot of the headings extracted from kiro's
-// agent hooks doc (.capmon-cache/kiro/hooks.0/extracted.json) as of 2026-04-16.
-// Includes the AWS docs cookie-banner boilerplate.
+// realKiroHooksLandmarks is a snapshot of the heading landmarks extracted from
+// kiro's agent hooks doc (.capmon-cache/kiro/hooks.0/extracted.json) as of the
+// 2026-07-09 rewrite that introduced the JSON file format, the "Trigger
+// reference" table, and the "Exit code behavior" section. Includes the AWS
+// docs cookie-banner boilerplate. The recognizer anchors matcher_patterns on
+// "Trigger reference" and decision_control + context_injection on "Exit code
+// behavior".
 var realKiroHooksLandmarks = []string{
 	"Select your cookie preferences",
 	"Customize cookie preferences",
 	"Essential", "Performance", "Functional", "Advertising",
-	"Your privacy choices",
 	"Unable to save cookie preferences",
 	"Hooks",
 	"What are agent hooks?",
 	"How agent hooks work",
 	"Setting up agent hooks",
-	"Creating a hook",
+	"JSON file format",
+	"Creating a hook from the UI",
 	"Ask Kiro to create a hook",
 	"Manually create a hook",
+	"Trigger reference",
+	"Exit code behavior",
 	"Next steps",
 }
 
@@ -295,17 +301,21 @@ var realKiroMcpLandmarks = []string{
 	"Using the Kiro panel",
 	"Environment variables",
 	"Disabling servers temporarily",
+	"OAuth authentication",
+	"Token expiry and re-authentication",
+	"Troubleshooting OAuth scopes",
 	"Security considerations",
 	"Troubleshooting configuration issues",
 }
 
-// TestRecognizeKiro_RealMcpLandmarks proves MCP recognition emits 2 canonical
-// MCP keys at "inferred" confidence: transport_types and env_var_expansion.
-// The other 6 keys (oauth_support, tool_filtering, auto_approve, marketplace,
-// resource_referencing, enterprise_management) must NOT be emitted — none
-// have heading-level evidence in the MCP doc. tool_filtering and auto_approve
-// are documented only as JSON config fields (not landmarks); the rest are
-// absent from the kiro MCP surface entirely.
+// TestRecognizeKiro_RealMcpLandmarks proves MCP recognition emits 3 canonical
+// MCP keys at "inferred" confidence: transport_types, env_var_expansion, and
+// oauth_support (added to the doc on 2026-06-10 under the "OAuth
+// authentication" heading). The other 5 keys (tool_filtering, auto_approve,
+// marketplace, resource_referencing, enterprise_management) must NOT be
+// emitted — none have heading-level evidence in the MCP doc. tool_filtering
+// and auto_approve are documented only as JSON config fields (not landmarks);
+// the rest are absent from the kiro MCP surface entirely.
 //
 // Test merges skills + rules + hooks + MCP fixtures to mirror real-world
 // cache merging — the MCP recognizer must distinguish its capabilities from
@@ -331,6 +341,7 @@ func TestRecognizeKiro_RealMcpLandmarks(t *testing.T) {
 	mcpInferred := []string{
 		"transport_types",
 		"env_var_expansion",
+		"oauth_support",
 	}
 	for _, c := range mcpInferred {
 		key := "mcp.capabilities." + c + ".supported"
@@ -342,7 +353,6 @@ func TestRecognizeKiro_RealMcpLandmarks(t *testing.T) {
 		}
 	}
 	for _, absent := range []string{
-		"mcp.capabilities.oauth_support.supported",
 		"mcp.capabilities.tool_filtering.supported",
 		"mcp.capabilities.auto_approve.supported",
 		"mcp.capabilities.marketplace.supported",
@@ -455,11 +465,12 @@ func TestRecognizeKiro_AgentsAnchorsMissing(t *testing.T) {
 }
 
 // TestRecognizeKiro_RealHooksLandmarks proves hooks recognition emits
-// hooks.supported = true on the merged skills+rules+hooks landmarks. Per the
-// curated format YAML, ALL 9 canonical hooks keys are unsupported in kiro
-// (observational shell-only, no matchers/JSON I/O/decision control). The
-// recognizer therefore emits ONLY hooks.supported via the bare anchor-only
-// pattern — no specific canonical capabilities are mapped.
+// hooks.supported = true plus the 3 canonical hooks keys that the 2026-07-09
+// doc rewrite added heading/table evidence for: matcher_patterns,
+// decision_control, and context_injection (all at "inferred" confidence). The
+// other 6 keys (handler_types, input_modification, async_execution,
+// hook_scopes, json_io_protocol, permission_control) must NOT be emitted —
+// they have no heading-level evidence.
 func TestRecognizeKiro_RealHooksLandmarks(t *testing.T) {
 	merged := append([]string{}, realKiroSkillsLandmarks...)
 	merged = append(merged, realKiroRulesLandmarks...)
@@ -476,21 +487,32 @@ func TestRecognizeKiro_RealHooksLandmarks(t *testing.T) {
 	if caps["hooks.supported"] != "true" {
 		t.Error("hooks.supported missing")
 	}
-	// All 9 canonical hooks keys are curated as unsupported for kiro — none
+	hooksInferred := []string{
+		"matcher_patterns",
+		"decision_control",
+		"context_injection",
+	}
+	for _, c := range hooksInferred {
+		key := "hooks.capabilities." + c + ".supported"
+		if caps[key] != "true" {
+			t.Errorf("%s missing", key)
+		}
+		if got := caps["hooks.capabilities."+c+".confidence"]; got != "inferred" {
+			t.Errorf("hooks.%s.confidence = %q, want inferred", c, got)
+		}
+	}
+	// The remaining 6 canonical hooks keys have no heading evidence — none
 	// must be emitted.
 	for _, absent := range []string{
 		"hooks.capabilities.handler_types.supported",
-		"hooks.capabilities.matcher_patterns.supported",
-		"hooks.capabilities.decision_control.supported",
 		"hooks.capabilities.async_execution.supported",
 		"hooks.capabilities.hook_scopes.supported",
 		"hooks.capabilities.json_io_protocol.supported",
-		"hooks.capabilities.context_injection.supported",
 		"hooks.capabilities.permission_control.supported",
 		"hooks.capabilities.input_modification.supported",
 	} {
 		if _, has := caps[absent]; has {
-			t.Errorf("%s should NOT be present for kiro (curated as unsupported)", absent)
+			t.Errorf("%s should NOT be present for kiro (no heading evidence)", absent)
 		}
 	}
 }

@@ -17,7 +17,7 @@ var realClaudeCodeLandmarks = []string{
 	"Create your first skill",
 	"Where skills live",
 	"Live change detection",
-	"Automatic discovery from nested directories",
+	"Automatic discovery from parent and nested directories",
 	"Skills from additional directories",
 	"Configure skills",
 	"Types of skill content",
@@ -91,6 +91,7 @@ var realClaudeCodeHooksLandmarks = []string{
 	"Common fields",
 	"Command hook fields",
 	"HTTP hook fields",
+	"MCP tool hook fields",
 	"Prompt and agent hook fields",
 	"Hook input and output",
 	"Common input fields",
@@ -282,11 +283,12 @@ var realClaudeCodeMcpLandmarks = []string{
 	"Documentation Index",
 	"Connect Claude Code to tools via MCP",
 	"What you can do with MCP",
-	"Popular MCP servers",
+	"Find and build MCP servers",
 	"Installing MCP servers",
 	"Option 1: Add a remote HTTP server",
 	"Option 2: Add a remote SSE server",
 	"Option 3: Add a local stdio server",
+	"Option 4: Add a remote WebSocket server",
 	"Managing your servers",
 	"MCP installation scopes",
 	"Local scope",
@@ -302,17 +304,17 @@ var realClaudeCodeMcpLandmarks = []string{
 	"Add MCP servers from JSON configuration",
 	"Use MCP resources",
 	"Reference MCP resources",
+	"Require approval for a specific tool",
 	"Managed MCP configuration",
-	"Option 1: Exclusive control with managed-mcp.json",
-	"Option 2: Policy-based control with allowlists and denylists",
-	"Allowlist behavior (allowedMcpServers)",
-	"Denylist behavior (deniedMcpServers)",
 }
 
 // TestRecognizeClaudeCode_RealMcpLandmarks proves MCP recognition fires against
-// the real cache snapshot — emits 7 of 8 canonical MCP keys at "inferred"
-// confidence (auto_approve intentionally absent — Claude Code's MCP doc has no
-// per-tool/per-server auto-approval heading above the hooks/permissions layer).
+// the real cache snapshot — emits 5 of 8 canonical MCP keys at "inferred"
+// confidence. auto_approve, marketplace, and tool_filtering are intentionally
+// absent (see the recognizer doc-comment): the doc has no per-tool/per-server
+// auto-approval heading, its former in-doc server catalog is now an external
+// directory pointer, and the server allow/deny headings moved to a separate
+// page and describe per-server (not per-tool) control.
 func TestRecognizeClaudeCode_RealMcpLandmarks(t *testing.T) {
 	result := capmon.RecognizeWithContext("claude-code", capmon.RecognitionContext{
 		Provider:  "claude-code",
@@ -331,10 +333,8 @@ func TestRecognizeClaudeCode_RealMcpLandmarks(t *testing.T) {
 		"transport_types",
 		"oauth_support",
 		"env_var_expansion",
-		"tool_filtering",
 		"resource_referencing",
 		"enterprise_management",
-		"marketplace",
 	}
 	for _, c := range mcpInferred {
 		key := "mcp.capabilities." + c + ".supported"
@@ -345,8 +345,10 @@ func TestRecognizeClaudeCode_RealMcpLandmarks(t *testing.T) {
 			t.Errorf("mcp.%s.confidence = %q, want inferred", c, got)
 		}
 	}
-	if _, has := caps["mcp.capabilities.auto_approve.supported"]; has {
-		t.Error("mcp.capabilities.auto_approve should NOT be present (no heading evidence in claude-code docs)")
+	for _, absent := range []string{"auto_approve", "marketplace", "tool_filtering"} {
+		if _, has := caps["mcp.capabilities."+absent+".supported"]; has {
+			t.Errorf("mcp.capabilities.%s should NOT be present (no heading evidence in claude-code docs)", absent)
+		}
 	}
 }
 

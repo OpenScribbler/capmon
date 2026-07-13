@@ -22,22 +22,22 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: marketplace
       supported: true
-      mechanism: 'Zed exposes an in-app MCP server gallery (zed: extensions filtered to context-servers, or Agent Panel > View Server Extensions) where servers can be browsed and installed'
+      mechanism: 'Zed exposes an in-app MCP server gallery (''As Extensions'' heading): zed: extensions action, or Settings > AI > MCP Servers > Add Server > Install from Extensions, where servers can be browsed and installed'
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: oauth_support
       supported: true
-      mechanism: When a remote MCP server is configured with a url but no Authorization header, Zed prompts the user to authenticate using the standard MCP OAuth flow
+      mechanism: When a remote MCP server is configured with a url but no Authorization header, Zed prompts the user to authenticate using the standard MCP OAuth flow; since upstream commit 12e1e244 (2026-07-03) the flow is also initiated when the server answers post-initialize requests with 401 Unauthorized carrying a WWW-Authenticate challenge (ContextServer::auth_challenge)
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: resource_referencing
       supported: false
-      mechanism: MCP resource referencing via @-style syntax is not documented
+      mechanism: explicitly out of scope — the 'Supported Features' heading states Zed currently supports MCP's Tools and Prompts features only (Discovery, Sampling, Elicitation listed as welcome contributions); no resource referencing
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: tool_filtering
       supported: true
       mechanism: 'Per-profile per-server tool enable/disable maps are supported via context_servers.<name>.tools in agent profile config; enable_all_context_servers: false allows disabling all servers except those explicitly listed in the profile'

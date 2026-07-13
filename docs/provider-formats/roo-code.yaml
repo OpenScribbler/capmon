@@ -1,7 +1,12 @@
+# ⚠ SUNSET (2026-05-15): Roo Code was discontinued; the upstream repo is
+# archived read-only. Claims below describe the frozen final release — still
+# accurate for the still-installable extension, but no longer evolving.
+# Sources stay monitored to catch takedowns/redirect breaks, not new features.
+# See docs/provider-sources/roo-code.yaml for the full sunset note.
 provider: roo-code
 docs_url: "https://docs.roocode.com"
 category: ide-extension
-last_fetched_at: "2026-04-11T00:00:00Z"
+last_fetched_at: "2026-07-13T18:22:26Z"
 last_changed_at: "2026-04-11T00:00:00Z"
 generation_method: human-edited
 
@@ -12,11 +17,13 @@ content_types:
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/.roo/rules/rules.md"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:56c6fbe03fc949f317cb713e666513c321d632be98e0ccc15f741de1c95c498e"
+        fetched_at: "2026-07-13T18:22:26Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/.roo/rules-code/use-safeWriteJson.md"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:f001cb0acb40182d790f8ed4ffb03c0adfcd1c4e021274f4e0195b6d51b7712c"
+        fetched_at: "2026-07-13T18:22:26Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -85,7 +92,8 @@ content_types:
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/.roo/skills/roo-translation/SKILL.md"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:572905c8c70f26ff4aed5354ff9468127dbed96e91e4bbe3776d831fe7a817f1"
+        fetched_at: "2026-07-13T18:22:26Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -174,15 +182,18 @@ content_types:
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/src/services/mcp/McpHub.ts"
         type: source_code
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:322dfa749a97441f3f4cc92676355c130bfa38f6a0b1a7fef2c845e9fa89a951"
+        fetched_at: "2026-07-13T18:22:26Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/packages/types/src/mcp.ts"
         type: source_code
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:7064b2b899eee528246e0fd2e123d2de6bc8712a540353245046cbd5e02ae6fe"
+        fetched_at: "2026-07-13T18:22:26Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/src/shared/globalFileNames.ts"
         type: source_code
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:0899ab51711478743f970592fd542cbc164e6ba3ea70e6a1498e4740fa95f972"
+        fetched_at: "2026-07-13T18:22:26Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -226,22 +237,22 @@ content_types:
         provider_field: type
       - id: always_allow
         name: alwaysAllow per-server allowlist
-        summary: Array of tool names that skip the user confirmation prompt for that server; distinct from Cline's autoApprove field name.
-        source_ref: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/packages/types/src/mcp.ts"
+        summary: Array of tool names that skip the user confirmation prompt for that server; distinct from Cline's autoApprove field name. Defined in McpHub.ts BaseConfigSchema as alwaysAllow z.array(z.string()).
+        source_ref: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/src/services/mcp/McpHub.ts"
         graduation_candidate: true
         conversion: translated
         provider_field: alwaysAllow
       - id: disabled_tools
         name: disabledTools per-server blocklist
-        summary: Array of tool names hidden from the agent, applied alongside alwaysAllow on each server entry.
-        source_ref: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/packages/types/src/mcp.ts"
+        summary: Array of tool names hidden from the agent, applied alongside alwaysAllow on each server entry. Defined in McpHub.ts BaseConfigSchema as disabledTools z.array(z.string()).
+        source_ref: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/src/services/mcp/McpHub.ts"
         graduation_candidate: true
         conversion: translated
         provider_field: disabledTools
       - id: watch_paths
         name: watchPaths config-reload triggers
-        summary: Array of filesystem paths that trigger a server reload when their contents change, useful for development iteration on stdio server binaries.
-        source_ref: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/packages/types/src/mcp.ts"
+        summary: Array of filesystem paths that trigger a server reload when their contents change, useful for development iteration on stdio server binaries. Defined in McpHub.ts BaseConfigSchema as watchPaths z.array(z.string()).optional().
+        source_ref: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/src/services/mcp/McpHub.ts"
         graduation_candidate: false
         conversion: embedded
         provider_field: watchPaths
@@ -268,15 +279,18 @@ content_types:
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/packages/types/src/mode.ts"
         type: source_code
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:2fd53138c0c2f2a75ddfe66e06abc14cc34862513385b47a79793d9680b3afc6"
+        fetched_at: "2026-07-13T18:22:26Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/src/core/config/CustomModesManager.ts"
         type: source_code
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:38906a0b4f2f645ccf01727af23b43b12c912c58fb17e3ebb1c54e64d65e5219"
+        fetched_at: "2026-07-13T18:22:26Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/.roomodes"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:6f7638ce4f233a805bd0979d6a20badc765314c1b928aad74bc56536705bb53b"
+        fetched_at: "2026-07-13T18:22:26Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -284,7 +298,7 @@ content_types:
         confidence: confirmed
       tool_restrictions:
         supported: true
-        mechanism: "groups array declares which tool groups (e.g., read, edit, browser, command, mcp) the mode may use; group entries may be strings or objects with fileRegex restrictions"
+        mechanism: "groups array declares which tool groups (read, edit, command, mcp) the mode may use; entries may be strings or [group, {fileRegex, description}] tuples for path-scoped edit access. The legacy 'browser' group is deprecated and stripped on load per mode.ts deprecatedToolGroups"
         confidence: confirmed
       invocation_patterns:
         supported: true
@@ -337,7 +351,7 @@ content_types:
         provider_field: customInstructions
       - id: tool_groups
         name: groups tool-group allowlist
-        summary: Array declaring which Roo Code tool groups (read, edit, browser, command, mcp) the mode may use; edit may also carry a fileRegex restriction object for path-scoped file writes.
+        summary: Array declaring which Roo Code tool groups (read, edit, command, mcp) the mode may use; edit may also carry a fileRegex restriction object for path-scoped file writes. The legacy 'browser' group is deprecated and stripped on load.
         source_ref: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/packages/types/src/mode.ts"
         graduation_candidate: true
         conversion: translated
@@ -364,7 +378,8 @@ content_types:
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/.roo/commands/commit.md"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-04-11T00:00:00Z"
+        content_hash: "sha256:efc08126119069c83264d02b8762b53bae9fbdb35b6d80db9431ede45fd8e3fc"
+        fetched_at: "2026-07-13T18:22:26Z"
     canonical_mappings:
       argument_substitution:
         supported: true

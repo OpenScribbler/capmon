@@ -72,8 +72,8 @@ content_types:
             confidence: inferred
       hierarchical_loading:
         supported: true
-        mechanism: hierarchical AGENTS.md loading gated by child_agents_md feature flag in config.toml; codex emits a precedence-explanation message to the model when enabled (documented under 'Hierarchical agents message')
-        confidence: inferred
+        mechanism: "Codex unconditionally collects every AGENTS.md from the project root down to the cwd and combines them (codex-rs/core/src/agents_md.rs module doc + find_nearest_ancestor_with_markers). The former child_agents_md feature flag was removed upstream (openai/codex #28993); base hierarchical loading is now always-on."
+        confidence: confirmed
   skills:
     supported: true
     capabilities:

@@ -12,13 +12,13 @@ content_types:
       - uri: "https://docs.cline.bot/customization/skills.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:976a101896fc0bbfc0573055d4f3ffecfc2ea833b7c10edcb64236b0d2de5500"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:6f8562d51b02f3bdb9616d7efda38ea8b7799dfc06693720b6056307a21a3512"
+        fetched_at: "2026-07-13T18:30:00Z"
       - uri: "https://docs.cline.bot/customization/skills"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:c6e0aa7e2d9bf93b4b5f4dc029a0432dac561a79a0fb5b52a6565a8d41204f1a"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:19ecc139d128f9617d8c5ed7e8c5f95d31c8151973628c4e68bc2cea4eeab09e"
+        fetched_at: "2026-07-13T18:30:00Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -60,12 +60,13 @@ content_types:
         supported: false
         confidence: confirmed
       user_invocable:
-        supported: false
+        supported: true
+        mechanism: "Enabled skills can be invoked explicitly from the chat input via slash command (/<skill-name>, e.g. /aws-deploy), which forces Cline to load that skill's SKILL.md — documented under 'Triggering Skills with Slash Commands'"
         confidence: confirmed
       auto_invocable:
         supported: true
         extension_id: description_based_auto_invocation
-        mechanism: "Cline auto-invokes skills by matching user message against the description frontmatter field via the use_skill tool; no explicit @-mention syntax exists."
+        mechanism: "Cline auto-invokes skills by matching the user message against the description frontmatter field via the use_skill tool; enabled skills can additionally be triggered explicitly by slash command (see user_invocable) — documented under 'How Skills Work' / 'Triggering Skills with Slash Commands'"
         confidence: confirmed
       skill_bundled_resources:
         supported: true
@@ -86,11 +87,18 @@ content_types:
         conversion: not-portable
       - id: description_based_auto_invocation
         name: Description-Based Auto-Invocation via use_skill Tool
-        summary: "Cline auto-invokes skills by matching user message against the description field; no explicit @-mention syntax exists."
+        summary: "Cline auto-invokes skills by matching the user message against the description field; enabled skills can also be triggered explicitly via slash command."
         source_ref: "https://docs.cline.bot/customization/skills.md#how-skills-work"
         graduation_candidate: false
         graduation_notes: "Graduated to auto_invocable canonical key (issue #73)."
         provider_field: "description"
+        conversion: not-portable
+      - id: slash_command_skill_invocation
+        name: Explicit Skill Invocation via Slash Command
+        summary: "Any enabled skill can be triggered directly from chat by typing /<skill-name> (e.g. /aws-deploy), forcing its SKILL.md to load instead of waiting for description-based auto-matching."
+        source_ref: "https://docs.cline.bot/customization/skills.md#triggering-skills-with-slash-commands"
+        graduation_candidate: false
+        graduation_notes: "Graduated to user_invocable canonical key (drift review 2026-07-13)."
         conversion: not-portable
       - id: skill_toggle
         name: Per-Skill Enable/Disable Toggle
@@ -120,8 +128,8 @@ content_types:
       - uri: "https://docs.cline.bot/customization/cline-rules"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:7c2687a2da2a6981d9a1b2e2df33268af46a608f146c9077e4e135570762e488"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:b6074899464576127d8de21fe761adf8dfd2f60dccdb8c518037d2c28e07d15f"
+        fetched_at: "2026-07-13T18:30:00Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -133,7 +141,7 @@ content_types:
         confidence: inferred
       cross_provider_recognition:
         supported: true
-        mechanism: "multi_source_rule_detection: Cline reads .clinerules/, .cursorrules, CLAUDE.md, and other provider rule files automatically"
+        mechanism: "multi_source_rule_detection: Cline auto-detects rules from .clinerules/, .cursorrules, .windsurfrules, and AGENTS.md (including ~/.agents/AGENTS.md) — documented under 'Supported Rule Types'. CLAUDE.md is no longer listed in the supported rule-type table (dropped in favor of the AGENTS.md standard)."
         confidence: confirmed
       auto_memory:
         supported: false
@@ -186,8 +194,8 @@ content_types:
       - uri: "https://docs.cline.bot/customization/hooks"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:a127d7a4123f8cf85f779b4242e8aeff257b8b86502e5b6bc062f5505acbc7e4"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:259407a07abc54281f6819965dc81f4f5c7ee17a28b311cc6458ec3d67ebae7c"
+        fetched_at: "2026-07-13T18:30:00Z"
     canonical_mappings:
       handler_types:
         supported: false
@@ -279,23 +287,43 @@ content_types:
       (milliseconds since epoch), not a number — this is a migration note for older scripts.
       workspaceRoots replaces the old singular workspacePath field.
 
+      ⚠ DRIFT FLAG (2026-07-13, issue #5): The dedicated hooks doc
+      (docs.cline.bot/customization/hooks) is now a 2-line stub reading "See details under
+      SDK Hooks page / See details under SDK Plugins" and the content moved into the Cline
+      SDK plugin system (docs.cline.bot/customization/plugins, /sdk/plugins,
+      /sdk/guides/writing-plugins). The NEW model replaces the filesystem-script model
+      (extensionless/.ps1 files named after the hook type in .clinerules/hooks/ or
+      ~/Documents/Cline/Hooks, JSON via stdin/stdout with cancel/contextModification/
+      errorMessage, eight named hook types) with TypeScript plugin lifecycle handlers
+      (beforeRun/afterRun/beforeModel/afterModel/beforeTool/afterTool/onEvent), a richer
+      hook-stage list (session_start, run_start, tool_call_before, tool_call_after, run_end,
+      error, …), and hook policies (mode blocking|async, timeoutMs, retries, failureMode
+      fail_open|fail_closed, maxConcurrency, queueLimit). This implies real canonical-key
+      changes NOT yet applied here: async_execution false→true, decision_control/
+      input_modification/context_injection now via plugin hook stages, json_io_protocol
+      (stdin/stdout JSON) likely no longer the mechanism, and eight_hook_types /
+      platform_specific_file_format obsolete. AMBIGUITY held for maintainer: the plugins doc
+      warns "This feature currently only applies to Cline SDK, CLI, and Kanban. Not
+      applicable on VSCode and JetBrains Extension for now" — so the OLD filesystem hook
+      model may STILL be the VSCode/JetBrains mechanism, i.e. the two models may coexist by
+      surface. Full re-curation deferred: requires re-pointing hooks sources to the plugin
+      docs, refetching cache, and a maintainer decision on the dual-model split. The
+      canonical_mappings above still describe the OLD model pending that decision.
+
   mcp:
     status: supported
     sources:
-      - uri: "https://docs.cline.bot/mcp/configuring-mcp-servers"
+      # 2026-07-13 (issue #5): both prior MCP pages (configuring-mcp-servers and
+      # mcp-transport-mechanisms) now 301-redirect to the consolidated mcp-overview page.
+      - uri: "https://docs.cline.bot/mcp/mcp-overview"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:eda2a0484ef5174a3653c427e2af14a6201dcd6be1f80b3d16233aaa9566bcbc"
-        fetched_at: "2026-05-06T00:00:00Z"
-      - uri: "https://docs.cline.bot/mcp/mcp-transport-mechanisms"
-        type: documentation
-        fetch_method: readability
-        content_hash: "sha256:69dfa51966bd3bb4455bd7b17fa34b3a23afa2165245753b5ba6c417c3d52e12"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:5b4032a7dc0b154784b318976d56b3b5e88e152b39a2209c246b0f945a08a5b0"
+        fetched_at: "2026-07-13T18:30:00Z"
     canonical_mappings:
       transport_types:
         supported: true
-        mechanism: "sse_transport_support: Cline supports SSE transport alongside stdio; HTTP transport support follows MCP protocol adoption"
+        mechanism: "Cline supports STDIO (local process) plus remote transports selected by the config `type` field: `streamableHttp` (recommended) and `sse` (legacy; the default when `type` is omitted) — documented under 'Transport types' and the 'Remote server (Streamable HTTP)' configuration example"
         confidence: confirmed
       oauth_support:
         supported: false
@@ -307,88 +335,77 @@ content_types:
         confidence: inferred
       tool_filtering:
         supported: true
-        mechanism: "always_allow_tools (visibility scope): Cline's always_allow list controls which MCP tools are exposed in the agent's available tool set without per-invocation prompts"
+        mechanism: "autoApprove (per-server tool list): the `autoApprove` array in a server's config entry names the MCP tools allowed to run without per-invocation confirmation — documented in the 'Configuration examples' JSON and 'Security basics' (Limit autoApprove to safe tools). NOTE: this field was renamed from `alwaysAllow` to `autoApprove` in the 2026-07 MCP docs consolidation."
         confidence: confirmed
       auto_approve:
         supported: true
-        mechanism: "always_allow_tools (execution-gating scope): Cline's always_allow list suppresses per-invocation confirmation prompts for listed tools that are already visible"
+        mechanism: "autoApprove (execution gating): the per-server `autoApprove` array suppresses per-invocation approval prompts for the listed MCP tools — documented under 'Configuration examples' / 'Security basics'"
         confidence: confirmed
       marketplace:
-        supported: true
-        mechanism: "mcp_marketplace: Cline has an in-IDE MCP server discovery and installation experience"
-        confidence: confirmed
+        supported: false
+        mechanism: "The 2026-07 MCP docs consolidation into mcp-overview removed the in-IDE MCP Marketplace section; no marketplace / 'Finding MCP Servers' discovery experience is documented in the current MCP docs or the docs.cline.bot/llms.txt sitemap (verified 2026-07-13). Server addition is now manual config, the `cline mcp` CLI wizard, or the Remote Servers tab."
+        confidence: inferred
       resource_referencing:
         supported: false
         mechanism: "Cline does not document @-mention or equivalent access to MCP resources"
         confidence: inferred
       enterprise_management:
-        supported: false
-        mechanism: "Cline does not document organization-level MCP configuration management"
+        supported: true
+        mechanism: "Cline Enterprise now documents org-level MCP management: 'MCP Server Controls' covers MCP server allowlisting and remote-MCP-server management (docs.cline.bot/enterprise-solutions/.../control-other-cline-features/mcp-server-controls) — verified 2026-07-13. NOTE: this evidence lives on the enterprise docs tree, not the tracked mcp-overview source."
         confidence: inferred
+    # 2026-07-13 (issue #5): the mcp_marketplace, ai_assisted_server_setup, and
+    # global_mcp_mode extensions were removed — those sections no longer appear in the
+    # consolidated MCP docs or the docs.cline.bot/llms.txt sitemap (verified 2026-07-13).
+    # Whether the underlying UI features still exist in-product is unverified; flagged for
+    # maintainer.
     provider_extensions:
-      - id: mcp_marketplace
-        name: Built-In MCP Marketplace for Server Discovery and Installation
-        summary: "In-IDE Marketplace UI for browsing and installing MCP servers directly from the MCP Servers panel."
-        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#finding-mcp-servers"
-        graduation_candidate: false
-        conversion: not-portable
-      - id: ai_assisted_server_setup
-        name: AI-Assisted MCP Server Setup via Conversation
-        summary: "Conversational setup flow: paste a GitHub repo URL and Cline clones, builds, and configures the MCP server with clarifying questions."
-        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#adding-servers-with-cline"
-        graduation_candidate: false
-        conversion: not-portable
-      - id: always_allow_tools
-        name: alwaysAllow List for Auto-Approving Specific MCP Tools
-        summary: "Per-server `alwaysAllow` array of tool names that execute without user confirmation; server-scoped, tool-name-specific."
-        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#stdio-transport-local-servers"
+      - id: auto_approve_tools
+        name: autoApprove List for Auto-Approving Specific MCP Tools
+        summary: "Per-server `autoApprove` array of tool names that execute without user confirmation; server-scoped, tool-name-specific. Renamed from the former `alwaysAllow` field."
+        source_ref: "https://docs.cline.bot/mcp/mcp-overview#configuration-examples"
         graduation_candidate: true
-        provider_field: "alwaysAllow"
+        provider_field: "autoApprove"
         conversion: translated
-      - id: global_mcp_mode
-        name: Global MCP Mode Setting for Token Usage Control
-        summary: "Global Cline>Mcp:Mode setting in Advanced MCP Settings that tunes token usage across all MCP servers."
-        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#global-mcp-mode"
-        graduation_candidate: false
-        conversion: not-portable
-      - id: sse_transport_support
-        name: SSE Transport Support for Remote MCP Servers
-        summary: "SSE transport for remote MCP servers over HTTP/HTTPS, configured via `url` + optional `headers` instead of command/args."
-        source_ref: "https://docs.cline.bot/mcp/configuring-mcp-servers#sse-transport-remote-servers"
+      - id: streamable_http_transport
+        name: Streamable HTTP Transport for Remote MCP Servers (SSE Legacy)
+        summary: "Remote MCP servers over HTTP/HTTPS configured via `url` + optional `headers`; the `type` field selects `streamableHttp` (recommended) or `sse` (legacy). Omitting `type` defaults to legacy `sse`."
+        source_ref: "https://docs.cline.bot/mcp/mcp-overview#transport-types"
         graduation_candidate: true
-        provider_field: "url"
+        provider_field: "type"
         conversion: translated
-      - id: stdio_vs_sse_deployment
-        name: "STDIO vs SSE: Per-User vs Centralized Deployment Model"
-        summary: "STDIO requires per-user installation with local resource use; SSE enables centralized single-server deployment serving multiple concurrent users over HTTP/HTTPS with server-side resource consumption."
-        source_ref: "https://docs.cline.bot/mcp/mcp-transport-mechanisms"
+      - id: stdio_vs_remote_deployment
+        name: "STDIO vs Remote: Per-User vs Centralized Deployment Model"
+        summary: "STDIO runs a local per-user process (lower latency, simpler local setup); remote HTTP/SSE enables a centralized hosted endpoint serving multiple concurrent clients."
+        source_ref: "https://docs.cline.bot/mcp/mcp-overview#transport-types"
         graduation_candidate: true
         conversion: not-portable
     loading_model: >
-      MCP server configuration is stored in cline_mcp_settings.json (edited via the MCP
-      Servers > Configure tab). STDIO servers are spawned as child processes (command + args
-      + env) using JSON-RPC 2.0 over newline-delimited stdin/stdout streams. SSE servers are
-      accessed over HTTP/HTTPS via a persistent connection for server-to-client events plus
-      separate POST requests for client-to-server messages. Both transports support an
-      alwaysAllow tool list and a disabled flag. Cline auto-detects available tools from
-      each connected server and surfaces them in chat. Per-server enable/disable toggles and
-      restart controls are available in the UI. Network timeout is configurable per server
-      (30s–1h, default 1 minute).
-    notes: "Config file is cline_mcp_settings.json. STDIO servers use command/args/env keys; SSE servers use url/headers keys. The disabled field can be set to true to deactivate without deleting. Windows requires PowerShell available on PATH for STDIO hook execution (hooks and MCP are separate, but same PowerShell dependency applies)."
+      MCP servers are declared under an `mcpServers` object. The CLI stores this in
+      ~/.cline/mcp.json; the IDE extension edits its MCP settings JSON via MCP Servers >
+      Configure (or adds hosted endpoints through the Remote Servers tab). STDIO servers are
+      spawned as child processes (command + args + env). Remote servers are reached over
+      HTTP/HTTPS with the transport chosen by the `type` field: `streamableHttp`
+      (recommended) or `sse` (legacy; the default when `type` is omitted). Both transports
+      support a per-server `autoApprove` tool list and a `disabled` flag. Cline auto-detects
+      available tools from each connected server and surfaces them in chat. Per-server
+      enable/disable and restart controls plus configurable request timeouts are available
+      in MCP settings; the `cline mcp` CLI wizard offers the same management actions.
+    notes: "CLI config file is ~/.cline/mcp.json; servers live under the `mcpServers` object. STDIO servers use command/args/env keys; remote servers use type/url/headers keys. Set `\"type\": \"streamableHttp\"` explicitly for the recommended transport — omitting `type` falls back to legacy `sse`. The per-server tool auto-approve field was renamed alwaysAllow → autoApprove in the 2026-07 docs consolidation. The `disabled` field deactivates a server without deleting it. The two prior MCP pages (configuring-mcp-servers, mcp-transport-mechanisms) now redirect to mcp-overview."
 
   commands:
     status: supported
+    # 2026-07-13 (issue #5): the dedicated Workflows doc was removed —
+    # customization/workflows.md now 301-redirects to cline-rules.md and
+    # features/slash-commands/workflows.md returns 404; no workflows page appears in the
+    # docs.cline.bot/llms.txt sitemap. The user-authored-command role is now filled by
+    # skills triggered via slash command (see using-commands 'Skills via Slash Commands').
+    # The workflows.md source was dropped here; see notes for the flagged consequences.
     sources:
-      - uri: "https://docs.cline.bot/customization/workflows.md"
-        type: documentation
-        fetch_method: readability
-        content_hash: "sha256:b0366d5f0127c883589b4a77238e0c6c80965a25053d57b3771c189cf1ad95b5"
-        fetched_at: "2026-05-06T00:00:00Z"
       - uri: "https://docs.cline.bot/core-workflows/using-commands"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:b825b520ece51cb1df960fffadcf58b7b2a96028e64c20d42e71733f52f62d8a"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:fd58abc91f2db2f90b490bdad97718ea0b08c09e2900380ede7d3a9dc3a5ef4f"
+        fetched_at: "2026-07-13T18:30:00Z"
     canonical_mappings:
       argument_substitution:
         supported: false
@@ -396,7 +413,7 @@ content_types:
         confidence: inferred
       builtin_commands:
         supported: true
-        mechanism: "Built-in slash commands (e.g., /newtask, /smol alias /compact, /newrule, /deep-planning, /explain-changes in VS Code, /reportbug) are hardcoded and not user-modifiable; user-authored workflows are additive, invoked alongside built-ins"
+        mechanism: "Built-in slash commands (/newtask, /smol alias /compact, /newrule, /deep-planning, /reportbug) are hardcoded and not user-modifiable — documented under 'Slash Commands'. As of 2026-07 /explain-changes is no longer listed; enabled skills are additive, invoked via slash command ('Skills via Slash Commands')"
         confidence: confirmed
     provider_extensions:
       - id: filename_as_command_name
@@ -425,7 +442,7 @@ content_types:
         conversion: not-portable
       - id: builtin_slash_commands
         name: Built-In Slash Commands
-        summary: "Hardcoded slash commands including /newtask, /smol (alias /compact), /newrule, /deep-planning, /explain-changes (VS Code only), /reportbug; separate from user-authored workflows."
+        summary: "Hardcoded slash commands: /newtask, /smol (alias /compact), /newrule, /deep-planning, /reportbug; separate from skills triggered via slash command. (/explain-changes was removed from the docs table in 2026-07.)"
         source_ref: "https://docs.cline.bot/core-workflows/using-commands#slash-commands"
         graduation_candidate: false
         conversion: not-portable
@@ -459,7 +476,20 @@ content_types:
       Documents folder. Workflow files are plain markdown — no frontmatter schema is defined
       and none is required. Invocation includes the .md extension (e.g., /deploy.md, not
       /deploy). Project workflows take precedence over global workflows on name collision.
-      Built-in slash commands are not user-modifiable; /explain-changes is VS Code-only.
+
+      ⚠ DRIFT FLAG (2026-07-13, issue #5): The dedicated Workflows documentation page was
+      removed — customization/workflows.md redirects to cline-rules.md,
+      features/slash-commands/workflows.md returns 404, and no workflows page remains in the
+      llms.txt sitemap (verified 2026-07-13). The surviving commands doc (using-commands) now
+      documents built-in slash commands plus 'Skills via Slash Commands' as the reusable
+      user-triggered mechanism, but no longer describes user-authored Workflow markdown files.
+      Consequence held for maintainer: the four workflow-based provider_extensions
+      (filename_as_command_name, two_scope_loading, plain_markdown_body,
+      xml_tool_syntax_in_workflows) now cite a removed page and their supported: mechanism has
+      no live doc evidence. It is UNVERIFIED whether the Workflows feature was removed from the
+      product or merely undocumented (superseded by slash-invocable skills). Left in place
+      pending a maintainer decision; /explain-changes was also dropped from the slash-command
+      table.
 
   agents:
     status: unsupported

@@ -27,11 +27,11 @@ proposed_mappings:
       source_value: ""
       confidence: inferred
     - canonical_key: oauth_support
-      supported: false
-      mechanism: Kiro MCP does not document OAuth 2.0 authentication; remote server auth uses static headers
+      supported: true
+      mechanism: Kiro handles browser-based OAuth flows automatically for remote MCP servers, using Dynamic Client Registration (DCR) by default; documented under 'OAuth authentication' heading (added 2026-06-10). For providers without DCR, oauth.clientId + oauthScopes (and optional oauth.redirectUri) are supplied per server. Only public PKCE clients (no client secret) are supported; expired tokens trigger automatic browser re-authentication.
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: resource_referencing
       supported: false
       mechanism: Kiro does not document MCP resource referencing

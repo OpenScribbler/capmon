@@ -1,19 +1,22 @@
 provider: windsurf
-docs_url: "https://docs.windsurf.com"
+# Windsurf was rebranded "Devin Desktop" by Cognition (2026); docs moved from
+# docs.windsurf.com/windsurf/cascade/* to docs.devin.ai/desktop/cascade/* with a
+# 1:1 page mapping. Slug stays `windsurf` (rename tracked separately).
+docs_url: "https://docs.devin.ai"
 category: standalone-app
-last_fetched_at: "2026-05-06T13:00:00Z"
-last_changed_at: "2026-05-06T13:00:00Z"
+last_fetched_at: "2026-07-13T18:23:29Z"
+last_changed_at: "2026-07-13T18:23:29Z"
 generation_method: subagent
 
 content_types:
   skills:
     status: supported
     sources:
-      - uri: "https://docs.windsurf.com/windsurf/cascade/skills.md"
+      - uri: "https://docs.devin.ai/desktop/cascade/skills.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:e1b8a6ec820a9f66f08251e7d3d1b2c1ffd2b1225fa0ecdba53cd418379e2d08"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:dd8cc997ea7a6b9088155609fd924f8187e095bffe6ef2e3d2da993ca5a85dda"
+        fetched_at: "2026-07-13T18:23:29Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -62,7 +65,7 @@ content_types:
       skill_bundled_resources:
         supported: true
         mechanism: "Arbitrary additional files alongside SKILL.md (scripts, checklists, templates) in the skill directory; all are loaded when the skill is invoked."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/skills.md#adding-supporting-resources"
+        source_ref: "https://docs.devin.ai/desktop/cascade/skills.md#adding-supporting-resources"
         confidence: confirmed
     # Optional extension depth fields (populated by capmon subagent):
     # - required: true | false | null (null = source doesn't say)
@@ -72,28 +75,28 @@ content_types:
       - id: supporting_resource_files
         name: Supporting resource files
         summary: "Arbitrary additional files alongside SKILL.md (scripts, checklists, templates) bundle a multi-step workflow into a single skill directory."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/skills.md#adding-supporting-resources"
+        source_ref: "https://docs.devin.ai/desktop/cascade/skills.md#adding-supporting-resources"
         graduation_candidate: false
         graduation_notes: "Graduated to skill_bundled_resources canonical key (issue #74)."
         conversion: not-portable
       - id: name_format_constraint
         name: Skill name format constraint
         summary: "Skill identifiers must be unique per scope and contain only lowercase letters, numbers, and hyphens."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/skills.md#required-frontmatter-fields"
+        source_ref: "https://docs.devin.ai/desktop/cascade/skills.md#required-frontmatter-fields"
         graduation_candidate: false
         provider_field: "name"
         conversion: embedded
       - id: auto_invocation
         name: Automatic model-driven invocation
         summary: "Cascade auto-invokes a skill when the user's request semantically matches its `description` frontmatter field."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/skills.md#automatic-invocation"
+        source_ref: "https://docs.devin.ai/desktop/cascade/skills.md#automatic-invocation"
         graduation_candidate: false
         provider_field: "description"
         conversion: not-portable
       - id: ui_creation
         name: UI-based skill creation
         summary: "Skills can be created through the Cascade panel UI (Workspace or Global) without manually authoring files."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/skills.md#using-the-ui-easiest"
+        source_ref: "https://docs.devin.ai/desktop/cascade/skills.md#using-the-ui-easiest"
         graduation_candidate: false
         conversion: not-portable
     loading_model: >
@@ -118,16 +121,16 @@ content_types:
   rules:
     status: supported
     sources:
-      - uri: "https://docs.windsurf.com/windsurf/cascade/memories.md"
+      - uri: "https://docs.devin.ai/desktop/cascade/memories.md"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:fc773e8df8957c2c576b5fd6f0367f40dd6a96c764a1cb8b09c36c990931119d"
-        fetched_at: "2026-05-06T13:00:00Z"
-      - uri: "https://docs.windsurf.com/windsurf/cascade/agents-md.md"
+        content_hash: "sha256:8de4729b80d441bfb2c1bf862dde70d1706c9bf955118cd4264767d3bd0c8666"
+        fetched_at: "2026-07-13T18:23:29Z"
+      - uri: "https://docs.devin.ai/desktop/cascade/agents-md.md"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:b39cca40533944da6f48b8d8c540161e0cc490a3468e7cd53dcfbd86a9dc5a68"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:4a890fc87f992fc59dd80be1d82ed1724c90f6a66047eca07b5790ff510e60a5"
+        fetched_at: "2026-07-13T18:23:29Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -147,38 +150,38 @@ content_types:
         confidence: confirmed
       hierarchical_loading:
         supported: true
-        mechanism: "rules_hierarchical_discovery: Windsurf discovers .windsurf/rules/ directories in the current workspace, all sub-directories, and parent directories up to the git root; rules from all levels are merged and deduplicated"
+        mechanism: "rules_hierarchical_discovery: rules directories are discovered in the current workspace, all sub-directories, and parent directories up to the git root; rules from all levels are merged and deduplicated. Per 'Rules Discovery' / 'Rules Storage Locations', .devin/rules/ is the preferred location and takes precedence, with .windsurf/rules/ kept as a legacy fallback for backward compatibility"
         confidence: confirmed
     provider_extensions:
       - id: activation_modes
         name: Four activation modes via trigger frontmatter
         summary: "Rules select one of four activation modes (always_on, model_decision, glob, or manual) via frontmatter."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/memories.md#activation-modes"
+        source_ref: "https://docs.devin.ai/desktop/cascade/memories.md#activation-modes"
         graduation_candidate: true
         provider_field: "trigger"
         conversion: translated
       - id: agents_md_auto_scoping
         name: "AGENTS.md and agents.md: location-based auto-scoping without frontmatter"
         summary: "Both AGENTS.md and agents.md (case-insensitive) are recognized; root-level files are always-on while subdirectory files become auto-glob rules scoped to that subtree."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/agents-md.md"
+        source_ref: "https://docs.devin.ai/desktop/cascade/agents-md.md"
         graduation_candidate: true
         conversion: not-portable
       - id: three_scopes_plus_system
         name: Global, workspace, and system rule scopes
-        summary: "Rules load from three user scopes plus an enterprise system scope, with per-scope character limits and OS-specific managed paths."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/memories.md#rules"
+        summary: "Rules load from three user scopes plus an enterprise system scope, with per-scope character limits and OS-specific managed paths. Global: ~/.codeium/windsurf/memories/global_rules.md (6,000-char limit). Workspace: .devin/rules/*.md preferred, .windsurf/rules/*.md legacy fallback (12,000-char limit each; legacy single-file .windsurfrules still read). System (per 'System-Level Rules (Enterprise)'): /etc/devin/rules/, /Library/Application Support/Devin/rules/, C:\\ProgramData\\Devin\\rules\\ preferred, with the legacy Windsurf-named directories as fallback."
+        source_ref: "https://docs.devin.ai/desktop/cascade/memories.md#rules"
         graduation_candidate: false
         conversion: not-portable
       - id: auto_generated_memories
         name: Auto-generated memories distinct from rules
         summary: "Cascade auto-generates workspace-scoped memories during conversations, stored separately from user-authored Rules and not committed to git."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/memories.md#memories"
+        source_ref: "https://docs.devin.ai/desktop/cascade/memories.md#memories"
         graduation_candidate: false
         conversion: not-portable
       - id: rules_hierarchical_discovery
         name: Multi-level hierarchical rules discovery
-        summary: "Windsurf searches for .windsurf/rules/ directories in the current workspace, all subdirectories, and parent directories up to the git root; rules from multiple locations are merged and deduplicated, displayed with shortest relative paths."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/memories.md#rules-discovery"
+        summary: "Windsurf (Devin Desktop) searches for .devin/rules/ (preferred) and legacy .windsurf/rules/ directories in the current workspace, all subdirectories, and parent directories up to the git root; rules from multiple locations are merged and deduplicated, displayed with shortest relative paths."
+        source_ref: "https://docs.devin.ai/desktop/cascade/memories.md#rules-discovery"
         graduation_candidate: false
         conversion: not-portable
     loading_model: >
@@ -201,17 +204,24 @@ content_types:
       reliably reusable knowledge, Rules or AGENTS.md are preferred over auto-generated Memories,
       since they are version-controlled and team-shareable. Rules discovery now includes
       subdirectories of the workspace and parent directories up to the git root, enabling
-      monorepo and multi-level project structures. Example community rule templates are maintained
-      at https://windsurf.com/editor/directory.
+      monorepo and multi-level project structures. Rebrand note (2026-07): following the
+      Windsurf -> "Devin Desktop" rebrand by Cognition, the docs designate .devin/rules/ as the
+      preferred workspace location (takes precedence) with .windsurf/rules/ as a legacy fallback,
+      and Devin-named system directories (e.g. /etc/devin/rules/) as preferred over the legacy
+      Windsurf-named ones ('Rules Discovery', 'Rules Storage Locations', 'System-Level Rules
+      (Enterprise)' headings). The global rules file remains ~/.codeium/windsurf/memories/
+      global_rules.md. The former community rule-template directory at
+      windsurf.com/editor/directory no longer resolves (redirects into docs.devin.ai); the docs
+      still cite it, but it is not a usable source.
 
   hooks:
     status: supported
     sources:
-      - uri: "https://docs.windsurf.com/windsurf/cascade/hooks.md"
+      - uri: "https://docs.devin.ai/desktop/cascade/hooks.md"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:e95467991b3d6b045758ce0843a09ae33e84395552c7006df839b1dcaca5e8d7"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:113fadf3c87376b60aaa311c3ba82e6265af39c9093695cccaef82b37d785b54"
+        fetched_at: "2026-07-13T18:23:29Z"
     canonical_mappings:
       handler_types:
         supported: false
@@ -253,38 +263,38 @@ content_types:
       - id: twelve_hook_events
         name: Twelve hook event types
         summary: "Twelve named event types span the agent lifecycle (pre/post read, write, run, mcp_tool_use, user_prompt, cascade_response, cascade_response_with_transcript, setup_worktree); pre-hooks can block via exit code 2."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/hooks.md#hook-events"
+        source_ref: "https://docs.devin.ai/desktop/cascade/hooks.md#hook-events"
         graduation_candidate: true
         conversion: translated
       - id: json_stdin_context
         name: JSON context delivered via stdin
         summary: "Each hook receives a JSON object on stdin with common fields (agent_action_name, trajectory_id, execution_id, timestamp, model_name, tool_info) plus event-specific data."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/hooks.md#common-input-structure"
+        source_ref: "https://docs.devin.ai/desktop/cascade/hooks.md#common-input-structure"
         graduation_candidate: true
         conversion: translated
       - id: three_config_scopes
         name: System, user, and workspace config scopes merged in order
         summary: "Hook JSON files load from system, user, and workspace scopes (plus optional cloud dashboard) and merge in a fixed precedence order."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/hooks.md#configuration"
+        source_ref: "https://docs.devin.ai/desktop/cascade/hooks.md#configuration"
         graduation_candidate: false
         conversion: not-portable
       - id: cloud_dashboard_distribution
         name: Cloud dashboard distribution for enterprise teams
         summary: "Enterprise teams configure hooks via the Windsurf Team Settings dashboard, distributed to all members and merged ahead of local scopes."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/hooks.md#cloud-dashboard-configuration"
+        source_ref: "https://docs.devin.ai/desktop/cascade/hooks.md#cloud-dashboard-configuration"
         graduation_candidate: false
         conversion: not-portable
       - id: transcript_hook
         name: Full conversation transcript hook variant
         summary: "A transcript-aware post-response hook variant writes structured JSONL to ~/.windsurf/transcripts/ and delivers the file path instead of inline markdown."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/hooks.md#post_cascade_response_with_transcript"
+        source_ref: "https://docs.devin.ai/desktop/cascade/hooks.md#post_cascade_response_with_transcript"
         graduation_candidate: false
         provider_field: "post_cascade_response_with_transcript"
         conversion: not-portable
       - id: powershell_cross_platform
         name: "Windows PowerShell command field for cross-platform hooks"
         summary: "Each hook accepts an optional `powershell` field for Windows-specific commands; on Windows, `powershell` takes priority over `command`. On macOS/Linux, `powershell` is ignored and `command` is used."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/hooks.md#configuration-options"
+        source_ref: "https://docs.devin.ai/desktop/cascade/hooks.md#configuration-options"
         graduation_candidate: false
         provider_field: "powershell"
         conversion: not-portable
@@ -311,11 +321,11 @@ content_types:
   mcp:
     status: supported
     sources:
-      - uri: "https://docs.windsurf.com/windsurf/cascade/mcp.md"
+      - uri: "https://docs.devin.ai/desktop/cascade/mcp.md"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:3c3d8c8098cd07a14935fa4da68a54e4623eda8220cf27442350dc4aad903b34"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:422f88f292a0542548262e3b496362c219db95d15d657a1c831724af98e9230a"
+        fetched_at: "2026-07-13T18:23:29Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -353,37 +363,37 @@ content_types:
       - id: three_transport_types
         name: "Three transport types: stdio, Streamable HTTP, SSE"
         summary: "MCP servers can use stdio, Streamable HTTP, or SSE transports; remote servers use `serverUrl`/`url` fields instead of `command`/`args`."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/mcp.md"
+        source_ref: "https://docs.devin.ai/desktop/cascade/mcp.md"
         graduation_candidate: true
         conversion: translated
       - id: config_interpolation
         name: Variable interpolation in mcp_config.json
         summary: "Config fields support `${env:VAR_NAME}` and `${file:/path}` interpolation to inject env vars and file contents without hardcoding secrets."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/mcp.md#config-interpolation"
+        source_ref: "https://docs.devin.ai/desktop/cascade/mcp.md#config-interpolation"
         graduation_candidate: true
         conversion: embedded
       - id: tool_limit_100
         name: 100-tool cap across all MCP servers with per-tool toggle
         summary: "Cascade caps total MCP tools at 100 across all configured servers; individual tools can be toggled on or off via the Cascade panel UI to stay within the limit. Disabled tools are tracked in a disabledTools array and are excluded from admin whitelist matching."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/mcp.md#configuring-mcp-tools"
+        source_ref: "https://docs.devin.ai/desktop/cascade/mcp.md#configuring-mcp-tools"
         graduation_candidate: false
         conversion: not-portable
       - id: enterprise_whitelist_and_registry
         name: Enterprise MCP whitelist and custom registry
         summary: "Team admins can whitelist approved MCP servers (regex matching) and replace the default marketplace with custom MCP registry URLs. Multiple registry URLs are supported; Windsurf takes the union of all registries."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/mcp.md#admin-controls-teams-enterprises"
+        source_ref: "https://docs.devin.ai/desktop/cascade/mcp.md#admin-controls-teams-enterprises"
         graduation_candidate: false
         conversion: not-portable
       - id: mcp_marketplace
         name: In-IDE MCP marketplace with deeplink install
         summary: "Built-in MCP marketplace accessible from the Cascade panel for one-click discovery and installation; supports deeplink format windsurf://windsurf-mcp-registry?serverName=<name> for direct server page navigation."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/mcp.md"
+        source_ref: "https://docs.devin.ai/desktop/cascade/mcp.md"
         graduation_candidate: false
         conversion: not-portable
       - id: oauth_per_transport
         name: OAuth support for all transport types
         summary: "Windsurf supports OAuth authentication for MCP servers across all three transport types (stdio, Streamable HTTP, SSE), enabling authenticated remote server connections."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/mcp.md"
+        source_ref: "https://docs.devin.ai/desktop/cascade/mcp.md"
         graduation_candidate: true
         conversion: translated
     loading_model: >
@@ -413,7 +423,7 @@ content_types:
     provider_extensions: []
     notes: >
       Windsurf has no installable-agent harness. The AGENTS.md support documented at
-      https://docs.windsurf.com/windsurf/cascade/agents-md.md is a rules delivery
+      https://docs.devin.ai/desktop/cascade/agents-md.md is a rules delivery
       mechanism that piggybacks on the Rules engine — root-level AGENTS.md files are
       always-on and subdirectory files are subtree-scoped, but these are not invocable
       agents and have no structured definition, tool restrictions, or orchestration.
@@ -424,11 +434,11 @@ content_types:
   commands:
     status: supported
     sources:
-      - uri: "https://docs.windsurf.com/windsurf/cascade/workflows.md"
+      - uri: "https://docs.devin.ai/desktop/cascade/workflows.md"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:8b59d036036ceaef30196ffcae0499ee9e143246f34504e6e539f0e4e37e3b89"
-        fetched_at: "2026-04-21T23:53:36Z"
+        content_hash: "sha256:633482172f0ef1da0b9326d38dff10bc9be34606e953a24d4514c04f4ad86376"
+        fetched_at: "2026-07-13T18:23:29Z"
     canonical_mappings:
       argument_substitution:
         supported: false
@@ -442,25 +452,25 @@ content_types:
       - id: character_limit_12000
         name: "12,000 character per-file limit"
         summary: "Each workflow markdown file is capped at 12,000 characters; content beyond the cap fails to load or save."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/workflows.md"
+        source_ref: "https://docs.devin.ai/desktop/cascade/workflows.md"
         graduation_candidate: false
         conversion: not-portable
       - id: manual_only_invocation
         name: Manual-only slash-command invocation
         summary: "Workflows never auto-invoke from model decisions or file patterns; the user must explicitly type /<workflow-name> in the Cascade input to run one."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/workflows.md"
+        source_ref: "https://docs.devin.ai/desktop/cascade/workflows.md"
         graduation_candidate: true
         conversion: translated
       - id: two_scope_loading
         name: Workspace and global scope loading
         summary: "Workflows load from two scopes: workspace (.windsurf/workflows/) for team-shared commands committed with the repo, and global (~/.codeium/windsurf/global_workflows/) for per-user commands available everywhere."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/workflows.md"
+        source_ref: "https://docs.devin.ai/desktop/cascade/workflows.md"
         graduation_candidate: true
         conversion: not-portable
       - id: filename_as_command_name
         name: Filename drives slash-command identifier
         summary: "The markdown file basename (minus .md) is the invocation name; no frontmatter or manifest is required to register a workflow."
-        source_ref: "https://docs.windsurf.com/windsurf/cascade/workflows.md"
+        source_ref: "https://docs.devin.ai/desktop/cascade/workflows.md"
         graduation_candidate: true
         conversion: embedded
     loading_model: >

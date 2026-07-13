@@ -44,23 +44,14 @@ var realClineNonSkillsLandmarks = []string{
 }
 
 // realClineHooksLandmarks is a snapshot of the hooks-doc headings from
-// .capmon-cache/cline/hooks.0/extracted.json (cline customization/hooks.md)
-// as of 2026-04-16.
+// .capmon-cache/cline/hooks.0/extracted.json (docs.cline.bot/customization/hooks)
+// as of 2026-07-13. The page is now a two-line stub redirecting to the SDK
+// plugin docs; only the "Hooks" heading survives. See the attestation on
+// clineHooksLandmarkOptions in recognize_cline.go — the hooks fragment now
+// suppresses cleanly because no capability heading remains on the tracked source.
 var realClineHooksLandmarks = []string{
 	"Documentation Index",
 	"Hooks",
-	"What You Can Build",
-	"Hook Types",
-	"Hook Lifecycle",
-	"Hook Locations",
-	"Creating a Hook",
-	"How Hooks Work",
-	"Input Structure",
-	"Output Structure",
-	"Context Modification",
-	"Hook Reference",
-	"Task Lifecycle Hooks",
-	"Tool Hooks",
 }
 
 // realClineRulesLandmarks is a snapshot of the rules-doc headings from
@@ -225,58 +216,36 @@ func TestRecognizeCline_RealRulesLandmarks(t *testing.T) {
 	}
 }
 
-// realClineMcpLandmarks is a snapshot of the MCP-doc headings combined from
-// .capmon-cache/cline/mcp.0/extracted.json (configuring-mcp-servers.md) and
-// .capmon-cache/cline/mcp.1/extracted.json (transport-mechanisms.md) as of
-// 2026-04-16. mcp.0 supplies the required anchor "Adding & Configuring
-// Servers" and the marketplace anchor "Finding MCP Servers"; mcp.1 supplies
-// the second required anchor "MCP Transport Mechanisms" and the
-// transport_types evidence.
+// realClineMcpLandmarks is a snapshot of the MCP-doc headings from the
+// consolidated mcp-overview page (.capmon-cache/cline/mcp.0 and mcp.1 both now
+// resolve to docs.cline.bot/mcp/mcp-overview) as of 2026-07-13 (issue #5). The
+// prior split pages (configuring-mcp-servers, mcp-transport-mechanisms) redirect
+// here; the old H1s and the "Finding MCP Servers" marketplace section are gone.
 var realClineMcpLandmarks = []string{
-	// mcp.0 — configuring-mcp-servers.md
 	"Documentation Index",
-	"Adding & Configuring Servers",
-	"Finding MCP Servers",
-	"Adding Servers with Cline",
-	"Managing Servers",
-	"Enable/Disable",
-	"Restart",
-	"Delete",
-	"Network Timeout",
-	"Editing Configuration Files",
-	"STDIO Transport (Local Servers)",
-	"SSE Transport (Remote Servers)",
-	"Global MCP Mode",
-	"Using MCP Tools",
+	"MCP",
+	"What MCP gives you",
+	"Quick start",
+	"Add servers",
+	"Manual config",
+	"CLI MCP wizard",
+	"Configuration examples",
+	"Local server (STDIO)",
+	"Remote server (Streamable HTTP)",
+	"Transport types",
+	"Managing servers",
+	"Security basics",
 	"Troubleshooting",
-	"Related",
-	// mcp.1 — transport-mechanisms.md
-	"MCP Transport Mechanisms",
-	"STDIO Transport",
-	"How STDIO Transport Works",
-	"STDIO Characteristics",
-	"When to Use STDIO",
-	"STDIO Implementation Example",
-	"SSE Transport",
-	"How SSE Transport Works",
-	"SSE Characteristics",
-	"When to Use SSE",
-	"SSE Implementation Example",
-	"Local vs. Hosted: Deployment Aspects",
-	"STDIO: Local Deployment Model",
-	"SSE: Hosted Deployment Model",
-	"Hybrid Approaches",
-	"Choosing Between STDIO and SSE",
-	"Configuring Transports in Cline",
+	"CLI",
 }
 
-// TestRecognizeCline_RealMcpLandmarks proves MCP recognition emits the 2
-// canonical MCP keys backed by heading-level evidence: transport_types and
-// marketplace. The other 6 canonical keys are either curated as unsupported
-// or backed only by body-text evidence (alwaysAllow JSON field for
-// tool_filtering / auto_approve) and must NOT be emitted by the recognizer.
-// Test merges all four content type fixtures to verify cross-content-type
-// robustness.
+// TestRecognizeCline_RealMcpLandmarks proves MCP recognition emits the single
+// canonical MCP key backed by heading-level evidence on the consolidated
+// overview page: transport_types. marketplace was removed from the docs
+// (2026-07-13) and must NOT be emitted. tool_filtering / auto_approve remain
+// curated as supported but live in body text / config-example JSON (autoApprove
+// field), not headings, so the recognizer stays silent. Test merges the other
+// content-type fixtures to verify cross-content-type robustness.
 func TestRecognizeCline_RealMcpLandmarks(t *testing.T) {
 	merged := append([]string{}, realClineLandmarks...)
 	merged = append(merged, realClineRulesLandmarks...)
@@ -295,20 +264,14 @@ func TestRecognizeCline_RealMcpLandmarks(t *testing.T) {
 	if caps["mcp.supported"] != "true" {
 		t.Error("mcp.supported missing")
 	}
-	mcpInferred := []string{
-		"transport_types",
-		"marketplace",
+	if caps["mcp.capabilities.transport_types.supported"] != "true" {
+		t.Error("mcp.capabilities.transport_types.supported missing")
 	}
-	for _, c := range mcpInferred {
-		key := "mcp.capabilities." + c + ".supported"
-		if caps[key] != "true" {
-			t.Errorf("%s missing", key)
-		}
-		if got := caps["mcp.capabilities."+c+".confidence"]; got != "inferred" {
-			t.Errorf("mcp.%s.confidence = %q, want inferred", c, got)
-		}
+	if got := caps["mcp.capabilities.transport_types.confidence"]; got != "inferred" {
+		t.Errorf("mcp.transport_types.confidence = %q, want inferred", got)
 	}
 	for _, absent := range []string{
+		"mcp.capabilities.marketplace.supported",
 		"mcp.capabilities.oauth_support.supported",
 		"mcp.capabilities.env_var_expansion.supported",
 		"mcp.capabilities.tool_filtering.supported",
@@ -317,17 +280,17 @@ func TestRecognizeCline_RealMcpLandmarks(t *testing.T) {
 		"mcp.capabilities.enterprise_management.supported",
 	} {
 		if _, has := caps[absent]; has {
-			t.Errorf("%s should NOT be present for cline (no heading evidence or curated unsupported)", absent)
+			t.Errorf("%s should NOT be present for cline (no heading evidence or removed from docs)", absent)
 		}
 	}
 }
 
 // TestRecognizeCline_McpAnchorsMissing proves the required-anchor guard
-// suppresses MCP emission when "MCP Transport Mechanisms" is absent.
+// suppresses MCP emission when "Transport types" is absent.
 func TestRecognizeCline_McpAnchorsMissing(t *testing.T) {
 	mutated := make([]string, 0, len(realClineMcpLandmarks))
 	for _, lm := range realClineMcpLandmarks {
-		if lm == "MCP Transport Mechanisms" {
+		if lm == "Transport types" {
 			continue
 		}
 		mutated = append(mutated, lm)
@@ -342,11 +305,13 @@ func TestRecognizeCline_McpAnchorsMissing(t *testing.T) {
 	}
 }
 
-// TestRecognizeCline_RealHooksLandmarks proves hooks recognition on the merged
-// skills+rules+hooks landmarks. Cline documents 4 of the 9 canonical hooks
-// keys at the heading level (handler_types, hook_scopes, json_io_protocol,
-// context_injection); the rest live in body text or are not documented.
-func TestRecognizeCline_RealHooksLandmarks(t *testing.T) {
+// TestRecognizeCline_HooksStubSuppresses proves the hooks fragment suppresses
+// cleanly now that the tracked hooks doc (docs.cline.bot/customization/hooks) is
+// a stub redirecting to the SDK plugin docs (2026-07-13, issue #5). With only
+// the "Hooks" heading present, the required anchors "Hook Lifecycle" / "Hook
+// Locations" are absent, so NO hooks capabilities may be emitted. skills+rules
+// still recognize, so the overall status stays Recognized.
+func TestRecognizeCline_HooksStubSuppresses(t *testing.T) {
 	merged := append([]string{}, realClineLandmarks...)
 	merged = append(merged, realClineRulesLandmarks...)
 	merged = append(merged, realClineHooksLandmarks...)
@@ -360,42 +325,29 @@ func TestRecognizeCline_RealHooksLandmarks(t *testing.T) {
 		t.Fatalf("status = %q, want %q (missing=%v)", result.Status, capmon.StatusRecognized, result.MissingAnchors)
 	}
 	caps := result.Capabilities
-	if caps["hooks.supported"] != "true" {
-		t.Error("hooks.supported missing")
-	}
-	hooksInferred := []string{
-		"handler_types",
-		"hook_scopes",
-		"json_io_protocol",
-		"context_injection",
-	}
-	for _, c := range hooksInferred {
-		key := "hooks.capabilities." + c + ".supported"
-		if caps[key] != "true" {
-			t.Errorf("%s missing", key)
-		}
-		if got := caps["hooks.capabilities."+c+".confidence"]; got != "inferred" {
-			t.Errorf("hooks.%s.confidence = %q, want inferred", c, got)
-		}
+	if _, has := caps["hooks.supported"]; has {
+		t.Error("hooks.supported should NOT be present — hooks doc is now a stub with no capability headings")
 	}
 	for _, absent := range []string{
-		"hooks.capabilities.matcher_patterns.supported",
-		"hooks.capabilities.decision_control.supported",
-		"hooks.capabilities.async_execution.supported",
-		"hooks.capabilities.permission_control.supported",
-		"hooks.capabilities.input_modification.supported",
+		"hooks.capabilities.handler_types.supported",
+		"hooks.capabilities.hook_scopes.supported",
+		"hooks.capabilities.json_io_protocol.supported",
+		"hooks.capabilities.context_injection.supported",
 	} {
 		if _, has := caps[absent]; has {
-			t.Errorf("%s should NOT be present for cline (no heading evidence)", absent)
+			t.Errorf("%s should NOT be present — hooks doc is a stub (moved to SDK plugins)", absent)
 		}
 	}
 }
 
-// realClineCommandsLandmarks is a snapshot of the headings extracted from
-// Cline's slash-commands doc (.capmon-cache/cline/commands.0/extracted.json)
-// as of 2026-04-17. Six built-in slash commands appear as individual H2/H3
-// landmarks — the strongest possible heading-level evidence for
-// builtin_commands.
+// realClineCommandsLandmarks is a snapshot of the headings from Cline's
+// slash-commands doc (docs.cline.bot/core-workflows/using-commands) as of
+// 2026-07-13. Five built-in slash commands appear as individual H3 landmarks —
+// the strongest heading-level evidence for builtin_commands. Changes since the
+// 2026-04 snapshot (issue #5): /explain-changes was removed from the table, and
+// the "Custom Workflows" section is gone (the dedicated Workflows doc was
+// removed; skills-via-slash-command now fills that role — see "Skills via Slash
+// Commands").
 var realClineCommandsLandmarks = []string{
 	"Documentation Index",
 	"Using Commands",
@@ -404,9 +356,8 @@ var realClineCommandsLandmarks = []string{
 	"/smol",
 	"/newrule",
 	"/deep-planning",
-	"/explain-changes",
 	"/reportbug",
-	"Custom Workflows",
+	"Skills via Slash Commands",
 }
 
 // TestRecognizeCline_RealCommandsLandmarks proves commands recognition fires

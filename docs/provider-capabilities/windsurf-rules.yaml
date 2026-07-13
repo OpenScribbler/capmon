@@ -28,7 +28,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: hierarchical_loading
       supported: true
-      mechanism: 'rules_hierarchical_discovery: Windsurf discovers .windsurf/rules/ directories in the current workspace, all sub-directories, and parent directories up to the git root; rules from all levels are merged and deduplicated'
+      mechanism: 'rules_hierarchical_discovery: rules directories are discovered in the current workspace, all sub-directories, and parent directories up to the git root; rules from all levels are merged and deduplicated. Per ''Rules Discovery'' / ''Rules Storage Locations'', .devin/rules/ is the preferred location and takes precedence, with .windsurf/rules/ kept as a legacy fallback for backward compatibility'
       source_field: ""
       source_value: ""
       confidence: confirmed

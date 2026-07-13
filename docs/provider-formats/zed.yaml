@@ -60,13 +60,13 @@ content_types:
       - uri: "https://zed.dev/docs/ai/mcp"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-05-06T12:57:00Z"
-        content_hash: "sha256:3b7a96e269dcbb52c3a5b2b8b88779d1ba09edfb694bbf7261a849d91c74a5d7"
+        fetched_at: "2026-07-13T18:19:52Z"
+        content_hash: "sha256:d529b69080eeb2d289d729f3846965db66394a6af4d319f659a652e95e792aff"
       - uri: "https://raw.githubusercontent.com/zed-industries/zed/main/crates/context_server/src/context_server.rs"
         type: source_code
         fetch_method: gh_raw
-        fetched_at: "2026-05-06T12:57:00Z"
-        content_hash: "sha256:1035d0f24cbcb693f575a8c53a9dd3a037776265cc265eb958ba74c1181e4c44"
+        fetched_at: "2026-07-13T18:19:52Z"
+        content_hash: "sha256:ed3818ee4ec499f77cbbb01909d8fb819424e38a4c818e23730d0d1003607e4c"
     canonical_mappings:
       transport_types:
         supported: true
@@ -74,7 +74,7 @@ content_types:
         confidence: confirmed
       oauth_support:
         supported: true
-        mechanism: "When a remote MCP server is configured with a url but no Authorization header, Zed prompts the user to authenticate using the standard MCP OAuth flow"
+        mechanism: "When a remote MCP server is configured with a url but no Authorization header, Zed prompts the user to authenticate using the standard MCP OAuth flow; since upstream commit 12e1e244 (2026-07-03) the flow is also initiated when the server answers post-initialize requests with 401 Unauthorized carrying a WWW-Authenticate challenge (ContextServer::auth_challenge)"
         confidence: confirmed
       env_var_expansion:
         supported: false
@@ -90,12 +90,12 @@ content_types:
         confidence: confirmed
       marketplace:
         supported: true
-        mechanism: "Zed exposes an in-app MCP server gallery (zed: extensions filtered to context-servers, or Agent Panel > View Server Extensions) where servers can be browsed and installed"
+        mechanism: "Zed exposes an in-app MCP server gallery ('As Extensions' heading): zed: extensions action, or Settings > AI > MCP Servers > Add Server > Install from Extensions, where servers can be browsed and installed"
         confidence: confirmed
       resource_referencing:
         supported: false
-        mechanism: "MCP resource referencing via @-style syntax is not documented"
-        confidence: inferred
+        mechanism: "explicitly out of scope — the 'Supported Features' heading states Zed currently supports MCP's Tools and Prompts features only (Discovery, Sampling, Elicitation listed as welcome contributions); no resource referencing"
+        confidence: confirmed
       enterprise_management:
         supported: false
         mechanism: "Zed does not document org-level MCP management"
@@ -124,13 +124,13 @@ content_types:
         provider_field: url
       - id: oauth_flow
         name: MCP OAuth authentication prompt
-        summary: "When a remote server's url is set but no Authorization header is provided, Zed automatically prompts the user to authenticate using the standard MCP OAuth flow. No extra configuration is required to trigger the prompt."
+        summary: "When a remote server's url is set but no Authorization header is provided, Zed automatically prompts the user to authenticate using the standard MCP OAuth flow. No extra configuration is required to trigger the prompt. The flow is also initiated when a server answers post-initialize requests with 401 Unauthorized carrying a WWW-Authenticate challenge (ContextServer::auth_challenge, upstream #60236)."
         source_ref: "https://zed.dev/docs/ai/mcp"
         graduation_candidate: false
         conversion: not-portable
       - id: server_gallery
         name: In-app MCP server gallery
-        summary: "Zed ships an agent panel UI for browsing and installing MCP servers (as extensions) without hand-editing settings.json. Accessible via 'zed: extensions' (filtered to context-servers) or Agent Panel top-right menu > View Server Extensions."
+        summary: "Zed ships a UI for browsing and installing MCP servers (as extensions) without hand-editing settings.json. Accessible via 'zed: extensions' or Settings > AI > MCP Servers > Add Server > Install from Extensions; the same page adds custom local/remote servers."
         source_ref: "https://zed.dev/docs/ai/mcp"
         graduation_candidate: false
         conversion: not-portable
@@ -156,7 +156,7 @@ content_types:
         conversion: not-portable
       - id: external_agent_forwarding
         name: MCP server forwarding to external agents
-        summary: "MCP servers configured in Zed are forwarded to external agents via the Agent Client Protocol. External agents can also access MCP servers from their own native config files."
+        summary: "MCP servers configured in Zed are forwarded to external agents via the Agent Client Protocol. External agents can also access MCP servers from their own native config files. The 'Agent Path Support' table distinguishes three paths: Zed Agent (uses Zed-configured servers directly), External Agents (forwarded over ACP), Terminal Threads (native CLIs/TUIs read their own MCP config)."
         source_ref: "https://zed.dev/docs/ai/mcp"
         graduation_candidate: false
         conversion: not-portable
@@ -179,10 +179,26 @@ content_types:
 
   agents:
     status: unsupported
-    sources: []
+    # Monitoring-only sources: check watches these for drift even though the
+    # content type is unsupported (derive skips unsupported types). Zed's agent
+    # capability data came from a one-time April 2026 cache of agent-settings;
+    # the July 2026 docs restructure split that page into agent-settings +
+    # agent-profiles and nothing noticed (bead capmon-sc6). These baselines
+    # make future changes to Zed's agent model fire the daily check.
+    sources:
+      - uri: "https://zed.dev/docs/ai/agent-settings"
+        type: documentation
+        fetch_method: gh_raw
+        fetched_at: "2026-07-13T18:19:52Z"
+        content_hash: "sha256:e22818a36925400174b41668eb9fddce9cb2a83c094bec9f5577676dec68c5df"
+      - uri: "https://zed.dev/docs/ai/agent-profiles"
+        type: documentation
+        fetch_method: gh_raw
+        fetched_at: "2026-07-13T18:19:52Z"
+        content_hash: "sha256:e85fab668658fa81ea0c95acb2509dec0db5ccedc168bdd465de5b092ddde66d"
     canonical_mappings: {}
     provider_extensions: []
-    notes: "Zed's agent profiles (write, ask, minimal) are built into the binary and are not user-definable as portable file-based content."
+    notes: "Zed's agent profiles are defined in settings.json (name/tools/enable_all_context_servers/context_servers/default_model) — configuration, not portable file-based agent definitions with prompts. Re-verified 2026-07-13: still no prompt field or file-based definition."
 
   commands:
     status: unsupported

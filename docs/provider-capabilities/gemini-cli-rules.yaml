@@ -10,7 +10,7 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: auto_memory
       supported: true
-      mechanism: 'memory_command: Gemini CLI /memory command saves notes that persist across sessions as rule-like content'
+      mechanism: 'memory_command: under the ''Manage context with the /memory command'' heading the /memory command now only shows (/memory show) and reloads (/memory reload) the concatenated GEMINI.md hierarchy — the /memory add append subcommand was removed upstream (commit 7504259d, ''clean up launched memory features''). Persistent cross-session memories are now saved via the separate Memory tool (this source''s ''Next steps'' see-also links docs/tools/memory.md ''to save persistent memories'')'
       source_field: ""
       source_value: ""
       confidence: confirmed

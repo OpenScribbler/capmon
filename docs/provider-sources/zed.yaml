@@ -73,8 +73,21 @@ content_types:
 
   agents:
     supported: false
-    # Zed's "agent profiles" (write, ask, minimal) are builtin — not user-definable
-    # files. No extractable user-authored agent format.
+    # Zed's agent profiles are settings.json configuration — not user-definable
+    # files. No extractable user-authored agent format (re-verified 2026-07-13).
+    # Monitoring-only sources (capmon-sc6): the July 2026 docs restructure split
+    # agent-settings into agent-settings + agent-profiles and went unnoticed
+    # because nothing watched these pages. Keep them monitored so changes to
+    # Zed's agent model fire the daily check.
+    sources:
+      - url: https://zed.dev/docs/ai/agent-settings
+        type: docs
+        format: html
+        extracts: [profile_config_fields]
+      - url: https://zed.dev/docs/ai/agent-profiles
+        type: docs
+        format: html
+        extracts: [profile_config_fields]
 
   commands:
     supported: false

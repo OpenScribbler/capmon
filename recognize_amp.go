@@ -9,6 +9,19 @@ func init() {
 // required anchors guard against passing mentions: "Agent Skills" alone could
 // appear in unrelated docs, so we additionally require "Skill Format" to
 // confirm the page actually documents the format.
+//
+// Re-anchored 2026-07-13 (drift issue #3): the upstream page was rewritten and
+// two previously-anchored headings vanished from the live doc —
+//   - "Installing Skills" — the dedicated install section was removed; skill
+//     creation is now folded into "Creating Skills" (building-skills) and the
+//     only management verb documented is "skill: list" under "Viewing Skills".
+//   - "Executable Tools in Skills" — the toolbox executable-tools section was
+//     removed; toolbox directories are now demoted to "legacy" discovery-only
+//     status (the precedence list ends "…legacy toolbox directories, and
+//     built-in skills"). amp.registerTool via the Plugin API is the successor.
+// The live headings are now: "Agent Skills", "Creating Skills", "Viewing
+// Skills", "Skill Format", "MCP Servers in Skills". No replacement anchors are
+// wired for the removed capabilities — the doc no longer documents them.
 func ampLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
 		{Kind: "substring", Value: "Agent Skills", CaseInsensitive: true},
@@ -26,9 +39,7 @@ func ampLandmarkOptions() LandmarkOptions {
 		ContentType: "skills",
 		Patterns: []LandmarkPattern{
 			pattern("creation_workflow", "Creating Skills", "documented under 'Creating Skills' heading"),
-			pattern("installation_workflow", "Installing Skills", "documented under 'Installing Skills' heading"),
 			pattern("mcp_integration", "MCP Servers in Skills", "documented under 'MCP Servers in Skills' heading"),
-			pattern("executable_tools", "Executable Tools in Skills", "documented under 'Executable Tools in Skills' heading"),
 		},
 	}
 }
@@ -158,7 +169,7 @@ func recognizeAmp(ctx RecognitionContext) RecognitionResult {
 	skillsResult := recognizeLandmarks(ctx, ampLandmarkOptions())
 	if len(skillsResult.Capabilities) > 0 {
 		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "project_scope", "skill directory placed under .agents/skills/<name>/ or .claude/skills/<name>/ within the project root", "confirmed"))
-		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "global_scope", "skill directory placed under ~/.config/agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/", "confirmed"))
+		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "global_scope", "skill directory placed under ~/.config/agents/skills/<name>/, ~/.agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/", "confirmed"))
 		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "canonical_filename", "SKILL.md", "confirmed"))
 	}
 

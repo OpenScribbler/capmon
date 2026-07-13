@@ -40,7 +40,7 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: tool_filtering
       supported: true
-      mechanism: MCPConfig has a disabled_tools array (list of tool names to exclude from a specific server). This enables per-server tool filtering at the configuration level.
+      mechanism: MCPConfig has a disabled_tools array (block list of tool names to exclude from a specific server) and an enabled_tools array (allow list of tool names to permit from that server). Both enable per-server tool filtering at the configuration level.
       source_field: ""
       source_value: ""
       confidence: confirmed

@@ -72,18 +72,26 @@ func clineRulesLandmarkOptions() LandmarkOptions {
 }
 
 // clineHooksLandmarkOptions returns the landmark patterns for Cline's hooks
-// documentation. Anchors derived from .capmon-cache/cline/hooks.0/extracted.json
-// (docs.cline.bot/customization/hooks.md).
+// documentation.
 //
-// Required anchors are unique to the hooks doc — "Hook Lifecycle" and "Hook
-// Locations" do not appear in skills/rules/mcp/commands docs, so this guard
-// prevents hooks patterns from firing on a context that includes only other
-// content-type landmarks.
+// Verified live: https://docs.cline.bot/customization/hooks (and .../hooks.md)
+// on 2026-07-13. The dedicated hooks page is now a two-line stub ("See details
+// under SDK Hooks page" / "See details under SDK Plugins"); the refreshed cache
+// (.capmon-cache/cline/hooks.0) contains only the "Hooks" heading. The hook
+// documentation moved into the Cline SDK plugin system
+// (docs.cline.bot/customization/plugins, /sdk/plugins, /sdk/guides/writing-plugins),
+// which are NOT tracked sources in cline's format doc. The former filesystem
+// hook model (named scripts, JSON via stdin/stdout, "Hook Types" / "Hook
+// Lifecycle" / "Hook Locations" / "Input Structure" / "Context Modification"
+// headings) no longer exists on this page.
 //
-// Cline documents 4 of the 9 canonical hooks keys at the heading level. The
-// other 5 (matcher_patterns, decision_control, async_execution,
-// permission_control, input_modification) live in body text or are not
-// documented capabilities, and are intentionally not mapped here.
+// The required anchors below ("Hook Lifecycle", "Hook Locations") therefore no
+// longer match the live stub, so this fragment SUPPRESSES cleanly — the honest
+// state, since the tracked hooks source no longer documents any hook capability
+// at the heading level. Re-curation to the SDK plugin model (and re-pointing the
+// hooks source to the plugin docs) is deferred to the maintainer; see the hooks
+// notes block in docs/provider-formats/cline.yaml. Format YAML hooks status:
+// supported (curator), pending that re-point.
 func clineHooksLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
 		{Kind: "substring", Value: "Hook Lifecycle", CaseInsensitive: true},
@@ -102,42 +110,41 @@ func clineHooksLandmarkOptions() LandmarkOptions {
 }
 
 // clineMcpLandmarkOptions returns the landmark patterns for Cline's MCP
-// documentation. Evidence is split across two cache sources:
-//   - mcp.0 (configuring-mcp-servers.md): server discovery, configuration UI,
-//     transport-section H2s, marketplace via "Finding MCP Servers"
-//   - mcp.1 (transport-mechanisms.md): authoritative transport reference with
-//     "MCP Transport Mechanisms" / "STDIO Transport" / "SSE Transport" headings
+// documentation.
 //
-// Per the curated format YAML (docs/provider-formats/cline.yaml), 4 of the 8
-// canonical MCP keys are supported. Only 2 have heading-level evidence
-// suitable for landmark recognition:
-//   - transport_types → "MCP Transport Mechanisms" (mcp.1) — backed by
-//     dedicated H2s for STDIO and SSE transports
-//   - marketplace → "Finding MCP Servers" (mcp.0) — the section that
-//     introduces the Cline MCP Marketplace
+// Re-anchored 2026-07-13 (issue #5): the two prior MCP pages
+// (configuring-mcp-servers, mcp-transport-mechanisms) now 301-redirect to a
+// single consolidated page, docs.cline.bot/mcp/mcp-overview. The old H1s
+// "Adding & Configuring Servers" and "MCP Transport Mechanisms" and the
+// "Finding MCP Servers" marketplace section no longer exist. The refreshed
+// cache (.capmon-cache/cline/mcp.0, mcp.1) contains the overview headings:
+// "What MCP gives you", "Quick start", "Add servers", "CLI MCP wizard",
+// "Configuration examples", "Transport types", "Managing servers",
+// "Security basics".
 //
-// tool_filtering and auto_approve are curated as supported (both backed by
-// the alwaysAllow JSON field) but the docs cover them in body text under
-// "STDIO Transport (Local Servers)" / "Editing Configuration Files" rather
-// than dedicated headings — landmark recognition cannot confirm without
-// schema-field evidence. The curated YAML keeps them at "confirmed", so the
-// recognizer staying silent here is the safer choice.
+// Only 1 canonical MCP key now has heading-level evidence:
+//   - transport_types → "Transport types" — STDIO vs remote HTTP/SSE, with the
+//     streamableHttp/sse split shown in the "Configuration examples" JSON.
 //
-// Required anchors are unique to the MCP docs:
-//   - "Adding & Configuring Servers" — H1 of mcp.0
-//   - "MCP Transport Mechanisms" — H1 of mcp.1
+// marketplace was DROPPED: the consolidated docs (verified live 2026-07-13,
+// incl. the docs.cline.bot/llms.txt sitemap) no longer document an in-IDE MCP
+// Marketplace; the curated format YAML now records marketplace: supported=false.
+// tool_filtering / auto_approve remain curated as supported (the per-server
+// `autoApprove` JSON field, renamed from `alwaysAllow`) but live only in body
+// text / config examples, not headings, so the recognizer stays silent on them.
 //
-// Neither appears in cline's skills, rules, hooks, or commands docs.
+// Required anchors are unique to the MCP overview doc and appear in no other
+// cline content-type doc:
+//   - "What MCP gives you"
+//   - "Transport types"
 func clineMcpLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
-		{Kind: "substring", Value: "Adding & Configuring Servers", CaseInsensitive: true},
-		{Kind: "substring", Value: "MCP Transport Mechanisms", CaseInsensitive: true},
+		{Kind: "substring", Value: "What MCP gives you", CaseInsensitive: true},
+		{Kind: "substring", Value: "Transport types", CaseInsensitive: true},
 	}
 	return McpLandmarkOptions(
-		McpLandmarkPattern("transport_types", "MCP Transport Mechanisms",
-			"transport types documented under 'MCP Transport Mechanisms' / 'STDIO Transport' / 'SSE Transport' headings (mcp.1)", required),
-		McpLandmarkPattern("marketplace", "Finding MCP Servers",
-			"in-IDE MCP Marketplace introduced under 'Finding MCP Servers' heading (mcp.0)", required),
+		McpLandmarkPattern("transport_types", "Transport types",
+			"transport types documented under 'Transport types' heading (STDIO + remote streamableHttp/sse), with the transport split shown in 'Configuration examples'", required),
 	)
 }
 
@@ -164,7 +171,7 @@ func clineCommandsLandmarkOptions() LandmarkOptions {
 	}
 	return CommandsLandmarkOptions(
 		CommandsLandmarkPattern("builtin_commands", "Slash Commands",
-			"6 built-in slash commands documented as individual headings (/newtask, /smol, /newrule, /deep-planning, /explain-changes, /reportbug); hardcoded, not user-modifiable", required),
+			"5 built-in slash commands documented as individual headings (/newtask, /smol, /newrule, /deep-planning, /reportbug); hardcoded, not user-modifiable", required),
 	)
 }
 

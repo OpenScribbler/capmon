@@ -8,15 +8,16 @@ import (
 
 // realCursorRulesLandmarks is a snapshot of headings extracted from
 // .capmon-cache/cursor/rules.0/extracted.json (cursor.com/docs/rules) as of
-// 2026-04-16. Update when the doc evolves.
+// 2026-07-13. Update when the doc evolves.
 var realCursorRulesLandmarks = []string{
 	// Top-level nav
 	"Command Palette",
 	"Get Started",
 	"Agent",
-	"Customizing",
+	"Customize",
 	"Cloud Agents",
 	"Integrations",
+	"SDK",
 	"CLI",
 	"Teams & Enterprise",
 	// Rules page
@@ -25,6 +26,7 @@ var realCursorRulesLandmarks = []string{
 	"Project rules",
 	"Rule file structure",
 	"Rule anatomy",
+	"Glob pattern examples",
 	"Creating a rule",
 	"Best practices",
 	"What to avoid in rules",
@@ -126,22 +128,27 @@ func TestRecognizeCursor_NoLandmarks(t *testing.T) {
 }
 
 // realCursorMcpLandmarks is a snapshot of the headings from cursor's MCP doc
-// (.capmon-cache/cursor/mcp.0/extracted.json — cursor.com/docs/context/mcp,
-// HTML) as of 2026-04-16. Only entries from the actual `landmarks` array are
-// included — table cells like "Resources", "Tools", "Prompts" live in Fields
-// not Landmarks and cannot be anchored on via substring matching.
+// (.capmon-cache/cursor/mcp.0/extracted.json — cursor.com/docs/mcp, HTML) as of
+// 2026-07-13. Only entries from the actual `landmarks` array are included —
+// table cells like "Resources", "Tools", "Prompts" live in Fields not
+// Landmarks and cannot be anchored on via substring matching.
 //
-// Cursor's MCP doc maps 6 of 8 canonical MCP keys via heading-level evidence.
-// resource_referencing and enterprise_management are absent (table-cell-only
-// and admin-console-only respectively).
+// Cursor's MCP doc maps 7 of 8 canonical MCP keys via heading-level evidence.
+// The 2026-07-13 refetch added an "Enterprise admin controls" block (Team MCP
+// distribution / MCP Allowlist / Network controls / User MCP extensions),
+// giving heading evidence for enterprise_management ("Enterprise admin
+// controls") and tool_filtering ("MCP Allowlist"). The old "Auto-run" heading
+// was renamed "Run Mode". Only resource_referencing remains absent
+// (table-cell-only in the "Protocol and extension support" table).
 var realCursorMcpLandmarks = []string{
 	// Top nav (shared across cursor docs, present here too)
 	"Command Palette",
 	"Get Started",
 	"Agent",
-	"Customizing",
+	"Customize",
 	"Cloud Agents",
 	"Integrations",
+	"SDK",
 	"CLI",
 	"Teams & Enterprise",
 	// MCP discovery + protocol
@@ -155,24 +162,30 @@ var realCursorMcpLandmarks = []string{
 	"Installing MCP servers",
 	"One-click installation",
 	"Using mcp.json",
-	"Configuration locations",
-	// Transport types (stdio is the only one with a dedicated heading)
-	"STDIO server configuration",
 	// OAuth
 	"Static OAuth for remote servers",
 	"Static redirect URL",
-	"Authentication",
 	// Config interpolation
 	"Combining with config interpolation",
+	// Transport types (stdio is the only one with a dedicated heading)
+	"STDIO server configuration",
+	"Using the Extension API",
+	"Configuration locations",
 	"Config interpolation",
+	"Authentication",
+	// Enterprise admin controls (added 2026-07-13)
+	"Enterprise admin controls",
+	"Team MCP distribution",
+	"MCP Allowlist",
+	"Network controls",
+	"User MCP extensions",
 	// Tool / approval surface
 	"Using MCP in chat",
 	"Tool approval",
-	"Auto-run",
+	"Run Mode",
 	"Tool response",
 	"Images as context",
 	// Other sections + FAQs
-	"Using the Extension API",
 	"Security considerations",
 	"Real-world examples",
 	"FAQ",
@@ -184,12 +197,12 @@ var realCursorMcpLandmarks = []string{
 	"Can I use MCP servers with sensitive data?",
 }
 
-// TestRecognizeCursor_RealMcpLandmarks proves MCP recognition emits 6
+// TestRecognizeCursor_RealMcpLandmarks proves MCP recognition emits 7
 // canonical MCP keys at "inferred" confidence: transport_types, oauth_support,
-// env_var_expansion, tool_filtering, auto_approve, marketplace.
-// resource_referencing and enterprise_management must NOT be emitted —
-// resource_referencing has table-cell-only evidence (not in Landmarks),
-// enterprise_management has no heading evidence at all.
+// env_var_expansion, tool_filtering, enterprise_management, auto_approve,
+// marketplace. Only resource_referencing must NOT be emitted — it has
+// table-cell-only evidence (a "Resources" row in the "Protocol and extension
+// support" table, not a Landmark heading).
 //
 // Test merges rules + MCP fixtures to mirror real-world cache merging — the
 // recognizer must distinguish MCP capabilities from rules ones via the
@@ -215,6 +228,7 @@ func TestRecognizeCursor_RealMcpLandmarks(t *testing.T) {
 		"oauth_support",
 		"env_var_expansion",
 		"tool_filtering",
+		"enterprise_management",
 		"auto_approve",
 		"marketplace",
 	}
@@ -229,7 +243,6 @@ func TestRecognizeCursor_RealMcpLandmarks(t *testing.T) {
 	}
 	for _, absent := range []string{
 		"mcp.capabilities.resource_referencing.supported",
-		"mcp.capabilities.enterprise_management.supported",
 	} {
 		if _, has := caps[absent]; has {
 			t.Errorf("%s should NOT be present (no heading evidence)", absent)
@@ -261,26 +274,32 @@ func TestRecognizeCursor_McpAnchorsMissing(t *testing.T) {
 
 // realCursorSkillsLandmarks is a snapshot of the headings from cursor's Skills
 // doc (.capmon-cache/cursor/skills.0/extracted.json — cursor.com/docs/skills,
-// HTML) as of 2026-04-22. Cursor implements the Agent Skills open standard;
+// HTML) as of 2026-07-13. Cursor implements the Agent Skills open standard;
 // the doc covers the SKILL.md frontmatter shape, scope directories, and the
-// disable_model_invocation toggle as headings.
+// disable_model_invocation toggle as headings. The 2026-07-13 refetch added
+// "Built-in Cursor skills", "Nested skill directories", and "Scoping a skill
+// to specific files" (the paths glob-scoping field) headings.
 var realCursorSkillsLandmarks = []string{
 	// Top nav (shared across cursor docs)
 	"Command Palette",
 	"Get Started",
 	"Agent",
-	"Customizing",
+	"Customize",
 	"Cloud Agents",
 	"Integrations",
+	"SDK",
 	"CLI",
 	"Teams & Enterprise",
 	// Skills page
 	"Agent Skills",
 	"What are skills?",
 	"How skills work",
+	"Built-in Cursor skills",
 	"Skill directories",
+	"Nested skill directories",
 	"SKILL.md file format",
 	"Frontmatter fields",
+	"Scoping a skill to specific files",
 	"Disabling automatic invocation",
 	"Including scripts in skills",
 	"Optional directories",
@@ -354,21 +373,30 @@ func TestRecognizeCursor_SkillsAnchorsMissing(t *testing.T) {
 
 // realCursorHooksLandmarks is a snapshot of the headings from cursor's Hooks
 // doc (.capmon-cache/cursor/hooks.0/extracted.json — cursor.com/docs/hooks,
-// HTML) as of 2026-04-22. Cursor documents an extensive lifecycle event set,
-// matcher configuration, and JSON I/O protocol as headings.
+// HTML) as of 2026-07-13. Cursor documents an extensive lifecycle event set,
+// matcher configuration, and JSON I/O protocol as headings. The 2026-07-13
+// refetch replaced "Agent and Tab Support" with a cloud-agent-support block
+// (Hook categories / Cloud agent support / Supported hooks / ...) and added
+// the "workspaceOpen" app-lifecycle event.
 var realCursorHooksLandmarks = []string{
 	// Top nav
 	"Command Palette",
 	"Get Started",
 	"Agent",
-	"Customizing",
+	"Customize",
 	"Cloud Agents",
 	"Integrations",
+	"SDK",
 	"CLI",
 	"Teams & Enterprise",
 	// Hooks page
 	"Hooks",
-	"Agent and Tab Support",
+	"Hook categories",
+	"Cloud agent support",
+	"Supported hooks",
+	"Hooks not available in cloud agents",
+	"Configuration sources",
+	"Execution type limits",
 	"Quickstart",
 	"Hook Types",
 	"Command-Based Hooks",
@@ -414,6 +442,7 @@ var realCursorHooksLandmarks = []string{
 	"sessionStart",
 	"sessionEnd",
 	"preCompact",
+	"workspaceOpen",
 	"Environment Variables",
 	"Troubleshooting",
 }
@@ -490,9 +519,11 @@ func TestRecognizeCursor_HooksAnchorsMissing(t *testing.T) {
 
 // realCursorAgentsLandmarks is a snapshot of headings extracted from
 // .capmon-cache/cursor/agents.0/extracted.json (cursor.com/docs/subagents,
-// HTML) as of 2026-04-28. Cursor's subagents doc maps 6 of 7 canonical agents
+// HTML) as of 2026-07-13. Cursor's subagents doc maps 6 of 7 canonical agents
 // keys at heading-level evidence; per_agent_mcp is correctly absent because
-// subagents inherit MCP from the parent rather than scoping per-agent.
+// subagents inherit MCP from the parent rather than scoping per-agent. The
+// 2026-07-13 refetch added "Model parameters" (id[opts] syntax) and a "Cloud
+// subagents" block (/in-cloud, /babysit).
 //
 // Source URL was migrated from cursor.com/docs/agent/overview (404'd / built-in
 // Agent feature page) to cursor.com/docs/subagents (file-based custom subagents
@@ -502,7 +533,7 @@ var realCursorAgentsLandmarks = []string{
 	"Command Palette",
 	"Get Started",
 	"Agent",
-	"Customizing",
+	"Customize",
 	"Cloud Agents",
 	"Integrations",
 	"SDK",
@@ -521,11 +552,15 @@ var realCursorAgentsLandmarks = []string{
 	"File format",
 	"Configuration fields",
 	"Model configuration",
+	"Model parameters",
 	"When the configured model won't be used",
 	"Using subagents",
 	"Automatic delegation",
 	"Explicit invocation",
 	"Parallel execution",
+	"Cloud subagents",
+	"Start a cloud subagent with /in-cloud",
+	"Babysit a PR with /babysit",
 	"Resuming subagents",
 	"Common patterns",
 	"Verification agent",

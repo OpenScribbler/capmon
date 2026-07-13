@@ -1,8 +1,8 @@
 provider: amp
 docs_url: "https://ampcode.com/manual"
 category: cli
-last_fetched_at: "2026-07-13T06:30:00Z"
-last_changed_at: "2026-05-06T00:00:00Z"
+last_fetched_at: "2026-07-13T18:17:33Z"
+last_changed_at: "2026-07-13T18:17:33Z"
 generation_method: subagent
 
 content_types:
@@ -12,8 +12,8 @@ content_types:
       - uri: "https://ampcode.com/manual/agent-skills.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:3364d9e8141430524bd952c1d6dcd7ce5682e6b0f9b74c5b5329e7fe797a4997"
-        fetched_at: "2026-05-06T12:57:00Z"
+        content_hash: "sha256:f6c73b990982fd25b4cfe30cf090c63b830576f7a8e01ec8d0d7914d7982e48b"
+        fetched_at: "2026-07-13T18:17:33Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -34,9 +34,10 @@ content_types:
         confidence: confirmed
       global_scope:
         supported: true
-        mechanism: "skill directory placed under ~/.config/agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/"
+        mechanism: "skill directory placed under ~/.config/agents/skills/<name>/, ~/.agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/ (the ~/.agents/skills/ path was added in the 2026-07 rewrite of the 'Agent Skills' doc — see intro paragraph and the 'Skill precedence (first wins)' list)"
         paths:
           - "~/.config/agents/skills/<name>/SKILL.md"
+          - "~/.agents/skills/<name>/SKILL.md"
           - "~/.config/amp/skills/<name>/SKILL.md"
           - "~/.claude/skills/<name>/SKILL.md"
         confidence: confirmed
@@ -81,8 +82,8 @@ content_types:
         graduation_candidate: false
         conversion: not-portable
       - id: toolbox_bundling
-        name: "Executable tool bundling via toolbox/"
-        summary: "Auto-register executables placed in skill's toolbox/ subdirectory as tools (stdin/stdout JSON contract)."
+        name: "Executable tool bundling via toolbox/ (legacy)"
+        summary: "Legacy: the 2026-07 rewrite of the 'Agent Skills' doc removed the dedicated 'Executable Tools in Skills' section that documented auto-registering executables in a skill's toolbox/ subdirectory (stdin/stdout JSON contract). Toolbox directories now survive only as a low-priority discovery location — the 'Skill precedence (first wins)' list ends with 'Plugins, legacy toolbox directories, and built-in skills'. The plugin API (amp.registerTool) is the documented successor for custom executable tools. Detail of the JSON contract is no longer documented on this page."
         source_ref: "https://ampcode.com/manual/agent-skills.md"
         graduation_candidate: false
         conversion: not-portable
@@ -94,8 +95,8 @@ content_types:
         graduation_notes: "Graduated to skill_bundled_resources canonical key (issue #74)."
         conversion: embedded
       - id: skill_cli
-        name: "CLI and command palette skill management"
-        summary: "Manage skills via 'amp skill' CLI or command palette (Ctrl+O in the CLI) using 'skill: add', 'skill: list', 'skill: remove'; install from GitHub shorthand (org/repo/path), git URL, or local path."
+        name: "Command palette skill management"
+        summary: "The 2026-07 rewrite of this page trimmed skill management to a single 'Viewing Skills' section documenting only 'skill: list' (View installed skills) via the command palette (Ctrl+O in the CLI). The previously documented 'amp skill' CLI verbs ('skill: add', 'skill: remove') and install sources (GitHub shorthand org/repo/path, git URL, local path) are no longer documented on this page. UNCERTAIN whether those CLI paths still exist in the product — skills curation is anchored solely on this source, so the claim is treated as no-longer-documented."
         source_ref: "https://ampcode.com/manual/agent-skills.md"
         graduation_candidate: false
         conversion: not-portable
@@ -112,15 +113,21 @@ content_types:
         graduation_candidate: false
         graduation_notes: "Graduated to auto_invocable canonical key (issue #73)."
         conversion: embedded
-    loading_model: "Lazy — name and description (frontmatter) are always visible to the model and loaded at startup; SKILL.md body is loaded on demand when the skill is invoked. MCP tools and toolbox executables bundled in a skill remain hidden until the skill is loaded. Skill precedence order (first wins): ~/.config/agents/skills/, ~/.config/amp/skills/, .agents/skills/, .claude/skills/, ~/.claude/skills/, then plugins, toolbox directories, and built-in skills."
+    loading_model: "Lazy — name and description (frontmatter) are always visible to the model and loaded at startup; SKILL.md body is loaded on demand when the skill is invoked. MCP tools bundled in a skill (mcp.json) remain hidden until the skill is loaded. Skill precedence order (first wins), per the 2026-07 rewrite of the doc: ~/.config/agents/skills/, ~/.agents/skills/, ~/.config/amp/skills/, .agents/skills/, .claude/skills/, ~/.claude/skills/, then plugins, legacy toolbox directories, and built-in skills."
     notes: >
       Skill names must be unique per scope. Per the documented precedence list, user-wide
       (~/.config/agents/skills/) skills have higher priority than project-specific (.agents/skills/)
-      skills — note: the source prose says "project-specific takes priority over user-wide" but
+      skills — note: the source prose still says "project-specific skills take priority over user-wide" but
       the explicit precedence list contradicts this; the list is treated as authoritative.
       Project skills in .agents/skills/ can be committed to git so the whole team gets them
       automatically. Cross-agent compat paths (.claude/skills/, ~/.claude/skills/) are discovered
       but at lower precedence than amp-native paths.
+      The 2026-07 rewrite of this page (fetched_at 2026-07-13) added the ~/.agents/skills/ user-wide
+      path, dropped the dedicated "Installing Skills" and "Executable Tools in Skills" sections,
+      demoted toolbox directories to "legacy" discovery-only status, and trimmed skill management to
+      a single "Viewing Skills" section (skill: list). MCP-server bundling (mcp.json), the
+      building-skills built-in skill, bundled passive resources, and lazy frontmatter-first loading
+      are all unchanged and still documented.
   rules:
     status: supported
     sources:

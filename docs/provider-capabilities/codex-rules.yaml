@@ -28,7 +28,7 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: hierarchical_loading
       supported: true
-      mechanism: 'hierarchical_agents_md: Codex loads AGENTS.md from subdirectories with defined precedence (deeper overrides higher)'
+      mechanism: 'Codex unconditionally collects every AGENTS.md from the project root down to the cwd and combines them; project root is found by walking up to the nearest ancestor with project markers, and traversal never passes the project root (codex-rs/core/src/agents_md.rs module doc + find_nearest_ancestor_with_markers). Previously described as gated by the child_agents_md feature flag; that experiment was removed upstream (openai/codex #28993) and base hierarchical loading is now always-on.'
       source_field: ""
       source_value: ""
       confidence: confirmed

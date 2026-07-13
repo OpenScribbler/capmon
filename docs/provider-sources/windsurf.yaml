@@ -1,13 +1,16 @@
 # Windsurf — Provider Source Manifest
-# Docs-only: no public repo. Good llms.txt index with 97 raw markdown URLs via Mintlify.
-# Two parallel doc hierarchies: /plugins/ (IDE plugin) and /windsurf/ (standalone IDE).
+# Docs-only: no public repo. Good llms.txt index with raw markdown URLs via Mintlify.
+# Rebrand (2026-07): Windsurf is now "Devin Desktop" by Cognition. Docs moved
+# 1:1 from docs.windsurf.com/windsurf/cascade/* to docs.devin.ai/desktop/cascade/*
+# (old URLs 301 across domains, which capmon's fetch validity rejects — hence the
+# direct devin.ai URLs below). Slug stays `windsurf`; rename tracked separately.
 
 schema_version: "1"
-last_verified: "2026-03-27"
+last_verified: "2026-07-13"
 
 slug: windsurf
 display_name: Windsurf
-vendor: Codeium
+vendor: Cognition
 status: active
 fetch_tier: llms-txt
 # No useful public repo (codeiumdev/windsurf is an empty POC).
@@ -16,6 +19,9 @@ change_detection:
   method: source-hash
   endpoint: https://docs.windsurf.com/llms.txt
   # method: source-hash — per-source baselines in docs/provider-formats/windsurf.yaml
+  # Note: this endpoint still serves 200 directly on windsurf.com (no redirect),
+  # while the rest of the domain redirects to devin.ai. If it starts redirecting,
+  # switch to https://docs.devin.ai/llms.txt (verified live, 200).
 
 content_types:
 
@@ -28,20 +34,21 @@ content_types:
 
   rules:
     sources:
-      - url: https://docs.windsurf.com/windsurf/cascade/memories.md
+      - url: https://docs.devin.ai/desktop/cascade/memories.md
         type: docs
         format: markdown
         extracts: [file_format, file_locations, features]
 
-      - url: https://docs.windsurf.com/windsurf/cascade/agents-md.md
+      - url: https://docs.devin.ai/desktop/cascade/agents-md.md
         type: docs
         format: markdown
         extracts: [file_format, features]
-    # Format: .windsurfrules (plain text) + Cascade memories system. Also reads AGENTS.md.
+    # Format: .devin/rules/*.md preferred, .windsurf/rules/*.md legacy fallback
+    # (legacy .windsurfrules still read) + Cascade memories system. Also reads AGENTS.md.
 
   hooks:
     sources:
-      - url: https://docs.windsurf.com/windsurf/cascade/hooks.md
+      - url: https://docs.devin.ai/desktop/cascade/hooks.md
         type: docs
         format: markdown
         extracts: [event_names, hook_config_fields, config_examples]
@@ -51,14 +58,14 @@ content_types:
 
   mcp:
     sources:
-      - url: https://docs.windsurf.com/windsurf/cascade/mcp.md
+      - url: https://docs.devin.ai/desktop/cascade/mcp.md
         type: docs
         format: markdown
         extracts: [server_config_fields, transport_types, config_examples]
 
   skills:
     sources:
-      - url: https://docs.windsurf.com/windsurf/cascade/skills.md
+      - url: https://docs.devin.ai/desktop/cascade/skills.md
         type: docs
         format: markdown
         extracts: [file_format, features]
@@ -72,7 +79,7 @@ content_types:
 
   commands:
     sources:
-      - url: https://docs.windsurf.com/windsurf/cascade/workflows.md
+      - url: https://docs.devin.ai/desktop/cascade/workflows.md
         type: docs
         format: markdown
         extracts: [file_format, file_locations, features]

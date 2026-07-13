@@ -1,8 +1,8 @@
 provider: factory-droid
 docs_url: "https://docs.factory.ai"
 category: cli
-last_fetched_at: "2026-05-06T00:00:00Z"
-last_changed_at: "2026-05-06T00:00:00Z"
+last_fetched_at: "2026-07-13T18:25:13Z"
+last_changed_at: "2026-07-13T18:25:13Z"
 generation_method: subagent
 
 content_types:
@@ -12,8 +12,8 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/skills"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:b9bfbedd5ade7bd9f3c4a82be83f8255d61b584145f8183cf8e05fceb2aa1313"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:3a949298a322594a378780266976873c9861b79bf27864a677cdcc723d892552"
+        fetched_at: "2026-07-13T18:25:13Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -97,16 +97,16 @@ content_types:
         graduation_candidate: false
         conversion: not-portable
     loading_model: ""
-    notes: "A compatibility discovery path at <repo>/.agent/skills/ is also supported. The docs additionally show skill.mdx accepted alongside SKILL.md. Skill descriptions serve double duty as both user-facing documentation and auto-invocation trigger signals — the model reads the description to decide whether the skill applies to the current task. Skills accept $ARGUMENTS substitution (same pattern as commands) and support an argument-hint frontmatter field for autocomplete hints. Nine skill family categories are available covering frontend UI, service integration, data analysis, product management, and automated QA."
+    notes: "A compatibility discovery path at <repo>/.agent/skills/ is also supported. The docs additionally show skill.mdx accepted alongside SKILL.md. Skill descriptions serve double duty as both user-facing documentation and auto-invocation trigger signals — the model reads the description to decide whether the skill applies to the current task. Skills accept $ARGUMENTS substitution (same pattern as commands) and support an argument-hint frontmatter field for autocomplete hints. Nine skill family categories are available covering frontend UI, service integration, data analysis, product management, and automated QA. As of the 2026-07-13 refetch the doc states custom slash commands have been merged into skills: a .factory/commands/review.md and a .factory/skills/review/SKILL.md both create /review and behave identically, with existing .factory/commands/ files still working. UNCERTAIN: the skills Frontmatter reference table now lists only name, description, user-invocable, and disable-model-invocation — argument-hint and $ARGUMENTS are no longer explicitly documented on the skills page, though the commands-merge implies skills inherit the same argument handling; the argument_substitution provider extension is retained on that basis pending confirmation."
 
   rules:
     status: supported
     sources:
-      - uri: "https://docs.factory.ai/cli/configuration"
+      - uri: "https://docs.factory.ai/cli/configuration/agents-md"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:68dd6098b2ce999a013beb0821de9e9fc23bd7cb27fcb0a06713a0866678d6db"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:11eb03eefbe43e9b75a8815802c03992c43dbf1d948142924bd66a2f7e2580f2"
+        fetched_at: "2026-07-13T18:25:13Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -132,36 +132,36 @@ content_types:
       - id: agents_md_format
         name: AGENTS.md Format
         summary: "Factory uses the cross-provider AGENTS.md standard (OpenAI/Codex origin), with innermost file precedence across directory levels."
-        source_ref: "https://docs.factory.ai/cli/configuration"
+        source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
         graduation_candidate: true
         conversion: translated
       - id: global_rules_path
         name: Global Rules Path
         summary: "A global ~/AGENTS.md applies across all projects, overridden by any project-level or subdirectory AGENTS.md."
-        source_ref: "https://docs.factory.ai/cli/configuration"
+        source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
         graduation_candidate: false
         conversion: translated
       - id: custom_instructions_setting
         name: Custom Instructions Setting
         summary: "Provides always-on guidance to the Droid regardless of which project is open, configured via the personal settings file's customInstructions key."
-        source_ref: "https://docs.factory.ai/cli/configuration"
+        source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
         graduation_candidate: false
         provider_field: "customInstructions"
         conversion: embedded
       - id: settings_local_override
         name: Local Settings Override
         summary: "settings.local.json alongside settings.json in any .factory/ folder provides machine-specific overrides that merge on top of the corresponding settings.json; intended to be gitignored."
-        source_ref: "https://docs.factory.ai/cli/configuration"
+        source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
         graduation_candidate: false
         conversion: not-portable
       - id: legacy_droid_yaml
         name: Legacy .droid.yaml Migration
         summary: ".droid.yaml was an older project configuration surface; current configuration uses .factory/settings.json, AGENTS.md, and purpose-specific files (mcp, hooks, skills)."
-        source_ref: "https://docs.factory.ai/cli/configuration"
+        source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
         graduation_candidate: false
         conversion: not-portable
     loading_model: ""
-    notes: "Factory mirrors the AGENTS.md cross-provider standard (OpenAI/Codex origin). Discovery hierarchy: ~/AGENTS.md (global) → repo root AGENTS.md → subdir AGENTS.md (innermost wins). Common sections: project overview, build/test commands, coding conventions, PR workflow. Settings file documents commandAllowlist and commandDenylist for shell command approval behavior; hooksDisabled: true globally disables all hooks without removing configurations."
+    notes: "Factory mirrors the AGENTS.md cross-provider standard (OpenAI/Codex origin). Discovery hierarchy: ~/AGENTS.md (global) → repo root AGENTS.md → subdir AGENTS.md (innermost wins). Common sections: project overview, build/test commands, coding conventions, PR workflow. Settings file documents commandAllowlist and commandDenylist for shell command approval behavior; hooksDisabled: true globally disables all hooks without removing configurations. Source URL moved 2026-07-13: the AGENTS.md doc relocated from /cli/configuration to /cli/configuration/agents-md (the old /cli/configuration path now serves the Sandbox page). Content is materially unchanged; the doc now lists ~/.factory/AGENTS.md as the personal-override discovery location."
 
   hooks:
     status: supported
@@ -169,13 +169,13 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/hooks-guide"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:2ba00ceade78cf380ef00efa6385a286909ff16ccb095df3bd6c63aecda401a6"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:caa58f9b5b4c5425bb00539341b7d312c1c09b6f878ae1dafdaddb556f6c384c"
+        fetched_at: "2026-07-13T18:25:13Z"
       - uri: "https://docs.factory.ai/reference/hooks-reference"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:863be38b9535b0b5cc702cb945d3185e91f3ef2e14a7f8bd0f5b75c0053774a7"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:408ccf3cf0eb0c275a25d7a156fc9a49303cbec54897698769e2118f20f740f4"
+        fetched_at: "2026-07-13T18:25:13Z"
     canonical_mappings:
       handler_types:
         supported: false
@@ -273,12 +273,12 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/mcp"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:ea4adae066cf30c1f67a713a816096d6084fb2cef78e965dc935c3ced70ce8aa"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:2ccad2e1e3ed285ea030bbf3678689d603a427e999dfa1466e01cda56316e8b3"
+        fetched_at: "2026-07-13T18:25:13Z"
     canonical_mappings:
       transport_types:
         supported: true
-        mechanism: "two transports documented: http (remote cloud endpoints, droid mcp add <name> <url> --type http) and stdio (local processes, droid mcp add <name> '<command>' [--env KEY=VALUE...])"
+        mechanism: "three transports documented under 'Adding Servers via CLI': http (Streamable HTTP, current standard, droid mcp add <name> <url> --type http), sse (legacy standalone HTTP+SSE, --type sse), and stdio (local processes, droid mcp add <name> '<command>' [--env KEY=VALUE...])"
         confidence: confirmed
       oauth_support:
         supported: true
@@ -286,11 +286,11 @@ content_types:
         confidence: confirmed
       env_var_expansion:
         supported: true
-        mechanism: "stdio server add command accepts --env KEY=VALUE flags; env field documented in configuration schema for stdio servers"
+        mechanism: "${VAR} and ${VAR:-default} expansion in mcp.json documented under 'Variable expansion' heading (supported in stdio command/args/env and http url/headers; expanded in memory at load time, file never rewritten); stdio server add also accepts --env KEY=VALUE flags"
         confidence: confirmed
       tool_filtering:
         supported: true
-        mechanism: "per-server tool disable via disabledTools field in Configuration Schema"
+        mechanism: "per-server tool filtering via disabledTools (blocklist) and enabledTools (allowlist; takes precedence when both set) fields in Configuration Schema, documented under 'Per-tool filtering' heading; mirrors --enabled-tools / --disabled-tools flags on droid exec"
         confidence: confirmed
       auto_approve:
         supported: false
@@ -305,9 +305,9 @@ content_types:
         mechanism: "no @-mention or resource referencing syntax for MCP resources documented"
         confidence: inferred
       enterprise_management:
-        supported: false
-        mechanism: "only user-level (~/.factory/mcp.json) and project-level (.factory/mcp.json) configuration scopes documented; no organization/enterprise admin layer"
-        confidence: inferred
+        supported: true
+        mechanism: "org-managed 'Enterprise MCP policy' (mcpPolicy with enabled + allowlist of hostname/command matchers) restricts which servers may connect; 'MCP autonomy URL overrides' (mcpAutonomyUrlOverrides) assign per-URL autonomy risk levels; both delivered via org-managed settings and cannot be weakened downstream. A folder-level scope (.factory/mcp.json in any ancestor dir) also exists alongside user and project scopes"
+        confidence: confirmed
     provider_extensions:
       - id: mcp_manager_ui
         name: "Interactive MCP Manager (/mcp)"
@@ -339,8 +339,27 @@ content_types:
         source_ref: "https://docs.factory.ai/cli/configuration/mcp"
         graduation_candidate: false
         conversion: not-portable
+      - id: enterprise_mcp_policy
+        name: Enterprise MCP Policy & Autonomy Overrides
+        summary: "Org-managed mcpPolicy (enabled + allowlist of remote-hostname / stdio-command matchers) centrally restricts which MCP servers may connect; mcpAutonomyUrlOverrides map URL glob patterns to autonomy risk levels (low/medium/high) governing how much confirmation a server's tools require. Both are MDM-delivered and cannot be overridden or weakened by user/project/folder settings."
+        source_ref: "https://docs.factory.ai/cli/configuration/mcp"
+        graduation_candidate: true
+        provider_field: "mcpPolicy"
+        conversion: not-portable
+      - id: mcp_variable_expansion
+        name: mcp.json Variable Expansion
+        summary: "${VAR} and ${VAR:-default} references in mcp.json are expanded against the shell environment at load time (in memory only; the file is never rewritten), supported in stdio command/args/env and http url/headers — keeping secrets out of version control."
+        source_ref: "https://docs.factory.ai/cli/configuration/mcp"
+        graduation_candidate: true
+        conversion: translated
+      - id: mcp_call_timeout
+        name: Per-Server MCP Call Timeout
+        summary: "timeoutMs per server in mcp.json overrides the global mcp.callTimeoutMs (settings.json) for long-running MCP tool calls; resolution order is per-server timeoutMs → global callTimeoutMs → built-in default."
+        source_ref: "https://docs.factory.ai/cli/configuration/mcp"
+        graduation_candidate: false
+        conversion: not-portable
     loading_model: ""
-    notes: "MCP configuration uses dedicated mcp.json files (not settings.json): ~/.factory/mcp.json for user-level servers and .factory/mcp.json for project-level servers. User-level config takes priority over project-level when both define the same server name. OAuth tokens store globally in the system keyring. env_var_expansion is now confirmed supported via --env flags on CLI add commands. Popular HTTP servers include Sentry, Hugging Face, Notion, Linear, Stripe, Figma, Vercel; popular stdio servers include Airtable, ClickUp, HubSpot."
+    notes: "MCP configuration uses dedicated mcp.json files (not settings.json) across three scopes: ~/.factory/mcp.json (user, highest priority), .factory/mcp.json in any ancestor dir (folder), and .factory/mcp.json in project root. OAuth tokens store globally in the system keyring. Updates from the 2026-07-13 refetch: a third transport `sse` (legacy HTTP+SSE) joins http and stdio; env_var_expansion now has explicit ${VAR}/${VAR:-default} 'Variable expansion' documentation (previously only --env flags); tool_filtering adds enabledTools allowlist alongside disabledTools; enterprise_management flipped false→true with the new 'Enterprise MCP policy' (mcpPolicy allowlist) and 'MCP autonomy URL overrides' (mcpAutonomyUrlOverrides) org-managed sections. Per-server timeoutMs and richer OAuth overrides (DCR/CIMD, clientMetadataUrl, tokenEndpointAuthMethod, callbackPort) are also newly documented. Custom droids can scope MCP access via an mcpServers frontmatter field (see agents/per_agent_mcp). UNCERTAIN: mcpAutonomyUrlOverrides classifies per-URL autonomy risk (a low level lets tools auto-run) but is an admin autonomy floor rather than a user-facing per-server auto-approve toggle, so auto_approve is left unsupported. Popular HTTP servers include Sentry, Hugging Face, Socket, Notion, Linear, Stripe, PayPal, Figma, Canva, Vercel, Netlify; popular stdio servers include Airtable, ClickUp, HubSpot."
 
   agents:
     status: supported
@@ -348,8 +367,8 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/custom-droids"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:3b5c72e662488dad5b8f95203961d09419f8680e2b3361ceab1057c24ae72977"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:75a95f7bf4f470b84a7b873fce7afb9a65be9921f6de1ddd4cfae1e3839152eb"
+        fetched_at: "2026-07-13T18:25:13Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -372,9 +391,9 @@ content_types:
         mechanism: "model field accepts inherit (use parent session model) or a specific model identifier; custom BYOK models use custom: prefix; reasoningEffort (low/medium/high) is an additional per-droid field ignored when model is inherit"
         confidence: confirmed
       per_agent_mcp:
-        supported: false
-        mechanism: "no per-droid MCP configuration documented; MCP is workspace-wide; droids can use MCP tools via the mcp tool category"
-        confidence: inferred
+        supported: true
+        mechanism: "mcpServers frontmatter field (array of configured server names, e.g. [\"linear\", \"github\"]) scopes a droid to specific MCP servers, documented under 'Selecting MCP servers' heading; omit to inherit session-wide MCP tools, set [] to exclude all, or list exact registered MCP tool IDs in tools for per-tool control"
+        confidence: confirmed
       subagent_spawning:
         supported: true
         mechanism: "droids exposed as subagent_type targets for Task tool delegation; /droids menu (I key) imports Claude Code .claude/agents/*.md to droid format with field mapping and model family translation"
@@ -410,6 +429,25 @@ content_types:
         source_ref: "https://docs.factory.ai/cli/configuration/custom-droids"
         graduation_candidate: false
         conversion: not-portable
+      - id: per_droid_mcp_servers
+        name: Per-Droid MCP Server Selection
+        summary: "The mcpServers frontmatter field (array of configured server names) scopes a custom droid to a subset of MCP servers instead of inheriting all session servers; omit to inherit, set [] to exclude all, or name exact registered MCP tool IDs in tools for finer control. Servers blocked by enterprise MCP policy stay unavailable even if listed."
+        source_ref: "https://docs.factory.ai/cli/configuration/custom-droids"
+        graduation_candidate: true
+        provider_field: "mcpServers"
+        conversion: translated
+      - id: builtin_subagents
+        name: Built-in Subagents (worker / explorer)
+        summary: "Two general-purpose subagents ship out of the box: worker (all tools, default complexity medium) for non-trivial delegation, and explorer (read-only, default complexity light) for fast codebase exploration. Both use model: inherit and follow complexity→model routing by their default tier."
+        source_ref: "https://docs.factory.ai/cli/configuration/custom-droids"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: droid_background_execution
+        name: Background & Resumable Subagents
+        summary: "Task tool subagents can run in the background (run_in_background: true returns a task_id; TaskOutput polls/fetches results, TaskStop terminates) and be resumed with a prior task_id to continue with full context. Subagents run non-interactively (AskUser disabled) and cannot spawn nested subagents."
+        source_ref: "https://docs.factory.ai/cli/configuration/custom-droids"
+        graduation_candidate: false
+        conversion: not-portable
       - id: droids_management_ui
         name: Droids Management UI
         summary: "/droids slash command opens a modal with list of droids (name, model, description, location badge, tools summary), a Create wizard (description, system prompt, identifier, model, tools), an Import from Claude Code option, and View/Edit/Delete/Reload actions. CLI normalizes filenames to lowercase-hyphenated on save."
@@ -417,7 +455,7 @@ content_types:
         graduation_candidate: false
         conversion: not-portable
     loading_model: ""
-    notes: "Factory calls agents 'Custom Droids'. Exposed as subagent_type targets for the Task tool with live progress streaming. Project droids override personal (note: reverse of skills). Tool categories are now fully documented: read-only (Read/LS/Grep/Glob), edit (Create/Edit/ApplyPatch), execute (Execute), web (WebSearch/FetchUrl), mcp (dynamic). Omitting tools grants access to all tools. TodoWrite is always included automatically. reasoningEffort (low/medium/high) is a new per-droid field for controlling reasoning depth, ignored when model is inherit. Import flow is UI-based via /droids + I key (replaces the previously documented /import-subagent slash command)."
+    notes: "The doc was renamed from 'Custom Droids (Subagents)' to 'Subagents' (H1) as of the 2026-07-13 refetch; 'Custom droids' now appears as an H3 subsection and remains Factory's name for user-defined subagents. Exposed as subagent_type targets for the Task tool with live progress streaming. Project droids override personal (note: reverse of skills). Tool categories: read-only (Read/LS/Grep/Glob), edit (Create/Edit/ApplyPatch), execute (Execute), web (WebSearch/FetchUrl), mcp (dynamic). Omitting tools grants all tools; TodoWrite is always auto-included; ApplyPatch auto-included with Edit on OpenAI models (both enabled when model is inherit). reasoningEffort (low/medium/high) is ignored when model is inherit. Key additions from this refetch: per_agent_mcp is now SUPPORTED via the mcpServers frontmatter field ('Selecting MCP servers'); two built-in subagents ship (worker = all tools/medium complexity, explorer = read-only/light); background execution (run_in_background + TaskOutput/TaskStop) and resume (task_id) are documented; a complexity tier (light/medium/heavy) drives complexity→model routing; a GenerateDroid tool AI-scaffolds droid configs; enterprise controls (subagentAutonomyLevel, maxAutonomyLevel, subagentModelSettings) govern subagents org-wide. Subagents run non-interactively and cannot spawn their own subagents (Task tool unavailable to them). Claude Code import remains UI-based via /droids + I key (scans ~/.claude/agents/ and <repo>/.claude/agents/)."
 
   commands:
     status: supported
@@ -425,8 +463,8 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/custom-slash-commands"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:7dbb0cc6105910ac39feda44e50679247a9de4dff599a24f7de0e9edfd2631db"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:894652da0201f9288598ea877acb984707134b08532e909c29d06301bfcb50e9"
+        fetched_at: "2026-07-13T18:25:13Z"
     canonical_mappings:
       argument_substitution:
         supported: true
@@ -463,4 +501,4 @@ content_types:
         graduation_candidate: false
         conversion: not-portable
     loading_model: ""
-    notes: "Commands are partly superseded by skills in Factory's model — the docs explicitly suggest using skills for new commands. The $ARGUMENTS substitution in Markdown commands is equivalent to the $ARGUMENTS pattern found in other providers (e.g. Claude Code). The argument-hint frontmatter field is analogous to Claude Code's argument-hint. Executable commands differ from skills by running as shell processes rather than being injected as prompts; their stdout (up to 64 KB) plus script contents are posted back to chat for transparency. Scripts inherit the shell environment and receive arguments as positional parameters."
+    notes: "Commands are partly superseded by skills in Factory's model — the docs explicitly suggest using skills for new commands. The $ARGUMENTS substitution in Markdown commands is equivalent to the $ARGUMENTS pattern found in other providers (e.g. Claude Code). The argument-hint frontmatter field is analogous to Claude Code's argument-hint. Executable commands differ from skills by running as shell processes rather than being injected as prompts; their stdout (up to 64 KB) plus script contents are posted back to chat for transparency. Scripts inherit the shell environment and receive arguments as positional parameters. As of the 2026-07-13 refetch the Markdown frontmatter table adds an allowed-tools key marked 'Reserved for future use'; positional placeholders ($1/$2) remain explicitly unsupported in Markdown commands (use $ARGUMENTS) but are the argument mechanism for Executable commands. Executable stdout AND stderr (up to 64 KB) plus script contents are posted back to the transcript."

@@ -7,15 +7,16 @@ import (
 )
 
 // realAmpLandmarks is a snapshot of the headings extracted from amp's skills doc
-// (.capmon-cache/amp/skills.0/extracted.json) as of 2026-04-16. Update when the
-// upstream doc evolves.
+// (.capmon-cache/amp/skills.0/extracted.json) as of 2026-07-13. Update when the
+// upstream doc evolves. The 2026-07-13 rewrite (drift issue #3) removed the
+// "Installing Skills" and "Executable Tools in Skills" headings and added
+// "Viewing Skills" — see ampLandmarkOptions for the re-anchoring rationale.
 var realAmpLandmarks = []string{
 	"Agent Skills",
 	"Creating Skills",
-	"Installing Skills",
+	"Viewing Skills",
 	"Skill Format",
 	"MCP Servers in Skills",
-	"Executable Tools in Skills",
 }
 
 // realAmpRulesLandmarks is a snapshot of the rules-relevant headings from
@@ -74,7 +75,7 @@ func TestRecognizeAmp_RealLandmarks(t *testing.T) {
 	if caps["skills.supported"] != "true" {
 		t.Error("skills.supported missing")
 	}
-	for _, c := range []string{"creation_workflow", "installation_workflow", "mcp_integration", "executable_tools"} {
+	for _, c := range []string{"creation_workflow", "mcp_integration"} {
 		if caps["skills.capabilities."+c+".supported"] != "true" {
 			t.Errorf("%s.supported missing", c)
 		}

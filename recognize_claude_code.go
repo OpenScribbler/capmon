@@ -29,7 +29,7 @@ func claudeCodeLandmarkOptions() LandmarkOptions {
 		Patterns: []LandmarkPattern{
 			pattern("frontmatter", "Frontmatter reference", "documented under 'Frontmatter reference' heading"),
 			pattern("live_reload", "Live change detection", "documented under 'Live change detection' heading"),
-			pattern("nested_directories", "Automatic discovery from nested directories", "documented under 'Automatic discovery from nested directories' heading"),
+			pattern("nested_directories", "Automatic discovery from parent and nested directories", "documented under 'Automatic discovery from parent and nested directories' heading"),
 			pattern("additional_directories", "Skills from additional directories", "documented under 'Skills from additional directories' heading"),
 			pattern("arguments", "Pass arguments to skills", "documented under 'Pass arguments to skills' heading"),
 			pattern("tool_preapproval", "Pre-approve tools for a skill", "documented under 'Pre-approve tools for a skill' heading"),
@@ -98,7 +98,7 @@ func claudeCodeHooksLandmarkOptions() LandmarkOptions {
 	}
 	return HooksLandmarkOptions(
 		HooksLandmarkPattern("handler_types", "Hook handler fields",
-			"four handler types documented under 'Hook handler fields' (Common fields, Command hook fields, HTTP hook fields, Prompt and agent hook fields)", required),
+			"five handler types documented under 'Hook handler fields' (Common fields, Command hook fields, HTTP hook fields, MCP tool hook fields, Prompt and agent hook fields)", required),
 		HooksLandmarkPattern("matcher_patterns", "Matcher patterns",
 			"matcher patterns documented under 'Matcher patterns' heading (exact, pipe-separated, regex)", required),
 		HooksLandmarkPattern("decision_control", "Decision control",
@@ -127,10 +127,28 @@ func claudeCodeHooksLandmarkOptions() LandmarkOptions {
 //
 // auto_approve is intentionally NOT mapped — Claude Code's MCP docs do not
 // document a per-tool or per-server auto-approval mechanism above the
-// permission-prompt layer described in the hooks/permissions docs. If the
-// upstream docs add such a heading later, add a McpLandmarkPattern here.
+// permission-prompt layer described in the hooks/permissions docs. The
+// "Require approval for a specific tool" heading (requiresUserInteraction,
+// CC v2.1.199+) forces MORE approval, not auto-approval, so it is not
+// auto_approve evidence. If the upstream docs add such a heading later, add a
+// McpLandmarkPattern here.
 //
-// transport_types is emitted as the bare object key (no .stdio/.sse/.http
+// marketplace and tool_filtering are also intentionally NOT mapped.
+// Verified live: https://code.claude.com/docs/en/mcp.md on 2026-07-13.
+//   - marketplace: the former "Popular MCP servers" in-doc catalog heading was
+//     replaced by "Find and build MCP servers", which points to an EXTERNAL
+//     Anthropic Directory (claude.ai/directory) reachable via `claude mcp add`,
+//     not an in-IDE marketplace. Format YAML curates marketplace as
+//     supported: false (docs/provider-formats/claude-code.yaml mcp
+//     canonical_mappings), and the derived spec agrees.
+//   - tool_filtering: the "Allowlist behavior (allowedMcpServers)" /
+//     "Denylist behavior (deniedMcpServers)" headings moved off this page to
+//     the separate /en/managed-mcp page. Those are per-SERVER allow/deny
+//     (enterprise_management), not per-TOOL visibility filtering. Format YAML
+//     curates tool_filtering as supported: false. Server-level allow/deny is
+//     still recognized via enterprise_management below.
+//
+// transport_types is emitted as the bare object key (no .stdio/.sse/.http/.ws
 // nesting) because the seeder pipeline treats per-key supported as the
 // minimum signal — nested transport flags would require evidence beyond
 // heading presence (e.g., schema enum values).
@@ -141,19 +159,15 @@ func claudeCodeMcpLandmarkOptions() LandmarkOptions {
 	}
 	return McpLandmarkOptions(
 		McpLandmarkPattern("transport_types", "Add a remote HTTP server",
-			"three transport options documented under 'Option 1: Add a remote HTTP server' / 'Option 2: Add a remote SSE server' / 'Option 3: Add a local stdio server' headings", required),
+			"four transport options documented under 'Option 1: Add a remote HTTP server' / 'Option 2: Add a remote SSE server' / 'Option 3: Add a local stdio server' / 'Option 4: Add a remote WebSocket server' headings", required),
 		McpLandmarkPattern("oauth_support", "Authenticate with remote MCP servers",
 			"OAuth 2.0 with callback port + pre-configured credentials documented under 'Authenticate with remote MCP servers' / 'Use a fixed OAuth callback port' / 'Use pre-configured OAuth credentials' headings", required),
 		McpLandmarkPattern("env_var_expansion", "Environment variable expansion in .mcp.json",
 			"env-var expansion in .mcp.json documented under 'Environment variable expansion in .mcp.json' heading", required),
-		McpLandmarkPattern("tool_filtering", "Allowlist behavior",
-			"allowlist + denylist tool filtering documented under 'Allowlist behavior (allowedMcpServers)' / 'Denylist behavior (deniedMcpServers)' headings", required),
 		McpLandmarkPattern("resource_referencing", "Use MCP resources",
 			"MCP resource @-mention referencing documented under 'Use MCP resources' / 'Reference MCP resources' headings", required),
 		McpLandmarkPattern("enterprise_management", "Managed MCP configuration",
-			"managed MCP config with managed-mcp.json + allowlists/denylists documented under 'Managed MCP configuration' / 'Option 1: Exclusive control with managed-mcp.json' / 'Option 2: Policy-based control with allowlists and denylists' headings", required),
-		McpLandmarkPattern("marketplace", "Popular MCP servers",
-			"in-doc curated server list documented under 'Popular MCP servers' heading; Claude Code surfaces servers via this catalog rather than an in-IDE marketplace", required),
+			"managed MCP config with managed-mcp.json + allowedMcpServers/deniedMcpServers server allow/deny documented under 'Managed MCP configuration' heading (detailed options on the linked /en/managed-mcp page)", required),
 	)
 }
 
@@ -196,7 +210,7 @@ func claudeCodeAgentsLandmarkOptions() LandmarkOptions {
 		AgentsLandmarkPattern("agent_scopes", "Choose the subagent scope",
 			"five-tier scope hierarchy (managed > --agents CLI > project > user > plugin) documented under 'Choose the subagent scope' heading; precedence rules in scope table", required),
 		AgentsLandmarkPattern("model_selection", "Choose a model",
-			"per-subagent model override (sonnet/opus/haiku alias, full model ID, or inherit) documented under 'Choose a model' heading; resolution order via CLAUDE_CODE_SUBAGENT_MODEL env var, --model flag, frontmatter, or main session", required),
+			"per-subagent model override (sonnet/opus/haiku/fable alias, full model ID, or inherit) documented under 'Choose a model' heading; resolution order via CLAUDE_CODE_SUBAGENT_MODEL env var, --model flag, frontmatter, or main session", required),
 		AgentsLandmarkPattern("per_agent_mcp", "Scope MCP servers to a subagent",
 			"per-subagent mcpServers field scopes which MCP servers each subagent can access (documented under 'Scope MCP servers to a subagent' heading)", required),
 		AgentsLandmarkPattern("subagent_spawning", "Chain subagents",

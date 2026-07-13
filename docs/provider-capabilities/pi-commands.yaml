@@ -4,7 +4,7 @@ format: ""
 proposed_mappings:
     - canonical_key: argument_substitution
       supported: true
-      mechanism: 'positional expansion: $1, $2 (specific positions), $@ or $ARGUMENTS (all args joined), ${@:N} (args from position N), ${@:N:L} (L args starting at N); richer syntax than most providers'
+      mechanism: 'positional expansion: $1, $2 (specific positions), $@ or $ARGUMENTS (all args joined), ${1:-default} (default value used when the arg is absent/empty), ${@:N} (args from position N), ${@:N:L} (L args starting at N); richer syntax than most providers'
       source_field: ""
       source_value: ""
       confidence: confirmed

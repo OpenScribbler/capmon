@@ -4,19 +4,19 @@ format: ""
 proposed_mappings:
     - canonical_key: auto_approve
       supported: true
-      mechanism: Users can configure permanent permissions through permissions.json files so that specific MCP tools do not require per-invocation approval; auto-run functionality can also be enabled globally.
+      mechanism: 'Users can configure permanent permissions through permissions.json files so that specific MCP tools do not require per-invocation approval. MCP also follows the same Run Modes as terminal commands: in Auto-review mode allowlisted MCP tools run immediately and everything else is routed through the classifier (documented under the ''Run Mode'' heading — formerly ''Auto-run'').'
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: enterprise_management
-      supported: false
-      mechanism: Cursor does not document organization-level managed MCP policy controls beyond the general hook and rule enterprise scopes.
+      supported: true
+      mechanism: 'The 2026-07-13 refetch added an ''Enterprise admin controls'' section: enterprise admins configure MCP policy from the Cursor dashboard (Team MCP distribution of shared servers, an MCP Allowlist of approved servers/tools, per-server Network controls, and governance of User MCP extensions). Documented under ''Enterprise admin controls'' / ''Team MCP distribution'' / ''MCP Allowlist'' / ''Network controls'' / ''User MCP extensions'' headings.'
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: env_var_expansion
       supported: true
-      mechanism: Server configuration supports variable interpolation using ${env:NAME} for environment variables, ${userHome} for the user's home directory, and ${workspaceFolder} for the workspace root — not limited to env blocks alone.
+      mechanism: Server configuration supports variable interpolation using ${env:NAME} for environment variables, ${userHome} for the user's home directory, ${workspaceFolder} for the workspace root, and ${pathSeparator} / ${/} for the OS path separator — not limited to env blocks alone (documented under 'Config interpolation').
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -39,11 +39,11 @@ proposed_mappings:
       source_value: ""
       confidence: confirmed
     - canonical_key: tool_filtering
-      supported: false
-      mechanism: Cursor does not document per-server tool allowlists or blocklists for MCP servers.
+      supported: true
+      mechanism: Enterprise admins define an MCP Allowlist (Team Settings > MCP Configuration) where per-server tool allowlists restrict which tools from an approved server may run automatically; command entries approve local stdio servers and URL entries approve remote HTTP/SSE servers (documented under the 'MCP Allowlist' heading, added 2026-07-13).
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: transport_types
       supported: true
       mechanism: 'Cursor documents three MCP transports: stdio for local processes managed by Cursor, sse for Server-Sent Events (local or remote, multi-user), and streamable-http for HTTP-based servers (local or remote, multi-user) with OAuth authentication support.'
