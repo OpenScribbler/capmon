@@ -4,7 +4,7 @@ format: ""
 proposed_mappings:
     - canonical_key: activation_mode
       supported: false
-      mechanism: Zed rule files load unconditionally when present at project root; no conditional activation syntax documented
+      mechanism: Zed instruction files load unconditionally (personal AGENTS.md every project; project-root file when present); no conditional activation syntax documented
       source_field: ""
       source_value: ""
       confidence: inferred
@@ -28,7 +28,7 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: hierarchical_loading
       supported: false
-      mechanism: Zed loads rule files from the project root only; no multi-tier hierarchical loading documented
+      mechanism: Zed loads instruction files from two fixed locations (personal ~/.config/zed/AGENTS.md plus one project-root file, project overriding personal); no directory-level traversal or subdirectory overrides documented
       source_field: ""
       source_value: ""
       confidence: inferred

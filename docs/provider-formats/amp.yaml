@@ -1,7 +1,7 @@
 provider: amp
 docs_url: "https://ampcode.com/manual"
 category: cli
-last_fetched_at: "2026-05-06T12:57:00Z"
+last_fetched_at: "2026-07-13T06:30:00Z"
 last_changed_at: "2026-05-06T00:00:00Z"
 generation_method: subagent
 
@@ -186,11 +186,11 @@ content_types:
   hooks:
     status: supported
     sources:
-      - uri: "https://ampcode.com/manual/appendix/permissions-reference.md"
+      - uri: "https://ampcode.com/manual/appendix/legacy-permissions-rules.txt"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:d5e24aca1259039675945e5eb1e193ac8635da69b582b309db6feb9c9891fa0f"
-        fetched_at: "2026-05-06T12:57:00Z"
+        content_hash: "sha256:e7a21d87492bae8fb92774c1446e063bff0b5490dbd84f947a149192b6961c6c"
+        fetched_at: "2026-07-13T06:30:00Z"
     canonical_mappings:
       handler_types:
         supported: true
@@ -283,48 +283,48 @@ content_types:
       - id: permissions_system
         name: "Permissions system (amp.permissions)"
         summary: "Ordered first-match-wins rule system under 'amp.permissions' with allow/reject/ask/delegate actions and per-context defaults."
-        source_ref: "https://ampcode.com/manual/appendix/permissions-reference.md"
+        source_ref: "https://ampcode.com/manual/appendix/legacy-permissions-rules.txt"
         graduation_candidate: false
         conversion: not-portable
         provider_field: "amp.permissions"
       - id: permissions_match_conditions
         name: "Permission match condition types"
         summary: "Match values support glob patterns ('*'), regex (strings starting and ending with '/'), arrays (OR across entries), literals (boolean/number/null/undefined as exact match), and nested objects (deep property matching with dot notation for objects and numeric strings for array indices). Tool name field also accepts globs (e.g., 'Bash', 'mcp__playwright__*')."
-        source_ref: "https://ampcode.com/manual/appendix/permissions-reference.md"
+        source_ref: "https://ampcode.com/manual/appendix/legacy-permissions-rules.txt"
         graduation_candidate: false
         conversion: not-portable
         provider_field: "matches"
       - id: permissions_delegate_action
         name: "Permission delegate action"
         summary: "Delegate decisions to an external program named in the rule's 'to' field (must be on $PATH). Amp pipes tool parameters as JSON to stdin and exports AMP_THREAD_ID, AGENT_TOOL_NAME, and AGENT=amp env vars. Exit status: 0=allow, 1=ask operator, ≥2=reject (stderr surfaced to the model). Plugin API is the documented successor; a compatibility plugin enforcing amp.permissions rules is planned."
-        source_ref: "https://ampcode.com/manual/appendix/permissions-reference.md"
+        source_ref: "https://ampcode.com/manual/appendix/legacy-permissions-rules.txt"
         graduation_candidate: false
         conversion: not-portable
         provider_field: "action"
       - id: permissions_reject_message
         name: "Permission reject with continuation message"
         summary: "A 'reject' rule may carry a 'message' string returned to the model; when set, the rejection continues the conversation with that feedback instead of halting it."
-        source_ref: "https://ampcode.com/manual/appendix/permissions-reference.md"
+        source_ref: "https://ampcode.com/manual/appendix/legacy-permissions-rules.txt"
         graduation_candidate: false
         conversion: not-portable
         provider_field: "message"
       - id: permissions_default_behavior
         name: "Default action when no rule matches"
         summary: "If no user rule and no built-in rule matches, Amp asks the operator on the main thread and rejects the call in sub-agents. Built-in rules (e.g., allowing 'ls' via Bash) are consulted after user rules."
-        source_ref: "https://ampcode.com/manual/appendix/permissions-reference.md"
+        source_ref: "https://ampcode.com/manual/appendix/legacy-permissions-rules.txt"
         graduation_candidate: false
         conversion: not-portable
       - id: permissions_context_restriction
         name: "Permission context restriction (thread vs subagent)"
         summary: "Optionally scopes a rule to main thread, sub-agent only, or both (omitted); defaults differ by context."
-        source_ref: "https://ampcode.com/manual/appendix/permissions-reference.md"
+        source_ref: "https://ampcode.com/manual/appendix/legacy-permissions-rules.txt"
         graduation_candidate: false
         conversion: not-portable
         provider_field: "context"
       - id: permissions_cli
         name: "Permissions CLI (amp permissions)"
         summary: "'amp permissions' subcommands manage rules in a UNIX-shell-style text format without editing JSON: 'list' (with '--builtin' for built-ins only), 'add' (e.g., 'add reject web_search'), 'edit' (opens $EDITOR; also accepts STDIN), and 'test' (dry-runs a tool+args call and prints the matched rule, action, and source). Single/double-quoted strings supported; unquoted true/false/null/numbers parsed as JSON literals; values containing '*' must be quoted."
-        source_ref: "https://ampcode.com/manual/appendix/permissions-reference.md"
+        source_ref: "https://ampcode.com/manual/appendix/legacy-permissions-rules.txt"
         graduation_candidate: false
         conversion: not-portable
     loading_model: "Hooks and permissions are loaded from the Amp settings file at startup. Hook definitions live under 'amp.hooks' and permission rules under 'amp.permissions'. Permission rules are evaluated as an ordered list — the first matching rule wins. No lazy loading is described; both systems are active for the duration of the Amp session."

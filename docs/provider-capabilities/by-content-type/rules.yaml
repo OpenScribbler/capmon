@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-11T23:55:29Z
+# Generated at: 2026-07-13T06:52:00Z
 
 content_type: rules
 providers:
@@ -279,10 +279,6 @@ providers:
                 capabilities:
                     always:
                         supported: true
-                        mechanism: project-root .rules file (or first-match fallback name) auto-included in every Agent Panel interaction; Library entries marked as Default Rules also load always_on (documented under '.rules files' / 'Default Rules')
-                        confidence: inferred
-                    manual:
-                        supported: true
-                        mechanism: Library rules invoked via slash command to inject the rule into the current agent context (documented under 'Slash Commands in Rules')
+                        mechanism: 'instructions are always-on context: personal ~/.config/zed/AGENTS.md applies to every project, and the first-match project-root instruction file applies to the current project, overriding personal on conflict (documented under ''Personal Instructions'' / ''Project Instructions'')'
                         confidence: inferred
 schema_version: "1"

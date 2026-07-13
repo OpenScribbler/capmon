@@ -73,7 +73,7 @@ content_types:
 
   hooks:
     sources:
-      - url: https://ampcode.com/manual/appendix/permissions-reference.md
+      - url: https://ampcode.com/manual/appendix/legacy-permissions-rules.txt
         type: docs
         format: markdown
         extracts: [permissions_schema, match_conditions]
@@ -81,7 +81,7 @@ content_types:
     # NOT file-based — stored as JSON config entries. Installers manage via JSON merge into settings.
     # Note: ampcode.com/manual/hooks.md was retired; the hooks section now lives inline at
     # ampcode.com/manual?internal#hooks (auth-gated). Recognition is anchored entirely on
-    # permissions-reference.md — see recognize_amp.go:71.
+    # legacy-permissions-rules.txt — see recognize_amp.go (ampHooksLandmarkOptions).
 
   mcp:
     sources:

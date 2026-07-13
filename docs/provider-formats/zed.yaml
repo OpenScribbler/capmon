@@ -5,7 +5,7 @@ category: standalone-app
 # - required: true | false | null (null = source doesn't say)
 # - value_type: see allow-list in formatdoc_validate.go
 # - examples: [{title?, lang, code, note?}]
-last_fetched_at: "2026-05-06T12:57:00Z"
+last_fetched_at: "2026-07-13T06:30:00Z"
 last_changed_at: "2026-05-06T00:00:00Z"
 generation_method: subagent
 
@@ -13,11 +13,11 @@ content_types:
   rules:
     status: supported
     sources:
-      - uri: "https://zed.dev/docs/ai/rules"
+      - uri: "https://zed.dev/docs/ai/instructions"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-05-06T12:57:00Z"
-        content_hash: "sha256:122fc3c7af9835b77e45d11c5c4b99fc3f07874c58bc1f3bb46cfd82774bfac3"
+        fetched_at: "2026-07-13T06:30:00Z"
+        content_hash: "sha256:2c984f0ae1887abde3391cd611f725edb7588a59ab1468a9b3db1a5f4333a315"
       - uri: "https://raw.githubusercontent.com/zed-industries/zed/main/.rules"
         type: example
         fetch_method: gh_raw
@@ -26,7 +26,7 @@ content_types:
     canonical_mappings:
       activation_mode:
         supported: false
-        mechanism: "Zed rule files load unconditionally when present at project root; no conditional activation syntax documented"
+        mechanism: "Zed instruction files load unconditionally (personal AGENTS.md every project; project-root file when present); no conditional activation syntax documented"
         confidence: inferred
       file_imports:
         supported: false
@@ -42,29 +42,17 @@ content_types:
         confidence: inferred
       hierarchical_loading:
         supported: false
-        mechanism: "Zed loads rule files from the project root only; no multi-tier hierarchical loading documented"
+        mechanism: "Zed loads instruction files from two fixed locations (personal ~/.config/zed/AGENTS.md plus one project-root file, project overriding personal); no directory-level traversal or subdirectory overrides documented"
         confidence: inferred
     provider_extensions:
       - id: cross_provider_rule_files
         name: Cross-provider rule file recognition
         summary: "At project root, Zed recognizes a priority-ordered list of rule filenames from multiple providers: .rules (preferred), .cursorrules, .windsurfrules, .clinerules, .github/copilot-instructions.md, AGENT.md, AGENTS.md, CLAUDE.md, GEMINI.md. The first matching file is used."
-        source_ref: "https://zed.dev/docs/ai/rules"
+        source_ref: "https://zed.dev/docs/ai/instructions"
         graduation_candidate: true
         conversion: preserved
-      - id: rules_library
-        name: Rules Library editor
-        summary: "Zed provides a dedicated Rules Library editor (agent panel > ... > Rules..., or cmd-alt-l on macOS / ctrl-alt-l on Windows/Linux) with syntax highlighting, inline assistant support, title editing from the editor title bar, and duplicate/delete controls."
-        source_ref: "https://zed.dev/docs/ai/rules"
-        graduation_candidate: false
-        conversion: not-portable
-      - id: default_rules
-        name: Default rules (paper clip icon)
-        summary: "Any rule in the Rules Library can be set as default by clicking the paper clip icon, making it automatically included in every new Agent Panel interaction. Default rules are managed through the Rules Library UI."
-        source_ref: "https://zed.dev/docs/ai/rules"
-        graduation_candidate: false
-        conversion: not-portable
-    loading_model: "Rules are plain Markdown with no frontmatter. Zed looks at the project root for a rule file using a priority-ordered list (.rules preferred, then .cursorrules, .windsurfrules, .clinerules, .github/copilot-instructions.md, AGENT.md, AGENTS.md, CLAUDE.md, GEMINI.md). The first matching file is provided to the agent as project context. Rules can also be created and managed through the Rules Library editor in the Agent Panel."
-    notes: "Single file at project root — no directory, no hierarchical scopes, no frontmatter. Global/user-scope rule files managed through the Rules Library UI are separate from file-based rules. The expanded cross-provider filename list (9 entries as of 2026-05) significantly broadens portability."
+    loading_model: "Instructions are plain Markdown with no frontmatter. Zed loads a personal instruction file (~/.config/zed/AGENTS.md; %APPDATA%\\Zed\\AGENTS.md on Windows) for every project, plus one project-root instruction file chosen by a priority-ordered list (.rules preferred, then .cursorrules, .windsurfrules, .clinerules, .github/copilot-instructions.md, AGENT.md, AGENTS.md, CLAUDE.md, GEMINI.md). The first matching project file is provided to the agent as project context and overrides personal instructions on conflict."
+    notes: "Zed renamed Rules to Instructions (2026-07, zed.dev/docs/ai/instructions): the Rules Library editor and default-rules (paper clip) UI were removed — reusable on-demand rules became Skills, always-on rules became AGENTS.md instructions. The rules_library and default_rules provider extensions were retired accordingly (see git history). Project files remain single-file at project root — no directory hierarchy, no frontmatter; the new personal AGENTS.md adds a user scope but no directory-level traversal."
 
   mcp:
     status: supported

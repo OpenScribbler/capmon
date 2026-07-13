@@ -68,8 +68,12 @@ func ampRulesLandmarkOptions() LandmarkOptions {
 
 // ampHooksLandmarkOptions returns the landmark patterns for Amp's hooks
 // capabilities. Evidence comes from a single cache source:
-//   - hooks.0 (permissions-reference.md): rich landmarks describing match
-//     conditions, regex patterns, and rule management
+//   - hooks.0 (legacy-permissions-rules.txt): rich landmarks describing
+//     match conditions, regex patterns, and rule management. This is the
+//     2026-07 home of the former permissions-reference.md (drift issue #3):
+//     Amp moved permissions to a Plugin API model and demoted the
+//     declarative amp.permissions rule reference — same headings, same
+//     content — to this appendix, kept for backwards compatibility.
 //
 // The previous /manual/hooks.md page was retired in early 2026 (drift
 // detection issue #92, 2026-04-29) and the runtime hooks feature is now
@@ -85,7 +89,7 @@ func ampRulesLandmarkOptions() LandmarkOptions {
 // rather than expose a hook-specific protocol.
 //
 // Required anchors are unique to the permissions doc:
-//   - "Permissions Reference" — H1 of permissions-reference.md
+//   - "Permissions Reference" — H1 of legacy-permissions-rules.txt
 //   - "How Permissions Work" — H2, not present in any other amp content doc
 func ampHooksLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{

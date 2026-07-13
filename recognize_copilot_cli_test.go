@@ -21,7 +21,7 @@ var realCopilotCliSkillsLandmarks = []string{
 // content-type docs. Required anchors must NOT match any of these.
 var realCopilotCliNonSkillsLandmarks = []string{
 	"Documentation Index",
-	"Hook types", "Session start hook", "Pre-tool use hook",
+	"Hook configuration format", "Hook events", "preToolUse decision control",
 	"Adding an MCP server", "Managing MCP servers",
 	"Plugin structure", "Creating a plugin",
 	"YAML frontmatter properties", "MCP server configuration details",
@@ -42,31 +42,43 @@ var realCopilotCliRulesLandmarks = []string{
 }
 
 // realCopilotCliHooksLandmarks is a snapshot of the headings from Copilot
-// CLI's hooks-configuration doc (.capmon-cache/copilot-cli/hooks.0/extracted.json)
-// as of 2026-04-16. Update when the doc evolves.
+// CLI's hooks reference doc (hooks.0, github/docs
+// content/copilot/reference/hooks-reference.md) as of 2026-07-13 — the
+// restructured successor to hooks-configuration.md (drift issue #7).
+// Inline backticks in headings are stripped by the extractor. Update when
+// the doc evolves.
 var realCopilotCliHooksLandmarks = []string{
-	"Hook types",
-	"Session start hook",
-	"Session end hook",
-	"User prompt submitted hook",
-	"Pre-tool use hook",
-	"Post-tool use hook",
-	"Error occurred hook",
-	"Script best practices",
-	"Reading input",
-	"Outputting JSON",
-	"Error handling",
-	"Handling timeouts",
-	"Advanced patterns",
-	"Multiple hooks of the same type",
-	"Conditional logic in scripts",
-	"Structured logging",
-	"Integration with external systems",
-	"Example use cases",
-	"Compliance audit trail",
-	"Cost tracking",
-	"Code quality enforcement",
-	"Notification system",
+	"Introduction",
+	"Hooks locations",
+	"Policy hooks",
+	"Cloud agent execution environment",
+	"Hook configuration format",
+	"Command hooks",
+	"Progress messages",
+	"HTTP hooks",
+	"Prompt hooks",
+	"Hook events",
+	"Hook event input payloads",
+	"sessionStart / SessionStart",
+	"sessionEnd / SessionEnd",
+	"userPromptSubmitted / UserPromptSubmit",
+	"preToolUse / PreToolUse",
+	"postToolUse / PostToolUse",
+	"postToolUseFailure / PostToolUseFailure",
+	"agentStop / Stop",
+	"subagentStart",
+	"subagentStop / SubagentStop",
+	"errorOccurred / ErrorOccurred",
+	"preCompact / PreCompact",
+	"preToolUse decision control",
+	"agentStop / subagentStop decision control",
+	"postToolUse output",
+	"permissionRequest decision control",
+	"notification hook",
+	"Matcher filtering",
+	"Tool names for hook matching",
+	"Exit codes for command hooks",
+	"Disable all hooks",
 	"Further reading",
 }
 

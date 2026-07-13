@@ -74,29 +74,33 @@ func copilotCliRulesLandmarkOptions() LandmarkOptions {
 	)
 }
 
-// copilotCliHooksLandmarkOptions returns the landmark patterns for Copilot CLI's
-// hooks-configuration doc. Anchors derived from
-// .capmon-cache/copilot-cli/hooks.0/extracted.json
-// (raw.githubusercontent.com/.../hooks-configuration.md).
+// copilotCliHooksLandmarkOptions returns the landmark patterns for Copilot
+// CLI's hooks reference doc. Anchors derived from
+// raw.githubusercontent.com/github/docs/.../reference/hooks-reference.md —
+// the 2026 successor to hooks-configuration.md (drift issue #7), which
+// restructured the reference: the old "Hook types" / "Reading input" /
+// "Outputting JSON" headings were replaced by "Hook configuration format"
+// (command / HTTP / prompt hook sub-sections) and "Hook event input
+// payloads" (per-event JSON schemas plus per-event decision-control
+// sections).
 //
-// Required anchors are unique to the hooks-configuration doc — "Hook types"
-// and "Reading input" do not appear in the rules, skills, or about-copilot-cli
-// docs.
+// Required anchors are unique to the hooks reference — "Hook configuration
+// format" and "Hook event input payloads" do not appear in the rules,
+// skills, or about-copilot-cli docs.
 //
-// Copilot CLI documents 2 of the 9 canonical hooks keys at the heading level
-// (handler_types via "Hook types", json_io_protocol via "Reading input" /
-// "Outputting JSON"). The other 7 are not documented as headings and are
-// intentionally not mapped.
+// Copilot CLI documents 2 of the 9 canonical hooks keys at the heading
+// level (handler_types, json_io_protocol). The others are not documented as
+// headings and are intentionally not mapped.
 func copilotCliHooksLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
-		{Kind: "substring", Value: "Hook types", CaseInsensitive: true},
-		{Kind: "substring", Value: "Reading input", CaseInsensitive: true},
+		{Kind: "substring", Value: "Hook configuration format", CaseInsensitive: true},
+		{Kind: "substring", Value: "Hook event input payloads", CaseInsensitive: true},
 	}
 	return HooksLandmarkOptions(
-		HooksLandmarkPattern("handler_types", "Hook types",
-			"hook handler types documented under 'Hook types' heading (session, prompt, tool, error)", required),
-		HooksLandmarkPattern("json_io_protocol", "Outputting JSON",
-			"JSON I/O protocol documented under 'Reading input' / 'Outputting JSON' headings", required),
+		HooksLandmarkPattern("handler_types", "Hook configuration format",
+			"three hook handler types — command (shell), HTTP (POST), and prompt hooks — documented under 'Hook configuration format' → 'Command hooks' / 'HTTP hooks' / 'Prompt hooks' headings", required),
+		HooksLandmarkPattern("json_io_protocol", "Hook event input payloads",
+			"hooks receive event-specific JSON on stdin (inline schema per event under 'Hook event input payloads') and return JSON decision output (per-event 'decision control' / 'postToolUse output' headings)", required),
 	)
 }
 
