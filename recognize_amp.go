@@ -19,6 +19,7 @@ func init() {
 //     removed; toolbox directories are now demoted to "legacy" discovery-only
 //     status (the precedence list ends "…legacy toolbox directories, and
 //     built-in skills"). amp.registerTool via the Plugin API is the successor.
+//
 // The live headings are now: "Agent Skills", "Creating Skills", "Viewing
 // Skills", "Skill Format", "MCP Servers in Skills". No replacement anchors are
 // wired for the removed capabilities — the doc no longer documents them.
