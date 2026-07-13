@@ -40,7 +40,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: global_scope
       supported: true
-      mechanism: skill directory placed under ~/.config/agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/
+      mechanism: skill directory placed under ~/.config/agents/skills/<name>/, ~/.agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/ (the ~/.agents/skills/ path was added in the 2026-07 rewrite of the 'Agent Skills' doc — see intro paragraph and the 'Skill precedence (first wins)' list)
       source_field: ""
       source_value: ""
       confidence: confirmed

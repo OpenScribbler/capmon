@@ -9,29 +9,29 @@ proposed_mappings:
       source_value: ""
       confidence: inferred
     - canonical_key: context_injection
-      supported: false
-      mechanism: Kiro hooks cannot inject context into the agent session
+      supported: true
+      mechanism: Command hooks with exit code 0 add their STDOUT to the agent context for SessionStart and UserPromptSubmit events (ignored for other triggers); documented under 'Exit code behavior'
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: decision_control
-      supported: false
-      mechanism: Kiro hooks are observational; no mechanism to block, allow, or modify tool invocations documented
+      supported: true
+      mechanism: 'Block-only: exit code 2 blocks execution for PreToolUse, UserPromptSubmit, and PreTaskExec (STDERR returned to the agent); documented via the ''Can block?'' column in the ''Trigger reference'' table and the ''Exit code behavior'' section. No allow or input-modify decisions documented'
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: handler_types
-      supported: false
-      mechanism: Kiro hooks execute shell commands or predefined agent prompts; no HTTP, LLM-as-hook, or TypeScript extension handler types documented
+      supported: true
+      mechanism: Hook action.type supports 'command' (shell) and 'agent' (predefined agent prompt) per the JSON file format — the agent type is a non-shell executor, which satisfies the canonical definition (executors beyond shell commands). No HTTP, mcp_tool, or TypeScript extension handler types documented
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: hook_scopes
       supported: false
-      mechanism: Kiro hooks are project-scoped; no multi-scope configuration documented
+      mechanism: Kiro hook JSON files live in .kiro/hooks/ at the workspace level only; no user/global/managed/plugin scope documented
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: input_modification
       supported: false
       mechanism: Kiro hooks cannot modify tool input before execution
@@ -40,16 +40,16 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: json_io_protocol
       supported: false
-      mechanism: Kiro hooks communicate via exit codes; no JSON stdin/stdout protocol documented
+      mechanism: Hook config is JSON, but the command I/O protocol is exit-code + STDOUT/STDERR text (documented under 'Exit code behavior'), not a JSON stdin/stdout message protocol
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: matcher_patterns
-      supported: false
-      mechanism: Kiro hooks fire on configured lifecycle events; no per-tool name filtering or regex matching documented
+      supported: true
+      mechanism: Per-hook 'matcher' regex field (JSON file format) filters by tool name or file path; the 'Trigger reference' table 'Matcher matches' column documents Tool name (regex) for PreToolUse/PostToolUse and File path (regex) for PostFileCreate/PostFileSave/PostFileDelete
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: permission_control
       supported: false
       mechanism: Kiro hooks do not participate in permission decisions

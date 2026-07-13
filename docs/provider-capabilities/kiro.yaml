@@ -35,12 +35,29 @@ content_types:
         confidence: inferred
   hooks:
     supported: true
+    capabilities:
+      context_injection:
+        supported: true
+        mechanism: exit code 0 adds hook command STDOUT to the agent context for SessionStart and UserPromptSubmit events; documented under the 'Exit code behavior' heading
+        confidence: inferred
+      decision_control:
+        supported: true
+        mechanism: exit code 2 blocks execution for PreToolUse / UserPromptSubmit / PreTaskExec (block only, no allow/modify); documented under the 'Exit code behavior' heading
+        confidence: inferred
+      matcher_patterns:
+        supported: true
+        mechanism: per-hook 'matcher' regex field filters by tool name or file path; the 'Trigger reference' table 'Matcher matches' column documents Tool name (regex) for PreToolUse/PostToolUse and File path (regex) for file events
+        confidence: inferred
   mcp:
     supported: true
     capabilities:
       env_var_expansion:
         supported: true
         mechanism: environment variable expansion (${VAR} syntax) documented under 'Environment variables' heading with security warning against inline secrets
+        confidence: inferred
+      oauth_support:
+        supported: true
+        mechanism: browser-based OAuth flows with Dynamic Client Registration; oauth.clientId / oauth.redirectUri / oauthScopes config fields and automatic token re-authentication documented under 'OAuth authentication' heading
         confidence: inferred
       transport_types:
         supported: true

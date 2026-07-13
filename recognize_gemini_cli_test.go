@@ -448,7 +448,7 @@ func TestRecognizeGeminiCli_CommandsAnchorsMissing(t *testing.T) {
 
 // realGeminiCliAgentsLandmarks is a snapshot of the merged headings from
 // .capmon-cache/gemini-cli/agents.{0,1}/extracted.json (docs/core/subagents.md
-// and docs/core/remote-agents.md) as of 2026-04-28. agents.0 is the primary
+// and docs/core/remote-agents.md) as of 2026-07-13. agents.0 is the primary
 // source with 41 headings covering automatic delegation, @-mention invocation,
 // agent definition files, tool wildcards, recursion protection, and
 // /agents management. agents.1 adds remote-subagent specific headings (Agent
@@ -464,7 +464,7 @@ var realGeminiCliAgentsLandmarks = []string{
 	"Codebase Investigator",
 	"CLI Help Agent",
 	"Generalist Agent",
-	"Browser Agent (experimental)",
+	"Browser Agent",
 	"Creating custom subagents",
 	"Agent definition files",
 	"File format",

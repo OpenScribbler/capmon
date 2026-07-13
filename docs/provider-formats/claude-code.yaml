@@ -1,8 +1,8 @@
 provider: claude-code
 docs_url: "https://docs.claude.com/en/docs/claude-code"
 category: cli
-last_fetched_at: "2026-05-06T14:00:00Z"
-last_changed_at: "2026-05-06T14:00:00Z"
+last_fetched_at: "2026-07-13T18:28:52Z"
+last_changed_at: "2026-07-13T18:28:52Z"
 generation_method: subagent
 
 content_types:
@@ -12,8 +12,8 @@ content_types:
       - uri: "https://code.claude.com/docs/en/skills.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:15145cbf7369c5532061cfe16254a55305dda0a7516941b944fedc0c19c313e7"
-        fetched_at: "2026-05-06T14:00:00Z"
+        content_hash: "sha256:e9c3ecd52a640a4113821a0443a0cc2cbcb79751a57adfd57be7f53c594452a6"
+        fetched_at: "2026-07-13T18:28:52Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -172,10 +172,10 @@ content_types:
         graduation_candidate: false
 
       - id: nested_directory_discovery
-        name: Nested Directory Auto-Discovery
-        summary: "Claude Code automatically discovers skills from .claude/skills/ directories along the path to edited files (monorepo support)."
+        name: Parent and Nested Directory Auto-Discovery
+        summary: "Project skills load from .claude/skills/ in the starting directory and every parent directory up to the repository root (loaded at start), and Claude Code additionally discovers skills from nested .claude/skills/ directories on demand when working with files in subdirectories below the starting directory (monorepo support)."
         conversion: not-portable
-        source_ref: "https://code.claude.com/docs/en/skills.md#automatic-discovery-from-nested-directories"
+        source_ref: "https://code.claude.com/docs/en/skills.md#automatic-discovery-from-parent-and-nested-directories"
         graduation_candidate: false
 
       - id: add_dir_skills_loading
@@ -209,8 +209,9 @@ content_types:
 
       - id: bundled_skills
         name: Bundled Skills
-        summary: "Claude Code ships built-in prompt-based skills (/simplify, /batch, /debug, /loop, /claude-api, /fewer-permission-prompts) immune to the shell-execution policy."
+        summary: "Claude Code ships built-in prompt-based skills (e.g. /doctor, /code-review, /batch, /debug, /loop, /claude-api, /dataviz, /design-sync, /run, /verify, /run-skill-generator, /simplify, /fewer-permission-prompts), marked [Skill] in the commands reference and immune to the shell-execution policy. Disable them via the disableBundledSkills setting; /doctor is exempt (CC v2.1.205+, stays typable when the setting is on) and is hidden instead via the DISABLE_DOCTOR_COMMAND env var or a skillOverrides doctor: off entry."
         conversion: not-portable
+        provider_field: "disableBundledSkills"
         source_ref: "https://code.claude.com/docs/en/skills.md#bundled-skills"
         graduation_candidate: false
 
@@ -276,8 +277,8 @@ content_types:
       - uri: "https://code.claude.com/docs/en/memory.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:7a03f7cec59986e35225812ea520be2ebeaa00f8cae1bdcc21d481d2d44970dd"
-        fetched_at: "2026-05-06T14:00:00Z"
+        content_hash: "sha256:633dbdccf64f123ebda1264c9209c4426c4a0ef206f3e628c6b5ccc838e286e6"
+        fetched_at: "2026-07-13T18:28:52Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -293,7 +294,7 @@ content_types:
         confidence: confirmed
       auto_memory:
         supported: true
-        mechanism: "Auto memory saves Claude's accumulated notes to ~/.claude/projects/<project>/memory/MEMORY.md; first 200 lines or 25KB loaded at session start; requires CC v2.1.59+; enabled by default; disable via CLAUDE_CODE_DISABLE_AUTO_MEMORY=1; override storage location via autoMemoryDirectory setting (accepted from policy/user settings and --settings flag, not from project or local settings); subagents can also maintain their own auto memory"
+        mechanism: "Auto memory saves Claude's accumulated notes to ~/.claude/projects/<project>/memory/MEMORY.md; first 200 lines or 25KB loaded at session start; requires CC v2.1.59+; enabled by default; disable via CLAUDE_CODE_DISABLE_AUTO_MEMORY=1; override storage location via autoMemoryDirectory setting (read from any settings scope: user, project, local, managed policy, or --settings flag); subagents can also maintain their own auto memory"
         confidence: confirmed
       hierarchical_loading:
         supported: true
@@ -323,7 +324,7 @@ content_types:
 
       - id: auto_memory
         name: Auto Memory
-        summary: "Claude auto-saves cross-session notes to ~/.claude/projects/<project>/memory/MEMORY.md; first 200 lines or 25KB loaded at session start; toggled via autoMemoryEnabled (CC v2.1.59+); disable via CLAUDE_CODE_DISABLE_AUTO_MEMORY=1; override storage location via autoMemoryDirectory setting (accepted from policy and user settings only). Topic files beyond MEMORY.md load on demand. All worktrees and subdirectories within the same git repo share one auto memory directory. Subagents can also maintain their own auto memory."
+        summary: "Claude auto-saves cross-session notes to ~/.claude/projects/<project>/memory/MEMORY.md; first 200 lines or 25KB loaded at session start; toggled via autoMemoryEnabled (CC v2.1.59+); disable via CLAUDE_CODE_DISABLE_AUTO_MEMORY=1; override storage location via autoMemoryDirectory setting (read from any settings scope: user, project, local, policy, or --settings). Topic files beyond MEMORY.md load on demand. All worktrees and subdirectories within the same git repo share one auto memory directory. Subagents can also maintain their own auto memory."
         conversion: not-portable
         provider_field: "autoMemoryEnabled"
         source_ref: "https://code.claude.com/docs/en/memory.md#auto-memory"
@@ -409,13 +410,13 @@ content_types:
       - uri: "https://code.claude.com/docs/en/hooks.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:07520d24ad471db6b69135540344d82a3901cda7bf8f303b6d5cb33fdc2cae84"
-        fetched_at: "2026-05-06T14:00:00Z"
+        content_hash: "sha256:8e781effb04ee36b17c1f959990418401430b5fb65946fdae99da097876b4674"
+        fetched_at: "2026-07-13T18:28:52Z"
       - uri: "https://code.claude.com/docs/en/hooks-guide.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:ccd1639a9d75881ff461746c92514826d6dc1e2ba49b5c6e167c1de3acc172df"
-        fetched_at: "2026-05-06T14:00:00Z"
+        content_hash: "sha256:e59f347ea3511697437e70359e6b228d0af46775e0b828772dd94f6205a049c8"
+        fetched_at: "2026-07-13T18:28:52Z"
       - uri: "hooks-example-hooks.json"
         type: example
         fetch_method: local_file
@@ -471,7 +472,7 @@ content_types:
     provider_extensions:
       - id: hook_events
         name: Hook Event Set
-        summary: "29 hook events spanning session, turn, and tool-call cadences: Setup, SessionStart, SessionEnd, InstructionsLoaded, UserPromptSubmit, UserPromptExpansion, PreToolUse, PermissionRequest, PermissionDenied, PostToolUse, PostToolUseFailure, PostToolBatch, Stop, StopFailure, Notification, SubagentStart, SubagentStop, TaskCreated, TaskCompleted, TeammateIdle, ConfigChange, CwdChanged, FileChanged, WorktreeCreate, WorktreeRemove, PreCompact, PostCompact, Elicitation, ElicitationResult. Each event has a defined matcher field; UserPromptSubmit, PostToolBatch, Stop, TeammateIdle, TaskCreated, TaskCompleted, WorktreeCreate, WorktreeRemove, and CwdChanged do not support matchers."
+        summary: "30 hook events spanning session, turn, and tool-call cadences: Setup, SessionStart, SessionEnd, InstructionsLoaded, UserPromptSubmit, UserPromptExpansion, MessageDisplay, PreToolUse, PermissionRequest, PermissionDenied, PostToolUse, PostToolUseFailure, PostToolBatch, Stop, StopFailure, Notification, SubagentStart, SubagentStop, TaskCreated, TaskCompleted, TeammateIdle, ConfigChange, CwdChanged, FileChanged, WorktreeCreate, WorktreeRemove, PreCompact, PostCompact, Elicitation, ElicitationResult. MessageDisplay (display-only: returns displayContent to replace assistant-message text on screen only, no decision control, 10s default timeout) fires per streamed assistant message. Each event has a defined matcher field; UserPromptSubmit, PostToolBatch, Stop, TeammateIdle, TaskCreated, TaskCompleted, WorktreeCreate, WorktreeRemove, MessageDisplay, and CwdChanged do not support matchers."
         conversion: translated
         source_ref: "https://code.claude.com/docs/en/hooks.md#hook-lifecycle"
         graduation_candidate: false
@@ -572,7 +573,7 @@ content_types:
         summary: "Handlers accept an if field using permission-rule syntax to gate execution on conditions. Only evaluated on tool events (PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest, PermissionDenied); hooks on other events with an if field never run. For Bash, matched against each subcommand after stripping leading VAR=value assignments."
         conversion: not-portable
         provider_field: "if"
-        source_ref: "https://code.claude.com/docs/en/hooks-guide.md#conditional-execution"
+        source_ref: "https://code.claude.com/docs/en/hooks-guide.md#filter-by-tool-name-and-arguments-with-the-if-field"
         graduation_candidate: false
 
       - id: hook_asyncRewake
@@ -580,7 +581,7 @@ content_types:
         summary: "Command hooks with asyncRewake: true wake Claude after completing background execution when exit code is 2, delivering stderr (or stdout if stderr empty) as a system reminder on the next turn. Implies async: true."
         conversion: not-portable
         provider_field: "asyncRewake"
-        source_ref: "https://code.claude.com/docs/en/hooks-guide.md#run-hooks-in-the-background"
+        source_ref: "https://code.claude.com/docs/en/hooks.md#run-hooks-in-the-background"
         graduation_candidate: false
 
       - id: hook_disable_all
@@ -588,7 +589,7 @@ content_types:
         summary: "Setting disableAllHooks: true in settings.json disables all hook execution for that scope; useful for debugging or locked-down environments."
         conversion: not-portable
         provider_field: "disableAllHooks"
-        source_ref: "https://code.claude.com/docs/en/hooks-guide.md#disable-hooks"
+        source_ref: "https://code.claude.com/docs/en/hooks.md#disable-or-remove-hooks"
         graduation_candidate: false
 
       - id: hook_allow_managed_only
@@ -596,7 +597,7 @@ content_types:
         summary: "Enterprise policy setting allowManagedHooksOnly: true restricts hook execution to only managed (admin-deployed) hooks, blocking user and project hooks. Plugin hooks force-enabled in managed settings enabledPlugins are exempt."
         conversion: not-portable
         provider_field: "allowManagedHooksOnly"
-        source_ref: "https://code.claude.com/docs/en/hooks-guide.md#enterprise-hook-controls"
+        source_ref: "https://code.claude.com/docs/en/hooks.md#hook-locations"
         graduation_candidate: false
 
       - id: hook_common_fields
@@ -651,12 +652,12 @@ content_types:
       - uri: "https://code.claude.com/docs/en/mcp.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:5bc8e693c44e72dd7103acac40cf1358b8fe8f5ae831814c0eb0c546a222bd3c"
-        fetched_at: "2026-05-06T14:00:00Z"
+        content_hash: "sha256:f47d84c3fdb820b17402b0633ede1b3579a3c0d682e8e707bc32354229d6c3b7"
+        fetched_at: "2026-07-13T18:28:52Z"
     canonical_mappings:
       transport_types:
         supported: true
-        mechanism: "mcp_transport_types: stdio (local process), SSE (deprecated, still supported), HTTP/streamable-HTTP (recommended for remote)"
+        mechanism: "mcp_transport_types: stdio (local process), SSE (deprecated, still supported), HTTP/streamable-HTTP (recommended for remote), WebSocket (type: ws; persistent bidirectional connection for servers that push events; header-only auth, no OAuth or --transport flag support)"
         confidence: confirmed
       oauth_support:
         supported: true
@@ -688,8 +689,8 @@ content_types:
         confidence: confirmed
     provider_extensions:
       - id: mcp_transport_types
-        name: Three Transport Types (stdio, SSE, HTTP)
-        summary: "Three transport types: stdio (local process), SSE (deprecated), HTTP/streamable-HTTP (recommended for remote with OAuth support)."
+        name: Four Transport Types (stdio, SSE, HTTP, WebSocket)
+        summary: "Four transport types: stdio (local process), SSE (deprecated), HTTP/streamable-HTTP (recommended for remote with OAuth support), and WebSocket (type: ws; persistent bidirectional connection suited to servers that push events unprompted, accepts the same url/headers/headersHelper/timeout/alwaysLoad fields as http, header-only auth, and supports neither OAuth nor the claude mcp add --transport flag)."
         conversion: translated
         provider_field: "transport"
         source_ref: "https://code.claude.com/docs/en/mcp.md#installing-mcp-servers"
@@ -752,6 +753,14 @@ content_types:
         conversion: not-portable
         provider_field: "MAX_MCP_OUTPUT_TOKENS"
         source_ref: "https://code.claude.com/docs/en/mcp.md#mcp-output-limits-and-warnings"
+        graduation_candidate: false
+
+      - id: mcp_require_user_interaction
+        name: Per-Tool Forced Approval (requiresUserInteraction)
+        summary: "An MCP server can mark a tool as requiring explicit approval on every call by setting _meta anthropic/requiresUserInteraction: true (JSON boolean) in its tools/list entry (CC v2.1.199+). Claude Code shows that tool's permission prompt on every call even in acceptEdits, auto, and bypassPermissions modes, offers no 'don't ask again' option, and ignores matching allow rules; in dontAsk mode the call is denied. Via --permission-prompt-tool an allow result is converted to a deny; the Agent SDK canUseTool callback still receives the call."
+        conversion: not-portable
+        provider_field: "requiresUserInteraction"
+        source_ref: "https://code.claude.com/docs/en/mcp.md#require-approval-for-a-specific-tool"
         graduation_candidate: false
 
       - id: mcp_managed_config
@@ -841,8 +850,8 @@ content_types:
       - uri: "https://code.claude.com/docs/en/sub-agents.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:1ff77579a0a3c26ff0295497f2a39dc088e28069a3f44af4f455f98fc7d2a75d"
-        fetched_at: "2026-05-06T14:00:00Z"
+        content_hash: "sha256:f3f95fd7ec9f2abf39f107f12fbf40326884180f342df009af9f44e3d57004e0"
+        fetched_at: "2026-07-13T18:28:52Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -862,7 +871,7 @@ content_types:
         confidence: confirmed
       model_selection:
         supported: true
-        mechanism: "model frontmatter field accepts sonnet/opus/haiku alias, full model ID (e.g. claude-opus-4-7), or inherit (default); resolution order: CLAUDE_CODE_SUBAGENT_MODEL env var > per-invocation model param > frontmatter model > main conversation model"
+        mechanism: "model frontmatter field accepts sonnet/opus/haiku/fable alias, full model ID (e.g. claude-opus-4-8, claude-sonnet-5), or inherit (default); resolution order: CLAUDE_CODE_SUBAGENT_MODEL env var > per-invocation model param > frontmatter model > main conversation model (CC v2.1.196+: CLAUDE_CODE_SUBAGENT_MODEL=inherit behaves as unset rather than forcing the main model)"
         confidence: confirmed
       per_agent_mcp:
         supported: true
@@ -989,7 +998,7 @@ content_types:
 
       - id: agent_permission_modes
         name: Per-Agent Permission Modes
-        summary: "permissionMode field controls permission handling: default (standard prompts), acceptEdits (auto-accept file edits in working dir or additionalDirectories), auto (background classifier), dontAsk (auto-deny non-allowed tools), bypassPermissions (skip all prompts except root/home removals), plan (read-only). Parent bypassPermissions or acceptEdits overrides subagent mode. Ignored for plugin subagents."
+        summary: "permissionMode field controls permission handling: default (standard prompts), manual (alias for default, CC v2.1.200+), acceptEdits (auto-accept file edits in working dir or additionalDirectories), auto (background classifier), dontAsk (auto-deny non-allowed tools), bypassPermissions (skip all prompts except root/home removals), plan (read-only). Parent bypassPermissions or acceptEdits overrides subagent mode. Ignored for plugin subagents."
         conversion: embedded
         provider_field: "permissionMode"
         source_ref: "https://code.claude.com/docs/en/sub-agents.md#permission-modes"
@@ -1022,8 +1031,8 @@ content_types:
       - uri: "https://code.claude.com/docs/en/commands.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:f5da2c18a1af2d4d72669de812574437dfd52e4a24cda33b546b39489c65351d"
-        fetched_at: "2026-05-06T14:00:00Z"
+        content_hash: "sha256:f0599f785be72683c9161085546e0b55802845c20e0ab2d42551746fc67886dc"
+        fetched_at: "2026-07-13T18:28:52Z"
     canonical_mappings:
       argument_substitution:
         supported: true
@@ -1031,7 +1040,7 @@ content_types:
         confidence: confirmed
       builtin_commands:
         supported: true
-        mechanism: "80+ built-in slash commands including /add-dir, /agents, /autofix-pr, /batch [Skill], /branch, /btw, /chrome, /claude-api [Skill], /clear, /color, /compact, /config, /context, /copy, /cost, /debug [Skill], /desktop, /diff, /doctor, /effort, /exit, /export, /extra-usage, /fast, /feedback, /fewer-permission-prompts [Skill], /focus, /heapdump, /help, /hooks, /ide, /init, /insights, /install-github-app, /install-slack-app, /keybindings, /login, /logout, /loop [Skill], /mcp, /memory, /mobile, /model, /passes, /permissions, /plan, /plugin, /powerup, /privacy-settings, /recap, /release-notes, /reload-plugins, /remote-control, /remote-env, /rename, /resume, /review, /rewind, /sandbox, /schedule, /security-review, /setup-bedrock, /setup-vertex, /simplify [Skill], /skills, /stats, /status, /statusline, /stickers, /tasks, /team-onboarding, /teleport, /terminal-setup, /theme, /tui, /ultraplan, /ultrareview, /upgrade, /usage; not user-modifiable; availability varies by platform and plan"
+        mechanism: "100+ built-in slash commands including /add-dir, /advisor, /agents, /autofix-pr, /background, /batch [Skill], /branch, /btw, /cd, /chrome, /claude-api [Skill], /clear, /code-review [Skill], /color, /compact, /config, /context, /copy, /cost, /dataviz [Skill], /debug [Skill], /deep-research, /design-login, /design-sync [Skill], /desktop, /diff, /doctor [Skill], /effort, /exit, /export, /fast, /feedback, /fewer-permission-prompts [Skill], /focus, /fork, /goal, /heapdump, /help, /hooks, /ide, /init, /insights, /install-github-app, /install-slack-app, /keybindings, /login, /logout, /loop [Skill], /mcp, /memory, /mobile, /model, /passes, /permissions, /plan, /plugin, /powerup, /pr-comments, /privacy-settings, /radio, /recap, /release-notes, /reload-plugins, /reload-skills, /remote-control, /remote-env, /rename, /resume, /review, /rewind, /run [Skill], /run-skill-generator [Skill], /sandbox, /schedule, /scroll-speed, /security-review, /setup-bedrock, /setup-vertex, /simplify [Skill], /skills, /stats, /status, /statusline, /stickers, /stop, /tasks, /team-onboarding, /teleport, /terminal-setup, /theme, /tui, /ultraplan, /ultrareview, /upgrade, /usage, /usage-credits, /verify [Skill], /vim, /voice, /web-setup, /workflows; not user-modifiable; availability varies by platform and plan"
         confidence: confirmed
     provider_extensions:
       - id: command_file_format
@@ -1050,7 +1059,7 @@ content_types:
 
       - id: bundled_skill_commands
         name: Bundled Skill Commands
-        summary: "Six commands ship as bundled skills rather than CLI logic (/batch, /claude-api, /debug, /fewer-permission-prompts, /loop, /simplify); use the skill mechanism and appear marked [Skill] in the commands table."
+        summary: "Thirteen commands ship as bundled prompt-based skills rather than fixed CLI logic (/batch, /claude-api, /code-review, /dataviz, /debug, /design-sync, /doctor, /fewer-permission-prompts, /loop, /run, /run-skill-generator, /simplify, /verify); they use the skill mechanism, appear marked [Skill] in the commands table, and can be disabled via the disableBundledSkills setting (/doctor exempt in CC v2.1.205+)."
         conversion: not-portable
         source_ref: "https://code.claude.com/docs/en/commands.md"
         graduation_candidate: false

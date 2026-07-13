@@ -87,19 +87,24 @@ func TestRecognizeCodex_OnlyExcludedStructs(t *testing.T) {
 
 // realCodexRulesLandmarks is the snapshot of headings extracted from codex's
 // AGENTS.md spec doc (.capmon-cache/codex/rules.0/extracted.json) as of
-// 2026-04-16. The cached doc is intentionally short — it redirects to the
-// developers.openai.com AGENTS.md spec which was not cached. rules.1 is
-// codex's own AGENTS.md instance file (their internal dev rules) and
-// intentionally NOT used as evidence.
+// 2026-07-13. The cached doc is a two-line redirect stub to the
+// developers.openai.com AGENTS.md spec (not cached); its only heading is
+// "AGENTS.md". The "Hierarchical agents message" landmark was dropped after
+// openai/codex #28993 removed the child AGENTS.md prompt experiment — see
+// codexRulesLandmarkOptions for the re-anchoring rationale. rules.1 is codex's
+// own AGENTS.md instance file (their internal dev rules) and intentionally NOT
+// used as evidence.
 var realCodexRulesLandmarks = []string{
 	"AGENTS.md",
-	"Hierarchical agents message",
 }
 
 // TestRecognizeCodex_RealRulesLandmarks proves rules recognition on the
 // minimal landmark set codex's spec doc provides. Codex supports
-// activation_mode.always, cross_provider_recognition.agents_md, and
-// hierarchical_loading. file_imports and auto_memory are intentionally absent.
+// activation_mode.always and cross_provider_recognition.agents_md from the
+// cached doc surface. hierarchical_loading is still supported (confirmed, on
+// agents_md.rs source evidence) but no longer emitted here because its doc
+// landmark was removed upstream. file_imports and auto_memory are intentionally
+// absent.
 func TestRecognizeCodex_RealRulesLandmarks(t *testing.T) {
 	result := capmon.RecognizeWithContext("codex", capmon.RecognitionContext{
 		Provider:  "codex",
@@ -117,7 +122,6 @@ func TestRecognizeCodex_RealRulesLandmarks(t *testing.T) {
 	rulesInferred := []string{
 		"activation_mode.always",
 		"cross_provider_recognition.agents_md",
-		"hierarchical_loading",
 	}
 	for _, c := range rulesInferred {
 		key := "rules.capabilities." + c + ".supported"
@@ -142,13 +146,13 @@ func TestRecognizeCodex_RealRulesLandmarks(t *testing.T) {
 }
 
 // TestRecognizeCodex_RulesAnchorsMissing proves the anchor-missing guardrail.
-// Stripping "Hierarchical agents message" — one of the required anchors —
-// suppresses recognition.
+// "AGENTS.md" is now the sole required anchor; a landmark set lacking it must
+// suppress recognition rather than fire on the pattern matchers.
 func TestRecognizeCodex_RulesAnchorsMissing(t *testing.T) {
 	result := capmon.RecognizeWithContext("codex", capmon.RecognitionContext{
 		Provider:  "codex",
 		Format:    "markdown",
-		Landmarks: []string{"AGENTS.md"},
+		Landmarks: []string{"Some unrelated heading"},
 	})
 	if result.Status != capmon.StatusAnchorsMissing {
 		t.Errorf("status = %q, want %q", result.Status, capmon.StatusAnchorsMissing)

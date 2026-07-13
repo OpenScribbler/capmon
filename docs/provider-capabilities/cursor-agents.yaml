@@ -22,7 +22,7 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: model_selection
       supported: true
-      mechanism: model frontmatter field selects a specific model for the agent, overriding the session default.
+      mechanism: model frontmatter field selects a specific model for the agent, overriding the session default. A 'Model parameters' syntax (added 2026-07-13) appends bracketed id=value options to the model id — e.g. claude-opus-4-8[effort=high,context=300k] or composer-2.5[fast=false] — to set per-model speed, reasoning effort, and context window.
       source_field: ""
       source_value: ""
       confidence: confirmed

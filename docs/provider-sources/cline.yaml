@@ -46,6 +46,13 @@ content_types:
         type: docs
         format: markdown
         extracts: [event_names, hook_config_fields, event_io_schemas, config_examples, features]
+    # ⚠ 2026-07-13 (issue #5): customization/hooks.md is now a stub redirecting to
+    # the SDK plugin docs (/customization/plugins, /sdk/plugins). Hooks moved from
+    # the filesystem-script model below to TypeScript plugin lifecycle handlers
+    # (beforeTool/afterTool/…, hook stages, hook policies with mode blocking|async).
+    # Re-point pending maintainer decision (the plugins Warning says the new model
+    # doesn't yet apply to VSCode/JetBrains, so the old model may persist there).
+    # OLD (filesystem) model, may still apply to VSCode/JetBrains:
     # 9 events: TaskStart, TaskResume, TaskCancel, TaskComplete, PreToolUse,
     #           PostToolUse, UserPromptSubmit, Notification, PreCompact
     # Hook I/O: JSON via stdin → JSON to stdout ({cancel, contextModification?, errorMessage?}).
@@ -54,18 +61,17 @@ content_types:
 
   mcp:
     sources:
-      - url: https://docs.cline.bot/mcp/adding-and-configuring-servers.md
+      # 2026-07-13 (issue #5): adding-and-configuring-servers.md and
+      # mcp-transport-mechanisms.md both now redirect to the consolidated
+      # mcp-overview.md.
+      - url: https://docs.cline.bot/mcp/mcp-overview.md
         type: docs
         format: markdown
-        extracts: [server_config_fields, config_examples]
-
-      - url: https://docs.cline.bot/mcp/mcp-transport-mechanisms.md
-        type: docs
-        format: markdown
-        extracts: [transport_types]
-    # Settings file: cline_mcp_settings.json (VS Code globalStoragePath).
-    # Transports: stdio, SSE, streamableHttp (camelCase).
-    # Fields: autoApprove[], disabled, timeout (default 60s).
+        extracts: [server_config_fields, config_examples, transport_types]
+    # CLI settings file: ~/.cline/mcp.json (mcpServers object).
+    # Transports: stdio + remote, chosen by the `type` field: streamableHttp
+    # (recommended) or sse (legacy default when type omitted).
+    # Fields: autoApprove[] (renamed from alwaysAllow), disabled, timeout.
 
   skills:
     sources:
@@ -85,10 +91,12 @@ content_types:
 
   commands:
     sources:
-      - url: https://docs.cline.bot/features/slash-commands/workflows.md
+      # 2026-07-13 (issue #5): the dedicated Workflows doc was removed
+      # (features/slash-commands/workflows.md now 404s; customization/workflows.md
+      # redirects to cline-rules.md). The surviving commands doc is using-commands,
+      # which documents built-in slash commands + skills-via-slash-command. Whether
+      # the user-authored Workflows feature still exists is UNVERIFIED — flagged.
+      - url: https://docs.cline.bot/core-workflows/using-commands.md
         type: docs
         format: markdown
         extracts: [file_format, file_locations, features]
-    # Cline Workflows map to the Commands content type. Format: plain
-    # markdown files at .clinerules/workflows/ (project) and
-    # ~/Documents/Cline/Workflows/ (global). Invoked via /<workflow-name>.

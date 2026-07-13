@@ -124,17 +124,20 @@ content_types:
         format: typescript
         extracts: [hook_config_fields]
 
-      # Rust source for config parsing and runtime types
-      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/src/engine/config.rs
-        type: source-code
-        format: rust
-        extracts: [hook_config_fields, matcher_format]
+      # Rust source for runtime types. NOTE: the former companion
+      # hooks/src/engine/config.rs was deleted upstream (#18893, 2026-04-23) —
+      # NOT renamed; the auto-healer's github-rename match to
+      # ext/skills/src/config.rs was a false positive (unrelated skills
+      # struct). Hook config schema evidence (HooksToml/MatcherGroup/
+      # HookHandlerConfig) lives in core/config.schema.json, already
+      # monitored above.
 
       - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/src/types.rs
         type: source-code
         format: rust
         extracts: [event_io_schemas]
-    # 5 events: PreToolUse, PostToolUse, SessionStart, UserPromptSubmit, Stop (PascalCase wire names)
+    # 10 events (PascalCase wire names): PreToolUse, PermissionRequest, PostToolUse,
+    # PreCompact, PostCompact, SessionStart, UserPromptSubmit, SubagentStart, SubagentStop, Stop.
     # Handler types: command, prompt, agent. Execution modes: sync, async. Scopes: thread, turn.
 
   mcp:

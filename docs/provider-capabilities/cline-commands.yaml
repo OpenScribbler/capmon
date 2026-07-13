@@ -10,7 +10,7 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: builtin_commands
       supported: true
-      mechanism: Built-in slash commands (e.g., /newtask, /smol alias /compact, /newrule, /deep-planning, /explain-changes in VS Code, /reportbug) are hardcoded and not user-modifiable; user-authored workflows are additive, invoked alongside built-ins
+      mechanism: Built-in slash commands (/newtask, /smol alias /compact, /newrule, /deep-planning, /reportbug) are hardcoded and not user-modifiable — documented under 'Slash Commands'. As of 2026-07 /explain-changes is no longer listed; enabled skills are additive, invoked via slash command ('Skills via Slash Commands')
       source_field: ""
       source_value: ""
       confidence: confirmed

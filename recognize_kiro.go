@@ -80,46 +80,64 @@ func kiroRulesLandmarkOptions() LandmarkOptions {
 //   - "What are agent hooks?" — H2 in hooks doc, not present in skills/rules
 //   - "Setting up agent hooks" — H2 in hooks doc, not present elsewhere
 //
-// Per the curated format YAML (docs/provider-formats/kiro.yaml), ALL 9
-// canonical hooks keys are marked supported: false for kiro — the doc
-// describes hooks as observational shell-command triggers without matchers,
-// JSON I/O, decision control, or any of the other documented capabilities.
+// The 2026-07-09 rewrite of the hooks doc added a documented JSON file format
+// (.kiro/hooks/, "JSON file format" heading), a "Trigger reference" table, and
+// an "Exit code behavior" section — all three surface as headings in the
+// extracted landmark set. This flipped 3 of the 9 canonical hooks keys from
+// unsupported to supported:
+//   - matcher_patterns → "Trigger reference" heading (the table's "Matcher
+//     matches" column documents regex on tool name / file path)
+//   - decision_control → "Exit code behavior" heading (exit code 2 blocks
+//     PreToolUse / UserPromptSubmit / PreTaskExec)
+//   - context_injection → "Exit code behavior" heading (exit code 0 adds hook
+//     STDOUT to the agent context for SessionStart / UserPromptSubmit)
 //
-// As a result, this recognizer only emits hooks.supported = true via a
-// bare anchor-only pattern. No capability-specific patterns are mapped.
+// decision_control and context_injection share the "Exit code behavior" anchor
+// because that one section documents both block semantics and STDOUT capture.
+//
+// The other 6 keys remain unmapped: handler_types (curated supported: true in
+// the format doc — command + agent action types — but the evidence lives in a
+// JSON code block, not a heading, so there is no landmark to anchor on),
+// input_modification (block only, no
+// input rewrite), async_execution (timeout only, synchronous), hook_scopes
+// (workspace-only .kiro/hooks/), json_io_protocol (exit-code + STDOUT/STDERR
+// text, not a JSON stdin/stdout message protocol), and permission_control
+// (no permission-rule updates). A bare anchor-only pattern still emits
+// hooks.supported when only the required anchors match.
 func kiroHooksLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
 		{Kind: "substring", Value: "What are agent hooks?", CaseInsensitive: true},
 		{Kind: "substring", Value: "Setting up agent hooks", CaseInsensitive: true},
 	}
-	return LandmarkOptions{
-		ContentType: "hooks",
-		Patterns: []LandmarkPattern{
-			// Bare anchor-only pattern (no Capability) ensures hooks.supported
-			// is emitted when the required anchors match.
-			{
-				Required: required,
-				Matchers: required,
-			},
-		},
-	}
+	return HooksLandmarkOptions(
+		// Bare anchor-only pattern (empty Capability) ensures hooks.supported
+		// is emitted even when no capability pattern fires.
+		LandmarkPattern{Required: required, Matchers: required},
+		HooksLandmarkPattern("matcher_patterns", "Trigger reference",
+			"per-hook 'matcher' regex field filters by tool name or file path; the 'Trigger reference' table 'Matcher matches' column documents Tool name (regex) for PreToolUse/PostToolUse and File path (regex) for file events", required),
+		HooksLandmarkPattern("decision_control", "Exit code behavior",
+			"exit code 2 blocks execution for PreToolUse / UserPromptSubmit / PreTaskExec (block only, no allow/modify); documented under the 'Exit code behavior' heading", required),
+		HooksLandmarkPattern("context_injection", "Exit code behavior",
+			"exit code 0 adds hook command STDOUT to the agent context for SessionStart and UserPromptSubmit events; documented under the 'Exit code behavior' heading", required),
+	)
 }
 
 // kiroMcpLandmarkOptions returns the landmark patterns for Kiro's MCP
 // configuration doc. Anchors derived from .capmon-cache/kiro/mcp.0/extracted.json
 // (https://kiro.dev/docs/mcp/configuration/, HTML).
 //
-// Kiro's MCP doc maps only 2 of 8 canonical MCP keys at the heading level:
-// transport_types ("Local server" + "Remote server" sub-headings) and
-// env_var_expansion ("Environment variables" heading).
+// Kiro's MCP doc maps 3 of 8 canonical MCP keys at the heading level:
+// transport_types ("Local server" + "Remote server" sub-headings),
+// env_var_expansion ("Environment variables" heading), and oauth_support
+// ("OAuth authentication" heading, added to the doc on 2026-06-10).
 //
-// The other 6 keys are intentionally unmapped here:
+// The other 5 keys are intentionally unmapped here:
 //   - tool_filtering, auto_approve: documented only as JSON config fields
 //     ('disabledTools', 'autoApprove') — table-cell evidence, not headings.
 //     Curator marks both supported (confirmed) via provider extensions
 //     kiro_mcp_disabled_tools and kiro_mcp_auto_approve.
-//   - oauth_support, marketplace, resource_referencing, enterprise_management:
-//     no heading or field evidence; absent from Kiro's MCP surface.
+//   - marketplace, resource_referencing, enterprise_management: no heading or
+//     field evidence; absent from Kiro's MCP surface.
 //
 // Required anchors are unique to the MCP doc:
 //   - "Configuration file structure" — H2 unique to mcp.0
@@ -129,11 +147,10 @@ func kiroHooksLandmarkOptions() LandmarkOptions {
 // "Adding MCP servers" appears in skills.0 (powers can bundle mcp.json) but
 // is not a required anchor here, so cross-content false positives are blocked.
 //
-// Per docs/provider-formats/kiro.yaml, the curator marks transport_types and
-// env_var_expansion as unsupported (inferred). The recognizer disagrees
-// because heading-level evidence exists for both. The two YAML files are
-// independent: provider-capabilities/ tracks recognizer emissions,
-// provider-formats/ tracks curator judgments.
+// The two YAML files are independent: provider-capabilities/ tracks recognizer
+// emissions (always "inferred" from landmarks), provider-formats/ tracks
+// curator judgments (transport_types/env_var_expansion/oauth_support are all
+// curated "confirmed" against explicit heading + field evidence).
 func kiroMcpLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
 		{Kind: "substring", Value: "Configuration file structure", CaseInsensitive: true},
@@ -144,6 +161,8 @@ func kiroMcpLandmarkOptions() LandmarkOptions {
 			"transport types (stdio for local, HTTPS/HTTP for remote) documented under 'Local server' / 'Remote server' configuration sub-headings", required),
 		McpLandmarkPattern("env_var_expansion", "Environment variables",
 			"environment variable expansion (${VAR} syntax) documented under 'Environment variables' heading with security warning against inline secrets", required),
+		McpLandmarkPattern("oauth_support", "OAuth authentication",
+			"browser-based OAuth flows with Dynamic Client Registration; oauth.clientId / oauth.redirectUri / oauthScopes config fields and automatic token re-authentication documented under 'OAuth authentication' heading", required),
 	)
 }
 

@@ -1,8 +1,8 @@
 provider: kiro
 docs_url: "https://kiro.dev/docs"
 category: standalone-app
-last_fetched_at: "2026-05-06T00:00:00Z"
-last_changed_at: "2026-05-06T00:00:00Z"
+last_fetched_at: "2026-07-13T18:27:50Z"
+last_changed_at: "2026-07-13T18:27:50Z"
 generation_method: subagent
 
 content_types:
@@ -12,8 +12,8 @@ content_types:
       - uri: "https://kiro.dev/docs/powers/create/"
         type: documentation
         fetch_method: html_url
-        content_hash: "sha256:7e90bf1b8b31599ebebe6b28624d7d6229a6be065cd051c4a8e56918b785dad0"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:c16d683d22b8a7674334865a8be49bd9b82974c9ddf575a10e51e57c9eec7cc4"
+        fetched_at: "2026-07-13T18:27:50Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -124,8 +124,8 @@ content_types:
       - uri: "https://kiro.dev/docs/steering/"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:e9147fdbfa43507de08c1491afac98af0fabdeb54f9a5086084bcfc5b5a8ec6b"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:3009f4a25ecd89c0ccf4265bd991107f58cf825f3807030734d8a0022b9df817"
+        fetched_at: "2026-07-13T18:27:50Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -193,21 +193,21 @@ content_types:
       - uri: "https://kiro.dev/docs/hooks/"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:e27955afa6cfa7ead219177efdd3c0ed755492bd56153d3162395c168a332eea"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:298f9df9b3d0f7dd9450b27e22ae6afd124a26aae2680e57f714f903f67f46da"
+        fetched_at: "2026-07-13T18:27:50Z"
     canonical_mappings:
       handler_types:
-        supported: false
-        mechanism: "Kiro hooks execute shell commands or predefined agent prompts; no HTTP, LLM-as-hook, or TypeScript extension handler types documented"
-        confidence: inferred
+        supported: true
+        mechanism: "Hook action.type supports 'command' (shell) and 'agent' (predefined agent prompt) per the JSON file format — the agent type is a non-shell executor, which satisfies the canonical definition (executors beyond shell commands). No HTTP, mcp_tool, or TypeScript extension handler types documented"
+        confidence: confirmed
       matcher_patterns:
-        supported: false
-        mechanism: "Kiro hooks fire on configured lifecycle events; no per-tool name filtering or regex matching documented"
-        confidence: inferred
+        supported: true
+        mechanism: "Per-hook 'matcher' regex field (JSON file format) filters by tool name or file path; the 'Trigger reference' table 'Matcher matches' column documents Tool name (regex) for PreToolUse/PostToolUse and File path (regex) for PostFileCreate/PostFileSave/PostFileDelete"
+        confidence: confirmed
       decision_control:
-        supported: false
-        mechanism: "Kiro hooks are observational; no mechanism to block, allow, or modify tool invocations documented"
-        confidence: inferred
+        supported: true
+        mechanism: "Block-only: exit code 2 blocks execution for PreToolUse, UserPromptSubmit, and PreTaskExec (STDERR returned to the agent); documented via the 'Can block?' column in the 'Trigger reference' table and the 'Exit code behavior' section. No allow or input-modify decisions documented"
+        confidence: confirmed
       input_modification:
         supported: false
         mechanism: "Kiro hooks cannot modify tool input before execution"
@@ -218,16 +218,16 @@ content_types:
         confidence: inferred
       hook_scopes:
         supported: false
-        mechanism: "Kiro hooks are project-scoped; no multi-scope configuration documented"
-        confidence: inferred
+        mechanism: "Kiro hook JSON files live in .kiro/hooks/ at the workspace level only; no user/global/managed/plugin scope documented"
+        confidence: confirmed
       json_io_protocol:
         supported: false
-        mechanism: "Kiro hooks communicate via exit codes; no JSON stdin/stdout protocol documented"
-        confidence: inferred
+        mechanism: "Hook config is JSON, but the command I/O protocol is exit-code + STDOUT/STDERR text (documented under 'Exit code behavior'), not a JSON stdin/stdout message protocol"
+        confidence: confirmed
       context_injection:
-        supported: false
-        mechanism: "Kiro hooks cannot inject context into the agent session"
-        confidence: inferred
+        supported: true
+        mechanism: "Command hooks with exit code 0 add their STDOUT to the agent context for SessionStart and UserPromptSubmit events (ignored for other triggers); documented under 'Exit code behavior'"
+        confidence: confirmed
       permission_control:
         supported: false
         mechanism: "Kiro hooks do not participate in permission decisions"
@@ -254,13 +254,13 @@ content_types:
         graduation_candidate: false
         graduation_notes: "Agent turn completion trigger is IDE-specific and not representable as a portable shell hook event."
         conversion: not-portable
-      - id: kiro_hooks_ui_only
-        name: "Hooks configured via IDE UI only"
-        summary: "Kiro hooks are created either by describing desired functionality in natural language (Kiro generates the configuration) or by manually completing a form with title, description, event type, action type, and execution instructions. No documented file-based configuration format — configuration is not portable."
+      - id: kiro_hook_json_file_format
+        name: "JSON hook file format (.kiro/hooks/)"
+        summary: "As of the 2026-07-09 rewrite, hooks can be authored directly as JSON files in .kiro/hooks/ at the workspace level, alongside natural-language and form-based UI creation. Each file has a 'version' string and a 'hooks' array; each hook declares name, optional description, trigger, matcher (regex, defaults to always-match), action ({type: command, command} or {type: agent, prompt}), timeout (seconds; 0 disables, ignored for agent actions), and enabled."
         source_ref: "https://kiro.dev/docs/hooks/"
         graduation_candidate: false
-        graduation_notes: "UI-only configuration with no documented portable file format — cannot be imported or exported as structured content."
-        conversion: not-portable
+        graduation_notes: "The rewrite introduced a documented portable JSON format; its core fields (trigger, matcher, block-via-exit-code, STDOUT-to-context) are now captured by the canonical hooks keys matcher_patterns, decision_control, and context_injection."
+        conversion: translated
       - id: kiro_hook_file_operation_triggers
         name: "File operation triggers (save, create, delete)"
         summary: "Hook triggers that fire on file save, file create, and file delete events within the IDE, enabling automated responses to file lifecycle changes."
@@ -268,15 +268,8 @@ content_types:
         graduation_candidate: false
         graduation_notes: "File operation triggers are common across IDE hook systems but Kiro's are IDE-internal and not portable as structured hook config."
         conversion: not-portable
-      - id: kiro_hook_manual_trigger
-        name: "Manual on-demand hook trigger"
-        summary: "Hook trigger type that fires only on explicit user request, enabling on-demand automation without automatic event-based execution."
-        source_ref: "https://kiro.dev/docs/hooks/"
-        graduation_candidate: false
-        graduation_notes: "Manual trigger type is Kiro-specific IDE behavior — not representable as a portable hook event."
-        conversion: not-portable
-    loading_model: "Hooks are IDE-managed event listeners. Triggers include: file save, file create, file delete, user prompt submission, agent turn completion, before/after tool invocations, before/after spec task execution, and manual on-demand triggers. Each hook specifies a trigger condition and an action (agent prompt or shell command). The system operates through two steps: event detection monitors IDE activities, then the configured action executes in response. Hooks are configured through the Kiro IDE panel by natural language description or manual form completion — no documented file-based configuration format."
-    notes: "Kiro's hook system is called 'Agent hooks' in documentation to distinguish it from code-level hooks. The documentation emphasizes UI-based creation over file-based config, with no documented portable file format. Because hooks have no documented portable file format, import/export support is limited to IDE-specific state. Canonical hook events (before_tool_execute, after_file_edit, etc.) have no confirmed file-format mapping for Kiro. The documentation highlights use cases including maintaining code consistency, preventing security issues, reducing manual work, standardizing processes, and accelerating development cycles."
+    loading_model: "Hooks are IDE-managed event listeners defined either as JSON files in .kiro/hooks/ (workspace) or via the Kiro panel (natural-language description or manual form). The documented triggers are: SessionStart (session begins), Stop (agent completes its turn), PreToolUse / PostToolUse (regex match on tool name; PreToolUse can block), PreTaskExec / PostTaskExec (spec task lifecycle; PreTaskExec can block), UserPromptSubmit (can block), and PostFileCreate / PostFileSave / PostFileDelete (regex match on file path). Each hook specifies a trigger, an optional matcher regex, and an action (agent prompt or shell command). Command actions signal via exit codes: 0 = success (STDOUT added to context for SessionStart/UserPromptSubmit), 2 = block execution (PreToolUse/UserPromptSubmit/PreTaskExec only; STDERR returned to the agent), any other = warning shown but execution proceeds. Manual on-demand hooks were removed and replaced by manual steering files."
+    notes: "Kiro's hook system is called 'Agent hooks' in documentation to distinguish it from code-level hooks. The 2026-07-09 rewrite added a documented portable JSON file format (.kiro/hooks/, version + hooks[] with name/trigger/matcher/action/timeout/enabled), flipping matcher_patterns, decision_control, and context_injection from unsupported to supported. Block is exit-code-only (no allow/modify), the I/O protocol is exit-code + STDOUT/STDERR text (not JSON messages), and hooks are workspace-scoped only. The former manual on-demand hook trigger was removed in favor of manual steering files. Use cases highlighted include maintaining code consistency, preventing security issues, reducing manual work, standardizing processes, and accelerating development cycles."
 
   mcp:
     status: supported
@@ -284,17 +277,17 @@ content_types:
       - uri: "https://kiro.dev/docs/mcp/configuration/"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:27b7b126f6ff68744659e1d1c3641bd7575caf75625ab036171942f9fe84b988"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:fa30fe0a5cfd961edac3a8f15f31853986bce3ec7157dfb755a1883f71d3594b"
+        fetched_at: "2026-07-13T18:27:50Z"
     canonical_mappings:
       transport_types:
         supported: true
         mechanism: "Kiro supports stdio (local process via command + args) and remote (HTTPS endpoint or localhost HTTP via url + optional headers) server types"
         confidence: confirmed
       oauth_support:
-        supported: false
-        mechanism: "Kiro MCP does not document OAuth 2.0 authentication; remote server auth uses static headers"
-        confidence: inferred
+        supported: true
+        mechanism: "Kiro handles browser-based OAuth flows automatically for remote MCP servers, using Dynamic Client Registration (DCR) by default; documented under 'OAuth authentication' heading (added 2026-06-10). For providers without DCR, oauth.clientId + oauthScopes (and optional oauth.redirectUri) are supplied per server. Only public PKCE clients (no client secret) are supported; expired tokens trigger automatic browser re-authentication."
+        confidence: confirmed
       env_var_expansion:
         supported: true
         mechanism: "kiro_mcp_env_var_expansion: Environment variables referenced dynamically using ${VARIABLE_NAME} syntax within MCP config values; recommended pattern for secrets instead of hardcoded values"
@@ -360,7 +353,7 @@ content_types:
         graduation_notes: "Environment variable interpolation in MCP config is a cross-provider useful pattern — multiple providers support similar mechanisms for secret injection."
         conversion: embedded
     loading_model: "MCP servers are configured in .kiro/settings/mcp.json (workspace/team, tracked in version control) or ~/.kiro/settings/mcp.json (global user). Both files use the same JSON schema: a top-level 'mcpServers' map where each key is the server name and each value is a server config object. Workspace config takes priority over global config; server name collisions resolve in favor of workspace. Servers can be stdio (command + args) or remote (url + optional headers). Configuration is accessed via the command palette (Cmd+Shift+P on Mac, Ctrl+Shift+P on Windows/Linux) or the Kiro panel's MCP Config icon. Changes apply automatically upon saving."
-    notes: "Config file paths use the settings subdirectory: .kiro/settings/mcp.json for workspace/team scope, ~/.kiro/settings/mcp.json for global scope. The JSON schema is similar to Claude Desktop's mcpServers format with Kiro-specific additions (autoApprove, disabledTools, disabled). Security documentation warns against storing sensitive values directly in config files — ${VAR} env var references are the recommended pattern for secrets. The env_var_expansion canonical key is now confirmed supported based on explicit documentation of ${VARIABLE_NAME} syntax."
+    notes: "Config file paths use the settings subdirectory: .kiro/settings/mcp.json for workspace/team scope, ~/.kiro/settings/mcp.json for global scope. The JSON schema is similar to Claude Desktop's mcpServers format with Kiro-specific additions (autoApprove, disabledTools, disabled). Security documentation warns against storing sensitive values directly in config files — ${VAR} env var references are the recommended pattern for secrets. The env_var_expansion canonical key is now confirmed supported based on explicit documentation of ${VARIABLE_NAME} syntax. As of the 2026-06-10 doc update, remote MCP servers support OAuth authentication (oauth_support now confirmed): browser-based flows with Dynamic Client Registration by default, plus per-server oauth.clientId / oauth.redirectUri / oauthScopes fields for providers lacking DCR (public PKCE clients only)."
 
   agents:
     status: supported
@@ -368,8 +361,8 @@ content_types:
       - uri: "https://kiro.dev/docs/cli/custom-agents/configuration-reference/"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:2135eb1889b6cb6fa0bf66d6283ac7e9b7166237a46217727de5107ad520aea9"
-        fetched_at: "2026-05-06T00:00:00Z"
+        content_hash: "sha256:2d369a5d3260214675754f064bd4e4f4b5010433bd7d7e872265c6c8f387da7e"
+        fetched_at: "2026-07-13T18:27:50Z"
     canonical_mappings:
       definition_format:
         supported: true

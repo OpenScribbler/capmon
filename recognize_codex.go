@@ -38,34 +38,43 @@ func codexSkillsOptions() GoStructOptions {
 // codexRulesLandmarkOptions returns the landmark patterns for Codex's rules
 // (AGENTS.md) documentation. Anchors derived from
 // .capmon-cache/codex/rules.0/extracted.json (docs/agents_md.md). The cached
-// doc is intentionally short — it redirects to the developers.openai.com
-// AGENTS.md spec which was not cached. Recognition is constrained to the two
-// landmarks present in the stub spec doc.
+// doc is a two-line redirect stub pointing at the developers.openai.com
+// AGENTS.md spec which is not cached — its only heading landmark is "AGENTS.md".
 //
 // rules.1 is codex's OWN AGENTS.md instance file (their internal dev rules)
 // and intentionally NOT used as evidence — instance content is not capability
 // vocabulary.
 //
-// Required anchors are unique to the rules doc (skills.* sources have no
-// AGENTS.md or "Hierarchical agents message" landmarks):
-//   - "AGENTS.md"
-//   - "Hierarchical agents message"
+// Re-anchored 2026-07-13: the doc previously carried a "Hierarchical agents
+// message" section that gated a hierarchical_loading landmark. openai/codex
+// #28993 ("Remove child AGENTS.md prompt experiment") deleted the
+// features.child_agents_md flag, its prompt template, and that doc section,
+// so both the anchor and the landmark pattern are gone. This is NOT a
+// capability regression: base hierarchical AGENTS.md loading is now
+// unconditional and lives in source (codex-rs/core/src/agents_md.rs collects
+// every AGENTS.md from project root down to cwd — verified live on
+// github.com/openai/codex main, 2026-07-13). hierarchical_loading therefore
+// stays supported: true / confirmed in docs/provider-formats/codex.yaml and
+// docs/provider-capabilities/codex.yaml on source-code evidence; the recognizer
+// simply no longer has a doc landmark to emit it from (curated confirmed data
+// outranks a landmark-inferred emission anyway).
 //
-// Per the seeder spec, codex supports activation_mode.always,
-// cross_provider_recognition.agents_md, and hierarchical_loading. file_imports
-// and auto_memory are intentionally absent from the cached doc surface.
+// Required anchor is unique to the rules doc (skills.*/hooks.*/agents.* sources
+// have no "AGENTS.md" landmark):
+//   - "AGENTS.md"
+//
+// Per the seeder spec, codex supports activation_mode.always and
+// cross_provider_recognition.agents_md from the cached doc surface.
+// file_imports and auto_memory are intentionally absent from that surface.
 func codexRulesLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
 		{Kind: "substring", Value: "AGENTS.md", CaseInsensitive: true},
-		{Kind: "substring", Value: "Hierarchical agents message", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
 		RulesLandmarkPattern("activation_mode.always", "AGENTS.md",
 			"AGENTS.md files are always_on within their scope (project root and child directories) — documented under 'AGENTS.md' (per docs/agents_md.md, redirects to developers.openai.com spec)", required),
 		RulesLandmarkPattern("cross_provider_recognition.agents_md", "AGENTS.md",
 			"codex is a primary AGENTS.md spec implementer (per github.com/openai/codex docs); AGENTS.md is the cross-provider standard", required),
-		RulesLandmarkPattern("hierarchical_loading", "Hierarchical agents message",
-			"hierarchical AGENTS.md loading gated by child_agents_md feature flag in config.toml; codex emits a precedence-explanation message to the model when enabled (documented under 'Hierarchical agents message')", required),
 	)
 }
 

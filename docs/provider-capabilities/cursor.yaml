@@ -64,7 +64,11 @@ content_types:
     capabilities:
       auto_approve:
         supported: true
-        mechanism: auto-approval / auto-run mode for trusted tools documented under 'Auto-run' heading
+        mechanism: auto-approval via Run Mode — MCP follows the same Run Modes as terminal commands; in Auto-review mode allowlisted MCP tools run immediately (documented under 'Run Mode' heading)
+        confidence: inferred
+      enterprise_management:
+        supported: true
+        mechanism: enterprise admins configure MCP policy from the Cursor dashboard — team MCP distribution, server/tool allowlists, and per-server network controls (documented under 'Enterprise admin controls' / 'Team MCP distribution' / 'Network controls' headings)
         confidence: inferred
       env_var_expansion:
         supported: true
@@ -80,7 +84,7 @@ content_types:
         confidence: inferred
       tool_filtering:
         supported: true
-        mechanism: per-server enable/disable toggle and per-tool approval documented under 'Tool approval' / 'Using MCP in chat' headings
+        mechanism: per-server tool allowlists restrict which tools from an approved server may run automatically; command/URL entries approve servers (documented under 'MCP Allowlist' heading)
         confidence: inferred
       transport_types:
         supported: true

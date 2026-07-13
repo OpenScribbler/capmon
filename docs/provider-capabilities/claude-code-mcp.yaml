@@ -46,7 +46,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: transport_types
       supported: true
-      mechanism: 'mcp_transport_types: stdio (local process), SSE (deprecated, still supported), HTTP/streamable-HTTP (recommended for remote)'
+      mechanism: 'mcp_transport_types: stdio (local process), SSE (deprecated, still supported), HTTP/streamable-HTTP (recommended for remote), WebSocket (type: ws; persistent bidirectional connection for servers that push events; header-only auth, no OAuth or --transport flag support)'
       source_field: ""
       source_value: ""
       confidence: confirmed

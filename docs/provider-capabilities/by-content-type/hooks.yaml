@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-13T06:52:00Z
+# Generated at: 2026-07-13T18:50:48Z
 
 content_type: hooks
 providers:
@@ -150,6 +150,19 @@ providers:
                 confidence: inferred
     kiro:
         supported: true
+        capabilities:
+            context_injection:
+                supported: true
+                mechanism: exit code 0 adds hook command STDOUT to the agent context for SessionStart and UserPromptSubmit events; documented under the 'Exit code behavior' heading
+                confidence: inferred
+            decision_control:
+                supported: true
+                mechanism: exit code 2 blocks execution for PreToolUse / UserPromptSubmit / PreTaskExec (block only, no allow/modify); documented under the 'Exit code behavior' heading
+                confidence: inferred
+            matcher_patterns:
+                supported: true
+                mechanism: per-hook 'matcher' regex field filters by tool name or file path; the 'Trigger reference' table 'Matcher matches' column documents Tool name (regex) for PreToolUse/PostToolUse and File path (regex) for file events
+                confidence: inferred
     pi:
         supported: true
         capabilities:

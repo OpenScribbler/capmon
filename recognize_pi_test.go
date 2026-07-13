@@ -142,7 +142,8 @@ func TestRecognizePi_NoLandmarks(t *testing.T) {
 // of 2026-04-17. Pi brands its slash-command surface as "Prompt Templates".
 // The "Argument Hints" + "Arguments" + "Usage" headings document the
 // positional shell-style substitution syntax ($1, $2, $@, $ARGUMENTS,
-// ${@:N}, ${@:N:L}) — strong heading-level evidence for argument_substitution.
+// ${1:-default}, ${@:N}, ${@:N:L}) — strong heading-level evidence for
+// argument_substitution.
 var realPiCommandsLandmarks = []string{
 	"Prompt Templates",
 	"Locations",

@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-13T06:52:00Z
+# Generated at: 2026-07-13T18:50:48Z
 
 content_type: commands
 providers:
@@ -9,7 +9,7 @@ providers:
         capabilities:
             builtin_commands:
                 supported: true
-                mechanism: 6 built-in slash commands documented as individual headings (/newtask, /smol, /newrule, /deep-planning, /explain-changes, /reportbug); hardcoded, not user-modifiable
+                mechanism: 5 built-in slash commands documented as individual headings (/newtask, /smol, /newrule, /deep-planning, /reportbug); hardcoded, not user-modifiable
                 confidence: inferred
     factory-droid:
         supported: true

@@ -36,8 +36,8 @@ func piHooksLandmarkOptions() LandmarkOptions {
 //
 // Maps 1 of 2 canonical commands keys at heading-level evidence:
 //   - argument_substitution → "Argument Hints" / "Arguments" / "Usage"
-//     headings; the doc covers $1, $2, $@, $ARGUMENTS, ${@:N}, and ${@:N:L}
-//     positional shell-style substitution syntaxes.
+//     headings; the doc covers $1, $2, $@, $ARGUMENTS, ${1:-default},
+//     ${@:N}, and ${@:N:L} positional shell-style substitution syntaxes.
 //
 // builtin_commands is intentionally NOT mapped — per the curated YAML
 // (docs/provider-formats/pi.yaml), pi has no built-in slash commands; the
@@ -58,7 +58,7 @@ func piCommandsLandmarkOptions() LandmarkOptions {
 	}
 	return CommandsLandmarkOptions(
 		CommandsLandmarkPattern("argument_substitution", "Argument Hints",
-			"positional shell-style substitution ($1, $2, $@, $ARGUMENTS, ${@:N}, ${@:N:L}) documented under 'Argument Hints' / 'Arguments' / 'Usage' headings", required),
+			"positional shell-style substitution ($1, $2, $@, $ARGUMENTS, ${1:-default}, ${@:N}, ${@:N:L}) documented under 'Argument Hints' / 'Arguments' / 'Usage' headings", required),
 	)
 }
 

@@ -45,11 +45,11 @@ proposed_mappings:
       source_value: ""
       confidence: confirmed
     - canonical_key: shared_scope
-      supported: false
-      mechanism: organization-level and enterprise-level skills explicitly stated as 'coming soon' in source
+      supported: true
+      mechanism: 'organization/enterprise-hosted skills documented as a loadable ''Remote'' scope in the CLI command reference ''Skill locations'' table — projected via the AHP relay and fetched on demand when invoked. (The prior ''coming soon'' statement for org/enterprise skills was removed from about-agent-skills.md in the 2026-07 docs update, commit 425f5b15.) NOTE: evidence is in cli-command-reference.md, not the cited skills how-to/concept sources, which have not yet caught up.'
       source_field: ""
       source_value: ""
-      confidence: confirmed
+      confidence: inferred
     - canonical_key: user_invocable
       supported: true
       mechanism: slash-prefixed skill name in user prompt (e.g. /frontend-design)

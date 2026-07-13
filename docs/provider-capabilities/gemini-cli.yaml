@@ -83,7 +83,7 @@ content_types:
             confidence: inferred
       auto_memory:
         supported: true
-        mechanism: /memory show / add / reload slash commands manage hierarchical memory (documented under 'Manage context with the /memory command')
+        mechanism: /memory show / reload slash commands manage the hierarchical GEMINI.md memory (documented under 'Manage context with the /memory command'); the /memory add append subcommand was removed upstream
         confidence: inferred
       file_imports:
         supported: true

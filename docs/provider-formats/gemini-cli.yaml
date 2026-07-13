@@ -99,8 +99,8 @@ content_types:
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/cli/gemini-md.md"
         type: documentation
         fetch_method: gh_raw
-        content_hash: "sha256:9bbf3d0b66e840b7a6dccdade5212828e15246765f9cb00f23e8949b98eb0496"
-        fetched_at: "2026-04-11T21:48:27Z"
+        content_hash: "sha256:d00eeaef22453de4756a9862d8467750f772e239c4ee9b6f755709429b47c2cf"
+        fetched_at: "2026-07-13T18:20:42Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -116,7 +116,7 @@ content_types:
         confidence: inferred
       auto_memory:
         supported: true
-        mechanism: "memory_command: Gemini CLI /memory command saves notes that persist across sessions as rule-like content"
+        mechanism: "memory_command: under the 'Manage context with the /memory command' heading the /memory command now only shows (/memory show) and reloads (/memory reload) the concatenated GEMINI.md hierarchy — the /memory add append subcommand was removed upstream (commit 7504259d, 'clean up launched memory features'). Persistent cross-session memories are now saved via the separate Memory tool (this source's 'Next steps' see-also links docs/tools/memory.md 'to save persistent memories')"
         confidence: confirmed
       hierarchical_loading:
         supported: true
@@ -144,7 +144,7 @@ content_types:
         conversion: preserved
       - id: memory_command
         name: /memory management command
-        summary: Slash command for showing, reloading, and appending to the active context files at runtime.
+        summary: Slash command for showing and reloading the active context files at runtime. The /memory add append subcommand was removed upstream; persistent memories are now saved via the separate Memory tool (docs/tools/memory.md).
         source_ref: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/cli/gemini-md.md"
         graduation_candidate: false
         conversion: not-portable
@@ -162,8 +162,8 @@ content_types:
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json"
         type: source_code
         fetch_method: gh_raw
-        content_hash: "sha256:66b821c93928050e92a75104d4f617a84bf75cce88af3915b11b2a77b01af530"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:8bc78d59eb87aa79893a0b5928720d571397505b94e2d983f988c5932afc0016"
+        fetched_at: "2026-07-13T18:20:42Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/hooks/index.md"
         type: documentation
         fetch_method: gh_raw
@@ -273,13 +273,13 @@ content_types:
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json"
         type: source_code
         fetch_method: gh_raw
-        content_hash: "sha256:66b821c93928050e92a75104d4f617a84bf75cce88af3915b11b2a77b01af530"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:8bc78d59eb87aa79893a0b5928720d571397505b94e2d983f988c5932afc0016"
+        fetched_at: "2026-07-13T18:20:42Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/tools/mcp-server.md"
         type: documentation
         fetch_method: gh_raw
-        content_hash: "sha256:c63bddf9e1f2d2718c8c520ae4c1a26b21376a61e697363c102e8357206e80c2"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:c666e348477ac0f37ee3522a4d8fc0f133904f4082e8fbae54afdcc0f825ce8b"
+        fetched_at: "2026-07-13T18:20:42Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/cli/tutorials/mcp-setup.md"
         type: documentation
         fetch_method: gh_raw
@@ -452,8 +452,8 @@ content_types:
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/core/subagents.md"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:cd6dadc846e123d1b8b5fd66c65027b9463b16246c0cb3ebdc32d63b22c03d76"
-        fetched_at: "2026-04-28T22:02:38Z"
+        content_hash: "sha256:1a1b38993a2f5c6e16afda1914974a86274e73fac90e3ab62334d45e34bf7849"
+        fetched_at: "2026-07-13T18:20:42Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/core/remote-agents.md"
         type: documentation
         fetch_method: http
@@ -526,7 +526,7 @@ content_types:
         conversion: translated
       - id: agent_builtin_experts
         name: Built-in expert subagents
-        summary: "Gemini CLI ships built-in subagents alongside user-authored ones: @codebase_investigator (codebase analysis), @cli_help (CLI docs), @generalist (multi-file operations), @browser_agent (experimental web automation)."
+        summary: "Gemini CLI ships built-in subagents alongside user-authored ones: @codebase_investigator (codebase analysis), @cli_help (CLI docs), @generalist (multi-file operations), @browser_agent (web automation — graduated from experimental/preview per the 'Browser Agent' heading)."
         source_ref: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/core/subagents.md"
         graduation_candidate: false
         conversion: not-portable

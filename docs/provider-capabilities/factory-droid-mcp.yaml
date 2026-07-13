@@ -9,14 +9,14 @@ proposed_mappings:
       source_value: ""
       confidence: inferred
     - canonical_key: enterprise_management
-      supported: false
-      mechanism: only user-level (~/.factory/mcp.json) and project-level (.factory/mcp.json) configuration scopes documented; no organization/enterprise admin layer
+      supported: true
+      mechanism: org-managed 'Enterprise MCP policy' (mcpPolicy with enabled + allowlist of hostname/command matchers) restricts which servers may connect; 'MCP autonomy URL overrides' (mcpAutonomyUrlOverrides) assign per-URL autonomy risk levels; both delivered via org-managed settings and cannot be weakened downstream. A folder-level scope (.factory/mcp.json in any ancestor dir) also exists alongside user and project scopes
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: env_var_expansion
       supported: true
-      mechanism: stdio server add command accepts --env KEY=VALUE flags; env field documented in configuration schema for stdio servers
+      mechanism: ${VAR} and ${VAR:-default} expansion in mcp.json documented under 'Variable expansion' heading (supported in stdio command/args/env and http url/headers; expanded in memory at load time, file never rewritten); stdio server add also accepts --env KEY=VALUE flags
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -40,13 +40,13 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: tool_filtering
       supported: true
-      mechanism: per-server tool disable via disabledTools field in Configuration Schema
+      mechanism: per-server tool filtering via disabledTools (blocklist) and enabledTools (allowlist; takes precedence when both set) fields in Configuration Schema, documented under 'Per-tool filtering' heading; mirrors --enabled-tools / --disabled-tools flags on droid exec
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: transport_types
       supported: true
-      mechanism: 'two transports documented: http (remote cloud endpoints, droid mcp add <name> <url> --type http) and stdio (local processes, droid mcp add <name> ''<command>'' [--env KEY=VALUE...])'
+      mechanism: 'three transports documented under ''Adding Servers via CLI'': http (Streamable HTTP, current standard, droid mcp add <name> <url> --type http), sse (legacy standalone HTTP+SSE, --type sse), and stdio (local processes, droid mcp add <name> ''<command>'' [--env KEY=VALUE...])'
       source_field: ""
       source_value: ""
       confidence: confirmed

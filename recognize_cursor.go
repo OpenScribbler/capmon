@@ -46,26 +46,34 @@ func cursorRulesLandmarkOptions() LandmarkOptions {
 
 // cursorMcpLandmarkOptions returns the landmark patterns for Cursor's MCP
 // documentation. Anchors derived from .capmon-cache/cursor/mcp.0/extracted.json
-// (https://cursor.com/docs/context/mcp, HTML).
+// (https://cursor.com/docs/mcp, HTML).
 //
-// Cursor's MCP doc maps 6 of 8 canonical MCP keys at the heading level.
-// Two are intentionally absent:
+// Cursor's MCP doc maps 7 of 8 canonical MCP keys at the heading level. As of
+// the 2026-07-13 refetch the doc grew an "Enterprise admin controls" block
+// (Team MCP distribution / MCP Allowlist / Network controls / User MCP
+// extensions), which supplies fresh heading evidence for two keys that were
+// previously absent:
+//   - enterprise_management: now anchored on "Enterprise admin controls" —
+//     enterprise admins configure MCP policy (distribution, allowlists,
+//     network controls) from the Cursor dashboard.
+//   - tool_filtering: now anchored on "MCP Allowlist" — tool allowlists
+//     restrict which tools from an approved server may run automatically
+//     (previously the doc documented no per-server tool allowlist).
+//
+// One canonical key remains intentionally absent:
 //   - resource_referencing: documented in the "Protocol and extension support"
 //     capability table as a row labeled "Resources", but table cells are
 //     extracted into Fields, not Landmarks. No heading-level evidence exists
 //     so the recognizer cannot anchor on it via landmark substring matching.
-//   - enterprise_management: cursor's enterprise MCP policy lives in
-//     admin-console docs not in this scrape.
+//
+// The former "Auto-run" heading was renamed "Run Mode" in the same refetch;
+// the auto_approve anchor tracks the new heading.
 //
 // Required anchors are unique to the MCP doc:
 //   - "What is MCP?" — H1/H2 of MCP discovery section
 //   - "Installing MCP servers" — H2 unique to MCP installation flow
 //
 // Neither appears in cursor's rules, skills, or hooks docs.
-//
-// Per docs/provider-formats/cursor.yaml, no curated MCP section exists yet
-// (only skills is curated, marked unsupported). Recognizer emissions land in
-// docs/provider-capabilities/cursor.yaml at "inferred" confidence.
 func cursorMcpLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
 		{Kind: "substring", Value: "What is MCP?", CaseInsensitive: true},
@@ -78,10 +86,12 @@ func cursorMcpLandmarkOptions() LandmarkOptions {
 			"OAuth 2.0 (with Client ID/Secret + scopes) documented under 'Static OAuth for remote servers' / 'Authentication' headings", required),
 		McpLandmarkPattern("env_var_expansion", "Config interpolation",
 			"${env:NAME}, ${userHome}, ${workspaceFolder}, ${pathSeparator} variable interpolation documented under 'Config interpolation' / 'Combining with config interpolation' headings", required),
-		McpLandmarkPattern("tool_filtering", "Tool approval",
-			"per-server enable/disable toggle and per-tool approval documented under 'Tool approval' / 'Using MCP in chat' headings", required),
-		McpLandmarkPattern("auto_approve", "Auto-run",
-			"auto-approval / auto-run mode for trusted tools documented under 'Auto-run' heading", required),
+		McpLandmarkPattern("tool_filtering", "MCP Allowlist",
+			"per-server tool allowlists restrict which tools from an approved server may run automatically; command/URL entries approve servers (documented under 'MCP Allowlist' heading)", required),
+		McpLandmarkPattern("enterprise_management", "Enterprise admin controls",
+			"enterprise admins configure MCP policy from the Cursor dashboard — team MCP distribution, server/tool allowlists, and per-server network controls (documented under 'Enterprise admin controls' / 'Team MCP distribution' / 'Network controls' headings)", required),
+		McpLandmarkPattern("auto_approve", "Run Mode",
+			"auto-approval via Run Mode — MCP follows the same Run Modes as terminal commands; in Auto-review mode allowlisted MCP tools run immediately (documented under 'Run Mode' heading)", required),
 		McpLandmarkPattern("marketplace", "One-click installation",
 			"one-click MCP server installation from a curated catalog documented under 'One-click installation' heading", required),
 	)

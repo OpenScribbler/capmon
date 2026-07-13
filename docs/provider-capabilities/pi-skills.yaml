@@ -40,7 +40,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: display_name
       supported: true
-      mechanism: 'yaml frontmatter key: name (required, max 64 chars, lowercase a-z/0-9/hyphens, must match parent directory name)'
+      mechanism: 'yaml frontmatter key: name (required, max 64 chars, lowercase a-z/0-9/hyphens). Unlike the Agent Skills standard, Pi does NOT require name to match the parent directory name: skills.ts validateName() dropped the parent-dir equality check (commit 5d31e70), an intentional deviation for shared cross-harness skill directories.'
       source_field: ""
       source_value: ""
       confidence: confirmed

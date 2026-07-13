@@ -27,11 +27,11 @@ proposed_mappings:
       source_value: ""
       confidence: confirmed
     - canonical_key: per_agent_mcp
-      supported: false
-      mechanism: no per-droid MCP configuration documented; MCP is workspace-wide; droids can use MCP tools via the mcp tool category
+      supported: true
+      mechanism: mcpServers frontmatter field (array of configured server names, e.g. ["linear", "github"]) scopes a droid to specific MCP servers, documented under 'Selecting MCP servers' heading; omit to inherit session-wide MCP tools, set [] to exclude all, or list exact registered MCP tool IDs in tools for per-tool control
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: subagent_spawning
       supported: true
       mechanism: droids exposed as subagent_type targets for Task tool delegation; /droids menu (I key) imports Claude Code .claude/agents/*.md to droid format with field mapping and model family translation

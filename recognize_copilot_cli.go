@@ -124,8 +124,11 @@ func copilotCliHooksLandmarkOptions() LandmarkOptions {
 //     `/agent <name>` body text, not as a heading. Skip.
 //   - agent_scopes: scope locations live in body text of agents.1, not as
 //     headings. Skip.
-//   - model_selection: no Model heading; the YAML frontmatter does not
-//     document a model field per the configuration spec.
+//   - model_selection: the config spec documents a `model` frontmatter field
+//     (as of the 2026-07 restructure of custom-agents-configuration.md), but
+//     it lives in the "YAML frontmatter properties" table, not under its own
+//     Model heading — the curator owns this key (format YAML marks it
+//     supported/confirmed); no landmark is emitted for it here.
 //   - subagent_spawning: no chain/spawn/delegate heading; no multi-agent
 //     coordination documented.
 //

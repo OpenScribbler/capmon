@@ -5,8 +5,8 @@ category: cli
 # - required: true | false | null (null = source doesn't say)
 # - value_type: see allow-list in formatdoc_validate.go
 # - examples: [{title?, lang, code, note?}]
-last_fetched_at: "2026-05-06T13:00:00Z"
-last_changed_at: "2026-05-06T13:00:00Z"
+last_fetched_at: "2026-07-13T18:22:14Z"
+last_changed_at: "2026-07-13T18:22:14Z"
 generation_method: subagent
 
 content_types:
@@ -65,8 +65,8 @@ content_types:
       - uri: "https://opencode.ai/docs/rules/"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:2edfcc1bfc52f30a5062dc7de5422ce43446a9e956e2e5eea839a70566ccbaf6"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:7193ac6a72ddac37f000ed5c5a7a4be667ed035d5637aacae9e7c472ae73e96d"
+        fetched_at: "2026-07-13T18:22:14Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -122,13 +122,13 @@ content_types:
       - uri: "https://opencode.ai/docs/agents/"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:cdc50424643f9ad41947af8fed5a21222cc8dd24c324f4a8ed1dddf2c5161ac0"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:1da8aca036511883626f482fb40e74a2fcd236ab7369d8a9d28d383dcd8fb420"
+        fetched_at: "2026-07-13T18:22:14Z"
       - uri: "https://raw.githubusercontent.com/sst/opencode/dev/packages/opencode/src/config/agent.ts"
         type: source_code
         fetch_method: gh_raw
-        content_hash: "sha256:f31c07ca5404b91c7b144ad917f72483d8d4e534b697b8c8ad758aa5c1501599"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:4844d4dfa48a516f5b134b0e310c3b0fc11292d0180b0b12ab8d96a43775efa7"
+        fetched_at: "2026-07-13T18:22:14Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -162,7 +162,7 @@ content_types:
     provider_extensions:
       - id: agent_mode
         name: Agent mode (primary / subagent / all)
-        summary: "Frontmatter mode field selects whether the agent is a root primary agent, a subagent invoked by another agent, or both. Defaults to all if not specified. Built-in primary agents: Build (all tools) and Plan (restricted). Built-in subagents: General (full tools) and Explore (read-only)."
+        summary: "Frontmatter mode field selects whether the agent is a root primary agent, a subagent invoked by another agent, or both. Defaults to all if not specified. Built-in primary agents: Build (all tools) and Plan (restricted). Built-in subagents: General (full tools), Explore (read-only), and Scout (read-only agent for external docs and dependency research — clones dependency repos into a managed cache)."
         source_ref: "https://opencode.ai/docs/agents/"
         graduation_candidate: true
         conversion: translated
@@ -184,7 +184,7 @@ content_types:
       - id: steps
         name: Per-step iteration limit
         summary: "Frontmatter steps field caps the number of agentic iterations before the agent is forced to respond with text only and summarize its work. Replaces the deprecated maxSteps field."
-        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/opencode/src/config/agent.ts"
+        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/core/src/v1/config/agent.ts"
         graduation_candidate: true
         conversion: translated
         provider_field: steps
@@ -205,14 +205,14 @@ content_types:
       - id: color
         name: Agent color tag
         summary: "Optional color hint for UI display of the agent. Accepts a hex color string (#RRGGBB) or a theme color name (primary, secondary, accent, success, warning, error, info)."
-        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/opencode/src/config/agent.ts"
+        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/core/src/v1/config/agent.ts"
         graduation_candidate: false
         conversion: embedded
         provider_field: color
       - id: hidden
         name: Hidden from pickers
         summary: "Boolean hidden flag (default: false) excludes a subagent from the @ autocomplete menu while still allowing programmatic invocation via the Task tool. Only applies to mode: subagent agents."
-        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/opencode/src/config/agent.ts"
+        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/core/src/v1/config/agent.ts"
         graduation_candidate: false
         conversion: embedded
         provider_field: hidden
@@ -226,7 +226,7 @@ content_types:
       - id: variant
         name: Default model variant
         summary: "Optional variant field specifies the default model variant for this agent. Applies only when using the agent's configured model."
-        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/opencode/src/config/agent.ts"
+        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/core/src/v1/config/agent.ts"
         graduation_candidate: false
         conversion: embedded
         provider_field: variant
@@ -244,7 +244,7 @@ content_types:
         graduation_candidate: false
         conversion: embedded
     loading_model: "Agents are markdown files with YAML frontmatter loaded from .opencode/agents/*.md or .opencode/agent/*.md (project scope) or ~/.config/opencode/agents/*.md (global scope). The loader glob accepts both singular 'agent/' and plural 'agents/' directory names and recurses. The agent name is derived from the filename (not a frontmatter field). Agents can also be defined inline in opencode.json under the agent key, which takes the same field set as frontmatter. Frontmatter declares: description, mode (primary | subagent | all, default: all), model, temperature, top_p, steps, permission, color, hidden, disable, variant, prompt. The markdown body becomes the system prompt; in JSON config the system prompt is the template field."
-    notes: "The canonical per-step iteration limit field is 'steps' (the legacy 'maxSteps' field is deprecated). The legacy 'tools' frontmatter map is deprecated in favor of 'permission'. Agent identity derives from the filename — there is no 'name' frontmatter key. Built-in hidden system agents (compaction, title, summary) exist but are not selectable in the UI."
+    notes: "The canonical per-step iteration limit field is 'steps' (the legacy 'maxSteps' field is deprecated). The legacy 'tools' frontmatter map is deprecated in favor of 'permission'. Agent identity derives from the filename — there is no 'name' frontmatter key. Built-in hidden system agents (compaction, title, summary) exist but are not selectable in the UI. As of 2026-07-13 the agent config schema was relocated upstream from packages/opencode/src/config/agent.ts (commit 83452558) into packages/core/src/v1/config/agent.ts (exported as ConfigAgentV1); the monitored check-path file is now a thin loader that imports the schema, but the full field set is unchanged. The docs now list a third built-in subagent, Scout (read-only external-docs/dependency research), alongside General and Explore."
 
   commands:
     status: supported
@@ -252,8 +252,8 @@ content_types:
       - uri: "https://opencode.ai/docs/commands/"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:eaf642ee6989c25fb28e3db90d3924935da7e52a6c528875d482a2277e81810b"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:9d4900e5e744946f37ab6192cb887d152616055a3e3be20df435f29a3438cbc8"
+        fetched_at: "2026-07-13T18:22:14Z"
     canonical_mappings:
       argument_substitution:
         supported: true
@@ -313,8 +313,8 @@ content_types:
       - uri: "https://opencode.ai/docs/mcp-servers/"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:26c7757f72658e3ad6f9c575053177979dbf3493e4499f92ee6674f3c47025c9"
-        fetched_at: "2026-05-06T13:00:00Z"
+        content_hash: "sha256:3ce1f56ebbe2ffc03213188645126ab0f080461704d5351589b3e5c66819eb2a"
+        fetched_at: "2026-07-13T18:22:14Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -339,7 +339,7 @@ content_types:
     provider_extensions:
       - id: local_transport
         name: Local (stdio) MCP transport
-        summary: "Local MCP servers are launched via a command array (command field) with optional environment variables (environment field). Communicate over stdio. Type must be set to local."
+        summary: "Local MCP servers are launched via a command array (command field) with optional environment variables (environment field) and an optional cwd field that sets the server process working directory (relative paths resolve from the workspace). Communicate over stdio. Type must be set to local."
         source_ref: "https://opencode.ai/docs/mcp-servers/"
         graduation_candidate: true
         conversion: translated
@@ -390,8 +390,8 @@ content_types:
         source_ref: "https://opencode.ai/docs/mcp-servers/"
         graduation_candidate: false
         conversion: embedded
-    loading_model: "MCP servers are configured under the mcp key in opencode.json (or opencode.jsonc) at the project root or in the global ~/.config/opencode/opencode.json. Each entry is a named server config with type (local or remote), and type-specific fields: local servers use command (array), environment (object), enabled, and timeout; remote servers use url, headers, oauth, enabled, and timeout. Tool visibility is controlled via the global tools map with glob patterns using the server name prefix. Organization-provided defaults from .well-known/opencode can be overridden per-server in local config."
-    notes: "OAuth 2.0 support via Dynamic Client Registration is confirmed — the existing inferred:false entry was incorrect based on prior source material. Enterprise management via .well-known/opencode remote defaults is also confirmed. The environment field (not env) is the correct key for local server environment variables."
+    loading_model: "MCP servers are configured under the mcp key in opencode.json (or opencode.jsonc) at the project root or in the global ~/.config/opencode/opencode.json. Each entry is a named server config with type (local or remote), and type-specific fields: local servers use command (array), environment (object), cwd (working directory), enabled, and timeout; remote servers use url, headers, oauth, enabled, and timeout. Tool visibility is controlled via the global tools map with glob patterns using the server name prefix. Organization-provided defaults from .well-known/opencode can be overridden per-server in local config."
+    notes: "OAuth 2.0 support via Dynamic Client Registration is confirmed — the existing inferred:false entry was incorrect based on prior source material. Enterprise management via .well-known/opencode remote defaults is also confirmed. The environment field (not env) is the correct key for local server environment variables. As of 2026-07-13 the docs document an optional cwd field for local servers (working directory for the server process; relative paths resolve from the workspace)."
 
   hooks:
     status: unsupported

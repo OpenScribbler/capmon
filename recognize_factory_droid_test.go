@@ -168,36 +168,50 @@ func TestRecognizeFactoryDroid_RealHooksLandmarks(t *testing.T) {
 }
 
 // realFactoryDroidAgentsLandmarks is a snapshot of the headings extracted from
-// Factory Droid's "Custom Droids (Subagents)" doc
-// (.capmon-cache/factory-droid/agents.0/extracted.json) as of 2026-04-17.
-// Mintlify zero-width space prefix on H2/H3/H4 entries handled transparently
-// by substring matchers.
+// Factory Droid's "Subagents" doc
+// (.capmon-cache/factory-droid/agents.0/extracted.json) as of 2026-07-13. The
+// page H1 was renamed from "Custom Droids (Subagents)" to "Subagents"; "Custom
+// droids" now appears as an H3 subsection. A "Selecting MCP servers" H3 (the
+// mcpServers per-droid field) is new. Mintlify zero-width space prefix on
+// H2/H3/H4 entries handled transparently by substring matchers.
 var realFactoryDroidAgentsLandmarks = []string{
-	"Custom Droids (Subagents)",
-	"\u200b1 · What are custom droids?",
-	"\u200b2 · Why use them?",
-	"\u200b3 · Quick start",
-	"\u200b4 · Configuration",
+	"Subagents",
+	"\u200b1 · What subagents are",
+	"\u200bCustom droids",
+	"\u200b2 · How subagents work",
+	"\u200bForeground vs. background",
+	"\u200bChecking back in on background tasks",
+	"\u200bResuming a previous subagent",
+	"\u200bRunning subagents in parallel",
+	"\u200b3 · Built-in subagents",
+	"\u200b4 · Controlling the autonomy level",
+	"\u200b5 · Controlling the model",
+	"\u200b6 · Enterprise controls",
+	"\u200b7 · Creating your own custom droid",
+	"\u200bAI-assisted droid generation",
+	"\u200b8 · Configuration",
 	"\u200bTool categories → concrete tools",
-	"\u200b5 · Managing droids in the UI",
-	"\u200b5.5 · Importing Claude Code subagents",
+	"\u200bSelecting MCP servers",
+	"\u200b9 · Managing droids in the UI",
+	"\u200b9.5 · Importing Claude Code subagents",
 	"\u200bHow to import",
 	"\u200bWhat happens during import",
 	"\u200bExample import flow",
 	"\u200bHandling tool validation errors",
-	"\u200b6 · Using custom droids effectively",
-	"\u200b7 · Examples",
+	"\u200b10 · Using subagents effectively",
+	"\u200b11 · Examples",
 	"\u200bCode reviewer (project scope)",
 	"\u200bSecurity sweeper (personal scope)",
 	"\u200bTask coordinator (with live progress)",
 }
 
 // TestRecognizeFactoryDroid_RealAgentsLandmarks proves agents recognition
-// emits 2 canonical agents keys at "inferred" confidence: definition_format
-// and tool_restrictions. The other 5 (invocation_patterns, agent_scopes,
-// model_selection, per_agent_mcp, subagent_spawning) must NOT be emitted —
-// no heading-level evidence in the agents doc, even though the curator marks
-// most of them supported from broader source knowledge.
+// emits 3 canonical agents keys at "inferred" confidence: definition_format,
+// tool_restrictions, and per_agent_mcp (the last newly mapped via the
+// "Selecting MCP servers" heading / mcpServers frontmatter field). The other 4
+// (invocation_patterns, agent_scopes, model_selection, subagent_spawning) must
+// NOT be emitted — no heading-level evidence in the agents doc, even though the
+// curator marks them supported from broader source knowledge.
 //
 // Test merges skills + hooks + agents fixtures to mirror real-world cache
 // merging — the agents recognizer must distinguish its capabilities from
@@ -219,7 +233,7 @@ func TestRecognizeFactoryDroid_RealAgentsLandmarks(t *testing.T) {
 	if caps["agents.supported"] != "true" {
 		t.Error("agents.supported missing")
 	}
-	for _, c := range []string{"definition_format", "tool_restrictions"} {
+	for _, c := range []string{"definition_format", "tool_restrictions", "per_agent_mcp"} {
 		key := "agents.capabilities." + c + ".supported"
 		if caps[key] != "true" {
 			t.Errorf("%s missing", key)
@@ -232,7 +246,6 @@ func TestRecognizeFactoryDroid_RealAgentsLandmarks(t *testing.T) {
 		"agents.capabilities.invocation_patterns.supported",
 		"agents.capabilities.agent_scopes.supported",
 		"agents.capabilities.model_selection.supported",
-		"agents.capabilities.per_agent_mcp.supported",
 		"agents.capabilities.subagent_spawning.supported",
 	} {
 		if _, has := caps[absent]; has {
@@ -388,7 +401,7 @@ var realFactoryDroidRulesLandmarks = []string{
 	"\u200bRecovery playbook:",
 	"\u200b10 · Getting started",
 	"Specification Mode",
-	"Auto-Run",
+	"Autonomy Level",
 	"\u200bSummary",
 }
 
@@ -469,9 +482,11 @@ func TestRecognizeFactoryDroid_RulesAnchorsMissing(t *testing.T) {
 
 // realFactoryDroidMcpLandmarks is a snapshot of the headings extracted from
 // Factory Droid's MCP doc (.capmon-cache/factory-droid/mcp.0/extracted.json)
-// as of 2026-04-28. The source URL switched from docs.factory.ai/llms.txt
-// (a 4-landmark navigation index) to docs.factory.ai/cli/configuration/mcp
-// (a 19-landmark Mintlify SPA fetched via chromedp).
+// as of 2026-07-13. The 2026-07-13 refetch adds sections for a third `sse`
+// transport, "OAuth Overrides", "Variable expansion" (env_var_expansion),
+// "Per-tool filtering", "MCP call timeout", "Per-droid server selection",
+// "Enterprise MCP policy" (enterprise_management), and "MCP autonomy URL
+// overrides".
 //
 // Mintlify landmarks have a leading zero-width space prefix on H2/H3 entries
 // (e.g. "\u200bAdding HTTP Servers"); substring matchers handle this transparently.
@@ -488,6 +503,7 @@ var realFactoryDroidMcpLandmarks = []string{
 	"\u200bPayments & Commerce",
 	"\u200bDesign & Media",
 	"\u200bInfrastructure & DevOps",
+	"\u200bAdding SSE Servers",
 	"\u200bAdding Stdio Servers",
 	"\u200bPopular Stdio MCP Servers",
 	"\u200bRemoving Servers",
@@ -496,14 +512,22 @@ var realFactoryDroidMcpLandmarks = []string{
 	"\u200bHow Layering Works",
 	"\u200bOAuth Tokens",
 	"\u200bConfiguration Schema",
+	"\u200bOAuth Overrides",
+	"\u200bVariable expansion",
+	"\u200bPer-tool filtering",
+	"\u200bMCP call timeout",
+	"\u200bPer-droid server selection",
+	"\u200bEnterprise MCP policy",
+	"\u200bMCP autonomy URL overrides",
 }
 
 // TestRecognizeFactoryDroid_RealMcpLandmarks proves MCP recognition fires from
-// the real docs page and emits 4 of 8 canonical MCP keys at "inferred"
-// confidence: transport_types, oauth_support, tool_filtering, marketplace.
-// The other 4 (env_var_expansion, auto_approve, resource_referencing,
-// enterprise_management) are curated as unsupported on the live page and must
-// NOT be emitted.
+// the real docs page and emits 6 of 8 canonical MCP keys at "inferred"
+// confidence: transport_types, oauth_support, tool_filtering, marketplace,
+// env_var_expansion (newly mapped via the "Variable expansion" heading), and
+// enterprise_management (newly mapped via the "Enterprise MCP policy" heading).
+// The other 2 (auto_approve, resource_referencing) remain undocumented on the
+// live page and must NOT be emitted.
 //
 // Test merges all five other content-type fixtures to mirror real-world cache
 // merging — the MCP recognizer must distinguish its capabilities from rules,
@@ -528,7 +552,7 @@ func TestRecognizeFactoryDroid_RealMcpLandmarks(t *testing.T) {
 	if caps["mcp.supported"] != "true" {
 		t.Error("mcp.supported missing")
 	}
-	for _, c := range []string{"transport_types", "oauth_support", "tool_filtering", "marketplace"} {
+	for _, c := range []string{"transport_types", "oauth_support", "tool_filtering", "marketplace", "env_var_expansion", "enterprise_management"} {
 		key := "mcp.capabilities." + c + ".supported"
 		if caps[key] != "true" {
 			t.Errorf("%s missing", key)
@@ -538,10 +562,8 @@ func TestRecognizeFactoryDroid_RealMcpLandmarks(t *testing.T) {
 		}
 	}
 	for _, absent := range []string{
-		"mcp.capabilities.env_var_expansion.supported",
 		"mcp.capabilities.auto_approve.supported",
 		"mcp.capabilities.resource_referencing.supported",
-		"mcp.capabilities.enterprise_management.supported",
 	} {
 		if _, has := caps[absent]; has {
 			t.Errorf("%s should NOT be present (curated as unsupported on the live page)", absent)

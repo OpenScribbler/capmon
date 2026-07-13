@@ -67,7 +67,7 @@ content_types:
         confidence: confirmed
       global_scope:
         supported: true
-        mechanism: skill directory placed under ~/.config/agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/
+        mechanism: skill directory placed under ~/.config/agents/skills/<name>/, ~/.agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/
         confidence: confirmed
       project_scope:
         supported: true
@@ -77,14 +77,6 @@ provider_exclusive:
   skills.creation_workflow:
     supported: true
     mechanism: documented under 'Creating Skills' heading
-    confidence: inferred
-  skills.executable_tools:
-    supported: true
-    mechanism: documented under 'Executable Tools in Skills' heading
-    confidence: inferred
-  skills.installation_workflow:
-    supported: true
-    mechanism: documented under 'Installing Skills' heading
     confidence: inferred
   skills.mcp_integration:
     supported: true

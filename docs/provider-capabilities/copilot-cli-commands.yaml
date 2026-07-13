@@ -4,7 +4,7 @@ format: ""
 proposed_mappings:
     - canonical_key: argument_substitution
       supported: false
-      mechanism: built-in slash commands accept literal positional arguments (e.g. /add-dir PATH, /skills info SKILL-NAME) but Copilot CLI does not document a user-authored custom-command mechanism with template-substitution syntax (no $ARGUMENTS, $1/$2, or {{args}} interpolation)
+      mechanism: Copilot CLI now documents a user-authored custom command format (.claude/commands/*.md with argument-hint / description / allowed-tools / disable-model-invocation fields — 'Commands (alternative skill format)' in cli-command-reference.md), but `argument-hint` is only a freeform display hint shown in the picker; no template-substitution syntax ($ARGUMENTS, $1/$2, {{args}}) is documented, so positional args are not interpolated into the command body
       source_field: ""
       source_value: ""
       confidence: inferred

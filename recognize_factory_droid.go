@@ -50,8 +50,13 @@ func factoryDroidLandmarkOptions() LandmarkOptions {
 // factoryDroidRulesLandmarkOptions returns the landmark patterns for Factory
 // Droid's AGENTS.md cross-provider rules doc. Anchors derived from
 // .capmon-cache/factory-droid/rules.0/extracted.json
-// (https://docs.factory.ai/cli/configuration — Mintlify SPA fetched via
-// chromedp).
+// (Mintlify SPA fetched via chromedp).
+//
+// The source URL moved 2026-07-13 from https://docs.factory.ai/cli/configuration
+// to https://docs.factory.ai/cli/configuration/agents-md — the old path now
+// serves the Sandbox page, while the AGENTS.md content relocated to the
+// agents-md path. The AGENTS.md section headings (and therefore all anchors
+// below) are materially unchanged by the move.
 //
 // Mintlify landmarks have a leading zero-width space prefix (e.g.
 // "​3 · File locations & discovery hierarchy"); substring matchers handle
@@ -130,34 +135,45 @@ func factoryDroidHooksLandmarkOptions() LandmarkOptions {
 }
 
 // factoryDroidAgentsLandmarkOptions returns the landmark patterns for Factory
-// Droid's "Custom Droids (Subagents)" doc. Anchors derived from
+// Droid's "Subagents" doc. Anchors derived from
 // .capmon-cache/factory-droid/agents.0/extracted.json
 // (https://docs.factory.ai/cli/configuration/custom-droids — Mintlify SPA).
 //
-// Maps 2 of 7 canonical agents keys at heading-level evidence:
+// The page H1 was renamed from "Custom Droids (Subagents)" to "Subagents"
+// (refetched 2026-07-13); "Custom droids" now appears as an H3 subsection under
+// "1 · What subagents are", so the "Custom Droids" required anchor (a
+// case-insensitive substring) still matches. The URL is unchanged.
+//
+// Maps 3 of 7 canonical agents keys at heading-level evidence:
 //   - definition_format → "Configuration" heading; .md files with system
 //     prompt, model preference, and tooling policy.
 //   - tool_restrictions → "Tool categories → concrete tools" heading; named
-//     tool categories (filesystem, shell, search, browser, web_fetch) rather
-//     than per-tool allowlists.
+//     tool categories (read-only, edit, execute, web, mcp) rather than per-tool
+//     allowlists.
+//   - per_agent_mcp → "Selecting MCP servers" heading; the mcpServers
+//     frontmatter field scopes a droid to a subset of configured MCP servers.
+//     Newly documented in the 2026-07-13 refetch (previously curated
+//     unsupported).
 //
-// Five keys are intentionally unmapped despite the curator (factory-droid.yaml)
+// Four keys are intentionally unmapped despite the curator (factory-droid.yaml)
 // marking them supported. The recognizer requires heading-level evidence; the
 // curator may mark capabilities supported from broader knowledge of the source:
-//   - invocation_patterns: documented in body text under "Using custom droids
+//   - invocation_patterns: documented in body text under "Using subagents
 //     effectively" but not as discrete invocation-mode headings.
 //   - agent_scopes: only example titles surface "(project scope)" and
 //     "(personal scope)" — these are example names, not scope-section
 //     headings, so the evidence is too weak for nested emission.
-//   - model_selection: no Model heading; per-droid model preference lives in
-//     YAML body of example configs, not as a section heading.
-//   - per_agent_mcp: no heading evidence; curator marks unsupported.
-//   - subagent_spawning: parent heading "Custom Droids (Subagents)" implies
-//     subagent semantics, and "Importing Claude Code subagents" describes
-//     interop, but no chain/spawn/delegate heading exists.
+//   - model_selection: "Controlling the model" is a routing/precedence section
+//     rather than a per-droid field heading; the model field itself lives in
+//     the Configuration table body.
+//   - subagent_spawning: parent heading "Subagents" implies subagent
+//     semantics, and "Importing Claude Code subagents" describes interop, but
+//     no chain/spawn/delegate heading exists (and subagents cannot spawn their
+//     own subagents).
 //
 // Required anchors are unique to agents.0:
-//   - "Custom Droids"          — H1, agents-specific
+//   - "Custom Droids"          — matches the "Custom droids" H3 (and the
+//     "Creating your own custom droid" / import example text); agents-specific.
 //   - "Tool categories"        — H3 ("Tool categories → concrete tools"),
 //     agents-specific (no other factory-droid doc uses this phrase).
 func factoryDroidAgentsLandmarkOptions() LandmarkOptions {
@@ -169,7 +185,9 @@ func factoryDroidAgentsLandmarkOptions() LandmarkOptions {
 		AgentsLandmarkPattern("definition_format", "Configuration",
 			"single-file .md droids with system prompt, model preference, and tooling policy documented under 'Configuration' heading", required),
 		AgentsLandmarkPattern("tool_restrictions", "Tool categories",
-			"categorical tool policy using named categories (filesystem, shell, search, browser, web_fetch) documented under 'Tool categories → concrete tools' heading", required),
+			"categorical tool policy using named categories (read-only, edit, execute, web, mcp) documented under 'Tool categories → concrete tools' heading", required),
+		AgentsLandmarkPattern("per_agent_mcp", "Selecting MCP servers",
+			"per-droid MCP scoping via the mcpServers frontmatter field documented under 'Selecting MCP servers' heading", required),
 	)
 }
 
@@ -185,25 +203,31 @@ func factoryDroidAgentsLandmarkOptions() LandmarkOptions {
 // zero-width space prefix on H2/H3 entries (e.g. "​OAuth Tokens"); substring
 // matchers handle this transparently.
 //
-// Maps 4 of 8 canonical MCP keys at heading-level evidence:
+// Maps 6 of 8 canonical MCP keys at heading-level evidence:
 //   - transport_types  → "Adding HTTP Servers" + "Adding Stdio Servers"
-//     section structure documents both http and stdio transports.
+//     section structure (plus "Adding SSE Servers") documents http, sse, and
+//     stdio transports.
 //   - oauth_support    → "OAuth Tokens" heading documents Factory's
-//     OS-keyring OAuth-token storage flow for HTTP MCP servers.
+//     OS-keyring OAuth-token storage flow for HTTP/SSE MCP servers.
 //   - tool_filtering   → "Configuration Schema" heading exposes the
-//     `disabledTools` field for per-server tool allowlisting.
+//     enabledTools/disabledTools fields for per-server tool filtering.
 //   - marketplace      → "Quick Start: Add from Registry" heading documents
 //     the 40+ pre-configured server catalog (Linear, GitHub, Stripe, etc.).
+//   - env_var_expansion → "Variable expansion" heading documents ${VAR} /
+//     ${VAR:-default} expansion in mcp.json. Newly documented in the
+//     2026-07-13 refetch (previously only --env flags were documented).
+//   - enterprise_management → "Enterprise MCP policy" heading documents the
+//     org-managed mcpPolicy allowlist (and mcpAutonomyUrlOverrides). Flipped
+//     from curated-unsupported to supported in the 2026-07-13 refetch.
 //
-// Four canonical keys are intentionally unmapped per the curated YAML
+// Two canonical keys are intentionally unmapped per the curated YAML
 // (docs/provider-formats/factory-droid.yaml) — the live MCP docs page does
 // not document them:
-//   - env_var_expansion: no ${VAR} expansion syntax documented.
-//   - auto_approve: no auto-approve / trust-list capability documented.
+//   - auto_approve: no user-facing per-server auto-approve / trust-list toggle
+//     documented. (mcpAutonomyUrlOverrides classifies per-URL autonomy risk but
+//     is an admin-managed autonomy floor, not a per-server approve toggle.)
 //   - resource_referencing: no @-mention or resource-pinning syntax
 //     documented for MCP server outputs.
-//   - enterprise_management: no fleet/policy/admin-controlled MCP server
-//     management documented.
 //
 // Required anchors are unique to mcp.0:
 //   - "Configuration Schema" — H2; mcp-doc-specific, absent from skills,
@@ -216,13 +240,17 @@ func factoryDroidMcpLandmarkOptions() LandmarkOptions {
 	}
 	return McpLandmarkOptions(
 		McpLandmarkPattern("transport_types", "Adding HTTP Servers",
-			"http and stdio transports documented under 'Adding HTTP Servers' and 'Adding Stdio Servers' headings", required),
+			"http, sse, and stdio transports documented under 'Adding HTTP Servers', 'Adding SSE Servers', and 'Adding Stdio Servers' headings", required),
 		McpLandmarkPattern("oauth_support", "OAuth Tokens",
-			"OS-keyring OAuth-token storage for HTTP MCP servers documented under 'OAuth Tokens' heading", required),
+			"OS-keyring OAuth-token storage for HTTP/SSE MCP servers documented under 'OAuth Tokens' heading", required),
 		McpLandmarkPattern("tool_filtering", "Configuration Schema",
-			"per-server tool allowlisting via the `disabledTools` field documented under 'Configuration Schema' heading", required),
+			"per-server tool filtering via enabledTools/disabledTools fields documented under 'Configuration Schema' / 'Per-tool filtering' headings", required),
 		McpLandmarkPattern("marketplace", "Quick Start: Add from Registry",
 			"40+ pre-configured MCP servers (Linear, GitHub, Stripe, etc.) documented under 'Quick Start: Add from Registry' heading", required),
+		McpLandmarkPattern("env_var_expansion", "Variable expansion",
+			"${VAR} and ${VAR:-default} expansion in mcp.json documented under 'Variable expansion' heading", required),
+		McpLandmarkPattern("enterprise_management", "Enterprise MCP policy",
+			"org-managed mcpPolicy allowlist and mcpAutonomyUrlOverrides documented under 'Enterprise MCP policy' heading", required),
 	)
 }
 

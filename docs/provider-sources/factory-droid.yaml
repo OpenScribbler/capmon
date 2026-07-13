@@ -35,7 +35,9 @@ content_types:
 
   rules:
     sources:
-      - url: https://docs.factory.ai/cli/configuration
+      # URL moved 2026-07-13: the AGENTS.md doc relocated from
+      # /cli/configuration (now the Sandbox page) to /cli/configuration/agents-md.
+      - url: https://docs.factory.ai/cli/configuration/agents-md
         type: docs
         format: html
         fetch_method: chromedp

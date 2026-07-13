@@ -22,7 +22,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: model_selection
       supported: true
-      mechanism: 'model frontmatter field accepts sonnet/opus/haiku alias, full model ID (e.g. claude-opus-4-7), or inherit (default); resolution order: CLAUDE_CODE_SUBAGENT_MODEL env var > per-invocation model param > frontmatter model > main conversation model'
+      mechanism: 'model frontmatter field accepts sonnet/opus/haiku/fable alias, full model ID (e.g. claude-opus-4-8, claude-sonnet-5), or inherit (default); resolution order: CLAUDE_CODE_SUBAGENT_MODEL env var > per-invocation model param > frontmatter model > main conversation model (CC v2.1.196+: CLAUDE_CODE_SUBAGENT_MODEL=inherit behaves as unset rather than forcing the main model)'
       source_field: ""
       source_value: ""
       confidence: confirmed

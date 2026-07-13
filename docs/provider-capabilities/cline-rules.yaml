@@ -16,7 +16,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: cross_provider_recognition
       supported: true
-      mechanism: 'multi_source_rule_detection: Cline reads .clinerules/, .cursorrules, CLAUDE.md, and other provider rule files automatically'
+      mechanism: 'multi_source_rule_detection: Cline auto-detects rules from .clinerules/, .cursorrules, .windsurfrules, and AGENTS.md (including ~/.agents/AGENTS.md) — documented under ''Supported Rule Types''. CLAUDE.md is no longer listed in the supported rule-type table (dropped in favor of the AGENTS.md standard).'
       source_field: ""
       source_value: ""
       confidence: confirmed

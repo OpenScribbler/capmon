@@ -4,7 +4,7 @@ format: ""
 proposed_mappings:
     - canonical_key: auto_invocable
       supported: true
-      mechanism: Cline auto-invokes skills by matching user message against the description frontmatter field via the use_skill tool; no explicit @-mention syntax exists.
+      mechanism: Cline auto-invokes skills by matching the user message against the description frontmatter field via the use_skill tool; enabled skills can additionally be triggered explicitly by slash command (see user_invocable) — documented under 'How Skills Work' / 'Triggering Skills with Slash Commands'
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -63,8 +63,8 @@ proposed_mappings:
       source_value: ""
       confidence: confirmed
     - canonical_key: user_invocable
-      supported: false
-      mechanism: ""
+      supported: true
+      mechanism: Enabled skills can be invoked explicitly from the chat input via slash command (/<skill-name>, e.g. /aws-deploy), which forces Cline to load that skill's SKILL.md — documented under 'Triggering Skills with Slash Commands'
       source_field: ""
       source_value: ""
       confidence: confirmed

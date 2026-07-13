@@ -40,7 +40,7 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: tool_restrictions
       supported: true
-      mechanism: groups array declares which tool groups (e.g., read, edit, browser, command, mcp) the mode may use; group entries may be strings or objects with fileRegex restrictions
+      mechanism: groups array declares which tool groups (read, edit, command, mcp) the mode may use; entries may be strings or [group, {fileRegex, description}] tuples for path-scoped edit access. The legacy 'browser' group is deprecated and stripped on load per mode.ts deprecatedToolGroups
       source_field: ""
       source_value: ""
       confidence: confirmed
