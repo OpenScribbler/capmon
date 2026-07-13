@@ -7,16 +7,21 @@ import (
 )
 
 // realZedRulesLandmarks is a snapshot of the rules-relevant headings + filename
-// landmarks extracted from zed's HTML rules doc
-// (.capmon-cache/zed/rules.1/extracted.json) as of 2026-04-16. The HTML
-// extractor surfaces both H2/H3 headings and the inline <code> filename
-// listings under the ".rules files" section.
+// landmarks extracted from zed's HTML instructions doc
+// (zed.dev/docs/ai/instructions) as of 2026-07-13 — the successor to the
+// retired docs/ai/rules page (drift issue #17). The HTML extractor surfaces
+// both H1/H2 headings and the inline <code> filename listings under the
+// "Project Instructions" section.
 //
 // rules.0 (zed's own .rules instance file with Rust coding guidelines) is
 // intentionally not included — instance content is not capability vocabulary.
 var realZedRulesLandmarks = []string{
-	"Rules",
-	".rules files",
+	"Instructions",
+	"Personal Instructions",
+	"Project Instructions",
+	"Instruction File Support",
+	"Instructions vs. Skills",
+	"Migrating from Rules",
 	".rules",
 	".cursorrules",
 	".windsurfrules",
@@ -26,14 +31,7 @@ var realZedRulesLandmarks = []string{
 	"AGENTS.md",
 	"CLAUDE.md",
 	"GEMINI.md",
-	"Rules Library",
-	"Opening the Rules Library",
-	"Managing Rules",
-	"Creating Rules",
-	"Using Rules",
-	"Default Rules",
-	"Slash Commands in Rules",
-	"Migrating from Prompt Library",
+	"~/.config/zed/AGENTS.md",
 }
 
 func TestRecognizeZed_RealRulesLandmarks(t *testing.T) {
@@ -52,7 +50,6 @@ func TestRecognizeZed_RealRulesLandmarks(t *testing.T) {
 	}
 	rulesInferred := []string{
 		"activation_mode.always",
-		"activation_mode.manual",
 		"cross_provider_recognition.agents_md",
 		"cross_provider_recognition.claude_md",
 		"cross_provider_recognition.gemini_md",
@@ -75,6 +72,9 @@ func TestRecognizeZed_RealRulesLandmarks(t *testing.T) {
 		"rules.capabilities.hierarchical_loading.supported",
 		"rules.capabilities.activation_mode.model_decision.supported",
 		"rules.capabilities.activation_mode.glob.supported",
+		// Library slash-command rules became Skills in the 2026-07
+		// instructions restructure — no longer rules vocabulary.
+		"rules.capabilities.activation_mode.manual.supported",
 	} {
 		if _, has := caps[absent]; has {
 			t.Errorf("%s should NOT be present for zed", absent)
@@ -83,12 +83,12 @@ func TestRecognizeZed_RealRulesLandmarks(t *testing.T) {
 }
 
 // TestRecognizeZed_RulesAnchorsMissing proves the anchor-missing guardrail.
-// Stripping "Migrating from Prompt Library" — one of the required anchors —
+// Stripping "Migrating from Rules" — one of the required anchors —
 // suppresses recognition.
 func TestRecognizeZed_RulesAnchorsMissing(t *testing.T) {
 	mutated := []string{}
 	for _, lm := range realZedRulesLandmarks {
-		if lm == "Migrating from Prompt Library" {
+		if lm == "Migrating from Rules" {
 			continue
 		}
 		mutated = append(mutated, lm)

@@ -4,55 +4,55 @@ format: ""
 proposed_mappings:
     - canonical_key: async_execution
       supported: false
-      mechanism: Copilot CLI hooks run synchronously; no async execution documented
+      mechanism: Copilot CLI hooks run synchronously; no async execution documented (only the notification event itself fires asynchronously)
       source_field: ""
       source_value: ""
       confidence: inferred
     - canonical_key: context_injection
-      supported: false
-      mechanism: Copilot CLI hooks cannot inject context into the agent session
+      supported: true
+      mechanism: postToolUse and sessionStart output field additionalContext injects text into the agent session — documented under 'postToolUse output' and the sessionStart row of 'Hook events'
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: decision_control
       supported: true
-      mechanism: 'pre_tool_use_deny: Copilot CLI PreToolUse hooks can deny (block) the tool invocation; no allow or modify documented'
+      mechanism: preToolUse returns permissionDecision allow/deny/ask (+ modifiedArgs); agentStop/subagentStop return decision block/allow to force another agent turn; permissionRequest returns behavior allow/deny ahead of the permission service — documented under the per-event 'decision control' headings
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: handler_types
-      supported: false
-      mechanism: Copilot CLI hooks execute shell commands only; no HTTP, LLM prompt, or agent handler types documented
+      supported: true
+      mechanism: 'three handler types: command hooks (bash/powershell scripts), HTTP hooks (POST requests), and prompt hooks (auto-submitted text, sessionStart only) — documented under ''Hook configuration format'''
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: hook_scopes
-      supported: false
-      mechanism: Copilot CLI hooks are configured at a single scope level; no multi-scope configuration documented
+      supported: true
+      mechanism: 'hooks load and combine from four scopes in order: policy-level files, user-level (~/.copilot), project (.github/hooks/*.json plus settings.json inline blocks), and plugin-contributed — documented under ''Hooks locations'''
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: input_modification
-      supported: false
-      mechanism: Copilot CLI hooks cannot modify tool input before execution
+      supported: true
+      mechanism: preToolUse output field modifiedArgs substitutes tool arguments before execution — documented under 'preToolUse decision control'
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: json_io_protocol
-      supported: false
-      mechanism: Copilot CLI hooks communicate via exit codes; no JSON stdin/stdout protocol documented
+      supported: true
+      mechanism: hooks receive event-specific JSON payloads on stdin (inline schema per event under 'Hook event input payloads') and return JSON decision/output objects on stdout (preToolUse, postToolUse, agentStop, permissionRequest)
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: matcher_patterns
-      supported: false
-      mechanism: Copilot CLI hooks fire on all events of their configured type; no per-tool filtering documented
+      supported: true
+      mechanism: optional 'matcher' regex per hook entry, compiled as ^(?:PATTERN)$ full-match against toolName (preToolUse/postToolUse/permissionRequest), notification_type, preCompact trigger, or subagent agentName — documented under 'Matcher filtering' / 'Tool names for hook matching'
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed
     - canonical_key: permission_control
-      supported: false
-      mechanism: Copilot CLI hooks can deny tool invocations (decision_control) but do not govern tool availability
+      supported: true
+      mechanism: permissionRequest hook fires before the permission service (rule checks, session approvals, auto-allow/deny, user prompting) and its behavior allow/deny decision preempts it — documented under 'permissionRequest decision control' (CLI only; cloud agent pre-approves tools)
       source_field: ""
       source_value: ""
-      confidence: inferred
+      confidence: confirmed

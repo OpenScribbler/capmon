@@ -46,7 +46,7 @@ content_types:
         format: markdown
         extracts: [file_format]
 
-      - url: https://zed.dev/docs/ai/rules
+      - url: https://zed.dev/docs/ai/instructions
         type: docs
         format: html
         extracts: [file_format, file_locations, features]

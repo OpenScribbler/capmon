@@ -34,10 +34,13 @@ var realAmpRulesLandmarks = []string{
 }
 
 // realAmpHooksLandmarks is a snapshot of the headings from amp's permissions
-// reference doc (.capmon-cache/amp/hooks.1/extracted.json — permissions-
-// reference.md) as of 2026-04-16. The hooks.0 doc (hooks.md) emits only a
-// single landmark "Hooks" — too thin to anchor on — so amp's hooks recognition
-// uses the permissions doc instead. Update when the upstream doc evolves.
+// reference doc — since 2026-07 served at
+// ampcode.com/manual/appendix/legacy-permissions-rules.txt (hooks.0), the
+// verbatim home of the former permissions-reference.md after amp moved to
+// plugin-based permissions (drift issue #3); headings are unchanged. The
+// retired hooks.md doc emitted only a single landmark "Hooks" — too thin to
+// anchor on — so amp's hooks recognition uses the permissions doc instead.
+// Update when the upstream doc evolves.
 var realAmpHooksLandmarks = []string{
 	"Permissions Reference",
 	"How Permissions Work",

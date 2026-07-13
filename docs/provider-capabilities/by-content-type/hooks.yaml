@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-11T23:55:29Z
+# Generated at: 2026-07-13T06:52:00Z
 
 content_type: hooks
 providers:
@@ -105,11 +105,11 @@ providers:
         capabilities:
             handler_types:
                 supported: true
-                mechanism: hook handler types documented under 'Hook types' heading (session, prompt, tool, error)
+                mechanism: three hook handler types - command (shell), HTTP (POST), and prompt hooks - documented under 'Hook configuration format' -> 'Command hooks' / 'HTTP hooks' / 'Prompt hooks' headings
                 confidence: inferred
             json_io_protocol:
                 supported: true
-                mechanism: JSON I/O protocol documented under 'Reading input' / 'Outputting JSON' headings
+                mechanism: hooks receive event-specific JSON on stdin (inline schema per event under 'Hook event input payloads') and return JSON decision output (per-event 'decision control' / 'postToolUse output' headings)
                 confidence: inferred
     cursor:
         supported: true

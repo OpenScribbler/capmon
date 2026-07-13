@@ -49,7 +49,7 @@ content_types:
 
   hooks:
     sources:
-      - url: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/hooks-configuration.md
+      - url: https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/hooks-reference.md
         type: docs
         format: markdown
         extracts: [event_names, event_io_schemas, hook_config_fields, matcher_format]

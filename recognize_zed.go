@@ -4,51 +4,49 @@ func init() {
 	RegisterRecognizer("zed", RecognizerKindDoc, recognizeZed)
 }
 
-// zedRulesLandmarkOptions returns the landmark patterns for Zed's rules
-// documentation. Anchors derived from .capmon-cache/zed/rules.1/extracted.json
-// (the HTML doc at zed.dev/docs/ai/rules). rules.0 is zed's own .rules
-// instance file (their internal Rust coding guidelines) and intentionally NOT
-// used as evidence — instance content is not capability vocabulary.
+// zedRulesLandmarkOptions returns the landmark patterns for Zed's
+// instructions documentation. Anchors derived from the HTML doc at
+// zed.dev/docs/ai/instructions — the 2026-07 successor to
+// zed.dev/docs/ai/rules (drift issue #17): Zed renamed Rules to
+// Instructions and split the old feature in two. Always-on rules became
+// AGENTS.md instructions (personal + project); reusable on-demand Library
+// rules became Skills — a different content type, so activation_mode.manual
+// (previously anchored on 'Slash Commands in Rules') is no longer part of
+// zed's rules vocabulary and is intentionally unmapped. rules.0 is zed's
+// own .rules instance file (their internal Rust coding guidelines) and
+// intentionally NOT used as evidence — instance content is not capability
+// vocabulary.
 //
-// NOTE: The seeder spec drafted cross_provider_recognition as unsupported, but
-// the live cache landmarks include AGENTS.md, AGENT.md, CLAUDE.md, GEMINI.md,
-// .cursorrules, .windsurfrules, .clinerules, and .github/copilot-instructions.md
-// listed under the ".rules files" section. Zed explicitly recognizes all of
-// these as fallback rule-file names. The recognizer trusts the live cache
-// over the draft spec.
+// The new page also documents a personal scope (~/.config/zed/AGENTS.md,
+// project file wins on conflict). hierarchical_loading stays unmapped: two
+// fixed file locations are not directory-level traversal with subdirectory
+// overrides.
 //
-// Required anchors are unique to the rules doc:
-//   - "Rules Library" (in-app library — distinctive zed feature)
-//   - "Migrating from Prompt Library" (zed-specific migration heading)
-//
-// Per the spec notes, zed's distinctive activation_mode is slash_command
-// (Library rules invoked via slash command). Project-root .rules + Library
-// Default Rules cover always_on. No frontmatter glob, manual, or
-// model_decision modes documented. No file_imports or auto_memory. No
-// hierarchical loading documented (project-root only, first-match wins among
-// the recognized filenames).
+// Required anchors are unique to the instructions doc:
+//   - "Instruction File Support" — H2, the per-file compatibility table.
+//     Other zed docs use "Agent Settings" (agents.2) or "Agent Panel
+//     Usage" (mcp.1).
+//   - "Migrating from Rules"     — H2, the rename's own migration heading.
 func zedRulesLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
-		{Kind: "substring", Value: "Rules Library", CaseInsensitive: true},
-		{Kind: "substring", Value: "Migrating from Prompt Library", CaseInsensitive: true},
+		{Kind: "substring", Value: "Instruction File Support", CaseInsensitive: true},
+		{Kind: "substring", Value: "Migrating from Rules", CaseInsensitive: true},
 	}
 	return RulesLandmarkOptions(
-		RulesLandmarkPattern("activation_mode.always", ".rules files",
-			"project-root .rules file (or first-match fallback name) auto-included in every Agent Panel interaction; Library entries marked as Default Rules also load always_on (documented under '.rules files' / 'Default Rules')", required),
-		RulesLandmarkPattern("activation_mode.manual", "Slash Commands in Rules",
-			"Library rules invoked via slash command to inject the rule into the current agent context (documented under 'Slash Commands in Rules')", required),
+		RulesLandmarkPattern("activation_mode.always", "Project Instructions",
+			"instructions are always-on context: personal ~/.config/zed/AGENTS.md applies to every project, and the first-match project-root instruction file applies to the current project, overriding personal on conflict (documented under 'Personal Instructions' / 'Project Instructions')", required),
 		RulesLandmarkPattern("cross_provider_recognition.agents_md", "AGENTS.md",
-			"AGENTS.md (and AGENT.md) recognized as fallback rule-file names in project root, first match wins (documented under '.rules files')", required),
+			"AGENTS.md is the primary instruction file (personal + project); AGENT.md also recognized in the project first-match list (documented under 'Project Instructions')", required),
 		RulesLandmarkPattern("cross_provider_recognition.claude_md", "CLAUDE.md",
-			"CLAUDE.md recognized as fallback rule-file name in project root, first match wins (documented under '.rules files')", required),
+			"CLAUDE.md recognized in the project-root first-match list (documented under 'Project Instructions' / 'Instruction File Support')", required),
 		RulesLandmarkPattern("cross_provider_recognition.gemini_md", "GEMINI.md",
-			"GEMINI.md recognized as fallback rule-file name in project root, first match wins (documented under '.rules files')", required),
+			"GEMINI.md recognized in the project-root first-match list (documented under 'Project Instructions')", required),
 		RulesLandmarkPattern("cross_provider_recognition.cursorrules", ".cursorrules",
-			".cursorrules recognized as fallback rule-file name in project root, first match wins (documented under '.rules files')", required),
+			".cursorrules recognized in the project-root first-match list (documented under 'Project Instructions')", required),
 		RulesLandmarkPattern("cross_provider_recognition.windsurfrules", ".windsurfrules",
-			".windsurfrules recognized as fallback rule-file name in project root, first match wins (documented under '.rules files')", required),
+			".windsurfrules recognized in the project-root first-match list (documented under 'Project Instructions')", required),
 		RulesLandmarkPattern("cross_provider_recognition.clinerules", ".clinerules",
-			".clinerules recognized as fallback rule-file name in project root, first match wins (documented under '.rules files')", required),
+			".clinerules recognized in the project-root first-match list (documented under 'Project Instructions')", required),
 	)
 }
 
@@ -133,7 +131,7 @@ func zedMcpLandmarkOptions() LandmarkOptions {
 //
 // Required anchors are unique to agents.2:
 //   - "Agent Settings"            — H1, agents-specific. Other zed docs use
-//     "Agent Panel Usage" (mcp.1) or "Rules Library" (rules.1), not "Agent
+//     "Agent Panel Usage" (mcp.1) or "Instructions" (rules.1), not "Agent
 //     Settings".
 //   - "Per-tool Permission Rules" — H3, agents-specific. mcp.1 uses just
 //     "Tool Permissions"; this longer phrase appears nowhere else.
