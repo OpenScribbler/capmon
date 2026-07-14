@@ -40,7 +40,7 @@ func windsurfRulesLandmarkOptions() LandmarkOptions {
 		RulesLandmarkPattern("auto_memory", "How to Manage Memories",
 			"Cascade-managed Memories layer auto-writes context based on conversation (documented under 'Memories & Rules' / 'How to Manage Memories')", required),
 		RulesLandmarkPattern("hierarchical_loading", "Rules Storage Locations",
-			".windsurf/rules scanned in current workspace, sub-directories, and parent dirs up to git root (documented under 'Rules Discovery' / 'Rules Storage Locations')", required),
+			".devin/rules/ (preferred; .windsurf/rules/ legacy fallback) scanned in current workspace, sub-directories, and parent dirs up to git root (documented under 'Rules Discovery' / 'Rules Storage Locations')", required),
 	)
 }
 

@@ -54,19 +54,19 @@ content_types:
         capabilities:
           agents_md:
             supported: true
-            mechanism: AGENTS.md read from project root and parent directories; global at ~/.config/opencode/AGENTS.md
+            mechanism: 'AGENTS.md read from project root and parent directories; global at ~/.config/opencode/AGENTS.md (documented under ''Types'' / ''Project'' / ''Global'' headings)'
             confidence: confirmed
           claude_md:
             supported: true
-            mechanism: 'CLAUDE.md fallback at project root and ~/.claude/CLAUDE.md globally when no AGENTS.md exists; disable via OPENCODE_DISABLE_CLAUDE_CODE=1'
+            mechanism: 'CLAUDE.md fallback at project root and ~/.claude/CLAUDE.md globally when no AGENTS.md exists; disable via OPENCODE_DISABLE_CLAUDE_CODE=1 (documented under ''Claude Code Compatibility'')'
             confidence: confirmed
       file_imports:
         supported: true
-        mechanism: instructions array in opencode.json (or the global ~/.config/opencode/opencode.json) lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context
+        mechanism: 'instructions array in opencode.json (or the global ~/.config/opencode/opencode.json) lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context (documented under ''Referencing External Files'' / ''Using opencode.json'')'
         confidence: confirmed
       hierarchical_loading:
         supported: true
-        mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md appended; all matching files combined
+        mechanism: 'AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md appended; all matching files combined (documented under ''Types'' / ''Precedence'')'
         confidence: confirmed
   hooks:
     supported: false
@@ -75,7 +75,7 @@ content_types:
     capabilities:
       enterprise_management:
         supported: true
-        mechanism: organizations publish default MCP server configs via a .well-known/opencode endpoint; local opencode.json values override remote defaults
+        mechanism: 'organizations publish default MCP server configs via a .well-known/opencode endpoint; local opencode.json values override remote defaults (documented under ''Enable'' / ''Overriding remote defaults'')'
         confidence: confirmed
       env_var_expansion:
         supported: true
@@ -83,15 +83,15 @@ content_types:
         confidence: confirmed
       oauth_support:
         supported: true
-        mechanism: 'OAuth 2.0 with Dynamic Client Registration (RFC 7591): 401 auto-detected, tokens stored in ~/.local/share/opencode/mcp-auth.json; oauth object for pre-registered credentials or oauth: false to disable'
+        mechanism: 'OAuth 2.0 with Dynamic Client Registration (RFC 7591): 401 auto-detected, tokens stored in ~/.local/share/opencode/mcp-auth.json; oauth object for pre-registered credentials or oauth: false to disable (documented under ''OAuth'' / ''Authenticating'' / ''OAuth Options'')'
         confidence: confirmed
       tool_filtering:
         supported: true
-        mechanism: global tools map keyed by server-name prefix with glob patterns (e.g. mymcp_*); per-agent access via the agent permission map
+        mechanism: 'global tools map keyed by server-name prefix with glob patterns (e.g. mymcp_*); per-agent access via the agent permission map (documented under ''Manage'' / ''Global'' / ''Per agent'' / ''Glob patterns'')'
         confidence: confirmed
       transport_types:
         supported: true
-        mechanism: 'two types under the mcp key in opencode.json: local (stdio, launched via command array) and remote (HTTP/SSE streamable, connected via url)'
+        mechanism: 'two types under the mcp key in opencode.json: local (stdio, launched via command array) and remote (HTTP/SSE streamable, connected via url) (documented under ''Local'' / ''Remote'' headings)'
         confidence: confirmed
   agents:
     supported: true
@@ -102,22 +102,22 @@ content_types:
         confidence: confirmed
       definition_format:
         supported: true
-        mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key
+        mechanism: 'markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key (documented under ''Configure'' / ''Markdown'' / ''Create agents'')'
         confidence: confirmed
       invocation_patterns:
         supported: true
         capabilities:
           at_mention:
             supported: true
-            mechanism: subagents invoked manually by @-mentioning the subagent name in a message; agent name derives from the filename
+            mechanism: 'subagents invoked manually by @-mentioning the subagent name in a message; agent name derives from the filename (documented under ''Subagents'')'
             confidence: confirmed
           natural_language:
             supported: true
-            mechanism: subagents invoked automatically by primary agents for specialized tasks based on their description field
+            mechanism: 'subagents invoked automatically by primary agents for specialized tasks based on their description field (documented under ''Subagents'')'
             confidence: confirmed
       model_selection:
         supported: true
-        mechanism: frontmatter model field (provider/model-id format) overrides the session default; subagents default to the invoking primary agent's model
+        mechanism: 'frontmatter model field (provider/model-id format) overrides the session default; subagents default to the invoking primary agent''s model (documented under ''Model'')'
         confidence: confirmed
       per_agent_mcp:
         supported: false
@@ -125,20 +125,20 @@ content_types:
         confidence: confirmed
       subagent_spawning:
         supported: true
-        mechanism: 'agents with mode: subagent (or all) are invocable from other agents via the Task tool, driven by the callee''s description; permission.task on the orchestrator controls which subagents it may invoke'
+        mechanism: 'agents with mode: subagent (or all) are invocable from other agents via the Task tool, driven by the callee''s description; permission.task on the orchestrator controls which subagents it may invoke (documented under ''Task permissions'')'
         confidence: confirmed
       tool_restrictions:
         supported: true
-        mechanism: permission frontmatter map configures ask/allow/deny per tool using named keys or wildcard glob patterns; fine-grained keys accept glob/pattern-to-action objects
+        mechanism: 'permission frontmatter map configures ask/allow/deny per tool using named keys or wildcard glob patterns; fine-grained keys accept glob/pattern-to-action objects (documented under ''Permissions'')'
         confidence: confirmed
   commands:
     supported: true
     capabilities:
       argument_substitution:
         supported: true
-        mechanism: $ARGUMENTS carries all arguments as a single string; positional $1/$2/$3 carry individual arguments — substituted from user input at invocation time
+        mechanism: '$ARGUMENTS carries all arguments as a single string; positional $1/$2/$3 carry individual arguments — substituted from user input at invocation time (documented under ''Arguments'')'
         confidence: confirmed
       builtin_commands:
         supported: true
-        mechanism: built-in /init, /undo, /redo, /share, /help; custom commands override built-ins when given the same name
+        mechanism: 'built-in /init, /undo, /redo, /share, /help; custom commands override built-ins when given the same name (documented under ''Built-in'')'
         confidence: confirmed

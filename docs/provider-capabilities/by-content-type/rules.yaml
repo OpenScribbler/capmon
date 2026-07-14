@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:45:36Z
+# Generated at: 2026-07-14T18:55:16Z
 
 content_type: rules
 providers:
@@ -250,19 +250,19 @@ providers:
                 capabilities:
                     agents_md:
                         supported: true
-                        mechanism: AGENTS.md read from project root and parent directories; global at ~/.config/opencode/AGENTS.md
+                        mechanism: AGENTS.md read from project root and parent directories; global at ~/.config/opencode/AGENTS.md (documented under 'Types' / 'Project' / 'Global' headings)
                         confidence: confirmed
                     claude_md:
                         supported: true
-                        mechanism: CLAUDE.md fallback at project root and ~/.claude/CLAUDE.md globally when no AGENTS.md exists; disable via OPENCODE_DISABLE_CLAUDE_CODE=1
+                        mechanism: CLAUDE.md fallback at project root and ~/.claude/CLAUDE.md globally when no AGENTS.md exists; disable via OPENCODE_DISABLE_CLAUDE_CODE=1 (documented under 'Claude Code Compatibility')
                         confidence: confirmed
             file_imports:
                 supported: true
-                mechanism: instructions array in opencode.json (or the global ~/.config/opencode/opencode.json) lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context
+                mechanism: instructions array in opencode.json (or the global ~/.config/opencode/opencode.json) lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context (documented under 'Referencing External Files' / 'Using opencode.json')
                 confidence: confirmed
             hierarchical_loading:
                 supported: true
-                mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md appended; all matching files combined
+                mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md appended; all matching files combined (documented under 'Types' / 'Precedence')
                 confidence: confirmed
     windsurf:
         supported: true
