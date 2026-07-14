@@ -116,13 +116,13 @@ content_types:
       - id: system_scope
         name: System Scope (Embedded Skills Cache)
         summary: "Fourth scope beyond Repo/User/Admin: embedded skills cached under $CODEX_HOME/skills/.system; symlinks not followed."
-        source_ref: "loader.rs (skill_roots_from_layer_stack_inner, discover_skills_under_root follow_symlinks logic)"
+        source_ref: "loader.rs (skill_roots_from_layer_stack_inner assembles the $CODEX_HOME/skills/.system system cache; load_skills_under_root applies DirectorySymlinkPolicy::Ignore for SkillScope::System so symlinks are not followed)"
         graduation_candidate: false
         conversion: not-portable
       - id: plugin_scope
         name: Plugin Scope
         summary: "Externally-injected plugin_skill_roots assigned User scope with namespaced name prefix; no config file required."
-        source_ref: "loader.rs (skill_roots_with_home_dir, namespaced_skill_name, plugin_namespace_for_skill_path)"
+        source_ref: "loader.rs (skill_roots_with_home_dir extends roots with plugin_skill_roots; load_skill_root assigns User scope carrying plugin_namespace; SkillNamespaceResolver.for_skill().qualify() computes the namespaced skill name)"
         graduation_candidate: false
         conversion: not-portable
       - id: monorepo_traversal
@@ -169,10 +169,11 @@ content_types:
       .system) are all present. Notable renames: the frontmatter struct SkillFrontmatterMetadata
       is now SkillMetadata; SkillsManager became SkillsService (#28705); plugin/system helper
       functions were reorganized (namespaced_skill_name / plugin_namespace_for_skill_path /
-      discover_skills_under_root are gone, replaced by plugin_namespace / namespace_resolver /
-      per-root walk logic). The plugin_scope and system_scope extension source_refs still name the
-      old helper functions and are stale (capabilities intact) — a maintainer may want to refresh
-      those symbol names.
+      discover_skills_under_root are gone, replaced by plugin_namespace / SkillNamespaceResolver /
+      per-root walk logic (load_skills_under_root, discover_skills, load_skill_root)). 2026-07-14:
+      the plugin_scope and system_scope extension source_refs above were refreshed to the current
+      loader.rs symbols (verified live on github.com/openai/codex main) — capabilities were always
+      intact; only the cited helper-function names had drifted.
 
   rules:
     status: supported
@@ -300,6 +301,46 @@ content_types:
         type: json_schema
         fetch_method: gh_raw
         content_hash: "sha256:dc2b30e84c97beca5825aa64ca46e1337e402781dc5a9142b67111d10523f15c"
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/pre-compact.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:065f0ae3cd628ac9af8c0cf9bd1d5a673bcbd5ea1d7dcdc0c6437f34dd0189d9"
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/pre-compact.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:c392f3054ae6750f427d4dec07380fd67e8c58a7939a35d5c69bfa070c7ca032"
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/post-compact.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:4a4b3f3022c939a15ab12e95f5c5c17b18bb20f74fe962ae0a51b2a3e76e63f9"
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/post-compact.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:48355bfcb568259cf396beb6ade2ac32827f50bf6a3c20b395c337dce184cbed"
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/subagent-start.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:ce7dc9b5ae8826d1e0c59ffcea793e558aebceb7917a2eb9bb2edd8a7ac37aa9"
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/subagent-start.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:34e8ec95393d2aa930d7932a34c3fb29a5e5f90c264fdbcc581393c5838b4660"
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/subagent-stop.command.input.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:94dc8df29f4691195ac2338ae6de876230e5100a10b94ef48df4e732424b5df5"
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/subagent-stop.command.output.schema.json"
+        type: json_schema
+        fetch_method: gh_raw
+        content_hash: "sha256:8ba2cd7899ae4544193764e67e988235edebe984abe5788634d123bbf13e3e3a"
         fetched_at: "2026-07-14T00:38:05Z"
       - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript/v2/HookEventName.ts"
         type: source_code
@@ -490,9 +531,9 @@ content_types:
       matcher, decision wire, updatedInput, async, HookScope, systemMessage, permissionDecision).
       types.rs was refactored: it now models the internal runtime HookEvent::AfterAgent variant
       (HookEventAfterAgent) and the HookPayload wire shape; the HookResult tri-state
-      (Success/FailedContinue/FailedAbort) is unchanged. NOTE: the new PreCompact/PostCompact and
-      SubagentStart/SubagentStop generated JSON schema files are NOT yet listed as monitored
-      sources here — a maintainer may want to add them to the hooks sources list.
+      (Success/FailedContinue/FailedAbort) is unchanged. 2026-07-14: the new PreCompact/PostCompact
+      and SubagentStart/SubagentStop generated JSON schema files (input + output for each, 8 files)
+      are now listed as monitored sources above alongside the original five events' schemas.
 
   mcp:
     status: supported

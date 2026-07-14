@@ -50,6 +50,13 @@ content_types:
         format: markdown
         extracts: [file_format, file_locations, hierarchy, features]
 
+      # Memory tool docs — evidence for auto_memory (persistent cross-session
+      # memories saved via the Memory tool, distinct from the /memory command).
+      - url: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/tools/memory.md
+        type: docs
+        format: markdown
+        extracts: [auto_memory, features]
+
   hooks:
     sources:
       # Primary: TypeScript enum defines all event names and I/O interfaces

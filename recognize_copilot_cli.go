@@ -270,7 +270,7 @@ func recognizeCopilotCli(ctx RecognitionContext) RecognitionResult {
 	skillsResult := recognizeLandmarks(ctx, copilotCliLandmarkOptions())
 	if len(skillsResult.Capabilities) > 0 {
 		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "project_scope", "skill directory under .github/skills/<name>/, .claude/skills/<name>/, or .agents/skills/<name>/ in project repository", "confirmed"))
-		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "global_scope", "skill directory under ~/.copilot/skills/<name>/, ~/.claude/skills/<name>/, or ~/.agents/skills/<name>/", "confirmed"))
+		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "global_scope", "skill directory under ~/.copilot/skills/<name>/ or ~/.agents/skills/<name>/", "confirmed"))
 		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "canonical_filename", "SKILL.md", "confirmed"))
 	}
 

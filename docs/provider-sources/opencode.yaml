@@ -1,12 +1,27 @@
 # OpenCode / Crush — Provider Source Manifest
 # Good sources: both repos have root-level JSON Schema. OpenCode is archived, Crush is the active successor.
+#
+# ⚠ IDENTITY / SOURCE DIVERGENCE (flagged 2026-07-14): There are TWO distinct
+# projects named "opencode". The header/repo/successor below describe the
+# ORIGINAL opencode-ai/opencode — confirmed archived read-only on GitHub
+# (archived=true, last push 2025-09-18), whose team moved to Charm and built the
+# active successor charmbracelet/crush. That lineage is accurate and is what the
+# locked status (archived) + successor (crush) refer to. HOWEVER the paired
+# format doc docs/provider-formats/opencode.yaml has been re-curated to track a
+# SEPARATE, active same-named project — sst/opencode (opencode.ai, dev branch,
+# TypeScript) — which is neither archived nor succeeded by crush. The content_types
+# sources below still point at the legacy opencode-ai/opencode Go tree, so the
+# manifest and its format doc now describe different projects. Reconciling this
+# fully (either re-onboard the manifest to sst/opencode as active, or re-point the
+# format doc back to the archived opencode-ai/crush lineage) needs a human call;
+# status and successor slug are intentionally left unchanged pending that decision.
 
 schema_version: "1"
 last_verified: "2026-03-27"
 
 slug: opencode
 display_name: OpenCode
-vendor: Charm (originally opencode-ai)
+vendor: opencode-ai # archived; team subsequently built the successor Crush at Charm
 status: archived
 fetch_tier: gh-api
 repo: opencode-ai/opencode

@@ -95,8 +95,8 @@ func codexRulesLandmarkOptions() LandmarkOptions {
 // unsupported (codex hooks communicate via exit codes + stdout text rather
 // than structured JSON I/O). The 8 supported keys map to type-name landmarks:
 //
-//	handler_types       → HookHandlerType (TS) / HookHandlerConfig (Rust)
-//	matcher_patterns    → MatcherGroup (Rust config.rs)
+//	handler_types       → HookHandlerType (TS) / HookHandlerConfig (config.schema.json HooksToml)
+//	matcher_patterns    → MatcherGroup (config.schema.json HooksToml)
 //	decision_control    → BlockDecisionWire / PreToolUseDecisionWire (JSON Schema)
 //	input_modification  → PreToolUseHookSpecificOutputWire (holds updatedInput)
 //	async_execution     → HookExecutionMode (TS)
@@ -116,9 +116,9 @@ func codexHooksLandmarkOptions() LandmarkOptions {
 	}
 	return HooksLandmarkOptions(
 		HooksLandmarkPattern("handler_types", "HookHandlerType",
-			"hook_handler_types: Codex supports shell command, LLM prompt, and agent handler types (HookHandlerType.ts enum, HookHandlerConfig in config.rs)", required),
+			"hook_handler_types: Codex supports shell command, LLM prompt, and agent handler types (HookHandlerType.ts enum, HookHandlerConfig in config.schema.json HooksToml)", required),
 		HooksLandmarkPattern("matcher_patterns", "MatcherGroup",
-			"hook_matcher: Codex hooks support pattern matching to filter which tools or events trigger the hook (MatcherGroup struct in config.rs)", required),
+			"hook_matcher: Codex hooks support pattern matching to filter which tools or events trigger the hook (MatcherGroup lives in config.schema.json HooksToml — the former codex-rs/hooks/src/engine/config.rs was deleted upstream #18893)", required),
 		HooksLandmarkPattern("decision_control", "BlockDecisionWire",
 			"hook_result_abort: Codex hooks can abort (block) the triggering action via decision wire types (BlockDecisionWire / PreToolUseDecisionWire in event output schemas)", required),
 		HooksLandmarkPattern("input_modification", "PreToolUseHookSpecificOutputWire",

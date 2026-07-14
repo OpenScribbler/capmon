@@ -168,10 +168,16 @@ func TestRecognizeCodex_RulesAnchorsMissing(t *testing.T) {
 //   - hooks.0-9 : JSON Schema files (5 events × input + output schemas)
 //   - hooks.10-13: TypeScript v2 protocol enums (HookEventName, HookHandlerType,
 //     HookExecutionMode, HookScope)
-//   - hooks.14-15: Rust source (engine config + types)
+//   - hooks.14-15: Rust source (schema_loader + types.rs)
 //
 // Type names are emitted as landmarks by the JSON Schema and TypeScript
-// extractors. Update this fixture when upstream codex evolves.
+// extractors. Update this fixture when upstream codex evolves. NOTE: the former
+// codex-rs/hooks/src/engine/config.rs was deleted upstream (#18893); its Rust
+// structs HooksFile/HookEvents/HookHandlerConfig no longer exist there (the hook
+// config schema now lives in config.schema.json HooksToml). Those three names are
+// retained in the fixture below only as a non-load-bearing historical snapshot —
+// the required anchors (HookEventName, HookScope) and the per-capability matcher
+// anchors (MatcherGroup, HookHandlerType, …) are what actually drive the test.
 var realCodexHooksLandmarks = []string{
 	// JSON Schema event input/output type names
 	"PreToolUseToolInput",
@@ -190,7 +196,9 @@ var realCodexHooksLandmarks = []string{
 	"HookHandlerType",
 	"HookExecutionMode",
 	"HookScope",
-	// Rust engine + types struct names
+	// Rust types.rs struct names (plus 3 defunct engine/config.rs names —
+	// HooksFile/HookEvents/HookHandlerConfig — kept as a historical snapshot; see
+	// the block comment above. MatcherGroup remains a live matcher_patterns anchor.)
 	"HooksFile",
 	"HookEvents",
 	"MatcherGroup",

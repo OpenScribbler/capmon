@@ -485,13 +485,14 @@ func TestRecognizeCursor_RealHooksLandmarks(t *testing.T) {
 			t.Errorf("hooks.%s.confidence = %q, want inferred", c, got)
 		}
 	}
-	// handler_types must NOT be emitted — the format-YAML curator marks it
-	// supported: false confirmed (cursor hooks execute shell commands only).
-	// The cache does include "Command-Based Hooks" and "Prompt-Based Hooks"
-	// landmarks suggesting the curator's claim may be outdated, but the
-	// recognizer must not contradict the curator's confirmed judgment.
+	// handler_types must NOT be emitted by the recognizer — the format-YAML
+	// curator now marks it supported: true confirmed (command + prompt handler
+	// types, corroborated by the "Command-Based Hooks"/"Prompt-Based Hooks"
+	// landmarks). Emission stays off because that supported value is a
+	// hand-curated master judgment the recognizer defers to rather than
+	// re-deriving from a landmark (a landmark emission would be redundant).
 	if _, has := caps["hooks.capabilities.handler_types.supported"]; has {
-		t.Error("hooks.capabilities.handler_types should NOT be emitted (curator marks supported: false confirmed)")
+		t.Error("hooks.capabilities.handler_types should NOT be emitted by the recognizer (hand-curated master claim is authoritative)")
 	}
 }
 
