@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/OpenScribbler/capmon/capyaml"
@@ -16,31 +17,95 @@ type SeedOptions struct {
 	Provider                string
 	Extracted               map[string]string // field path → value from extraction (Phase 9 wires full mapping)
 	ForceOverwriteExclusive bool
+	// CanonicalKeysPath locates the canonical-key registry used to decide
+	// whether an extracted capability key is canonical (→ content_types
+	// capabilities) or provider-exclusive (→ provider_exclusive). Defaults to
+	// docs/spec/canonical-keys.yaml.
+	CanonicalKeysPath string
 }
 
 // SeedProviderCapabilities creates or updates docs/provider-capabilities/<provider>.yaml
 // from extracted data. It is idempotent: if the file already exists, extracted fields
-// are merged in. provider_exclusive entries are preserved unconditionally unless
-// ForceOverwriteExclusive is set.
+// are merged in.
+//
+// Extracted capability keys not registered in the canonical-key registry are
+// routed to provider_exclusive as "<content_type>.<key>" nodes — never into
+// content_types capabilities. Existing provider_exclusive entries are
+// preserved: an extracted key colliding with one is skipped unless
+// ForceOverwriteExclusive is set, in which case the colliding entries (and
+// only those) are overwritten with a warning naming each. The section is
+// never cleared wholesale.
 func SeedProviderCapabilities(opts SeedOptions) error {
 
 	path := filepath.Join(opts.CapsDir, opts.Provider+".yaml")
+
+	keysPath := opts.CanonicalKeysPath
+	if keysPath == "" {
+		keysPath = "docs/spec/canonical-keys.yaml"
+	}
+	reg, err := loadKeyRegistry(keysPath)
+	if err != nil {
+		return fmt.Errorf("load canonical-key registry: %w", err)
+	}
 
 	var caps capyaml.ProviderCapabilities
 	existing, err := capyaml.LoadCapabilityYAML(path)
 	if err == nil {
 		caps = *existing
-		if opts.ForceOverwriteExclusive {
-			caps.ProviderExclusive = nil
-			fmt.Printf("WARNING: --force-overwrite-exclusive cleared provider_exclusive for %s\n", opts.Provider)
-		}
-		// Without ForceOverwriteExclusive, ProviderExclusive is preserved from existing file
 	} else {
 		// New file
 		caps = capyaml.ProviderCapabilities{
 			SchemaVersion: "1",
 			Slug:          opts.Provider,
 		}
+	}
+
+	// Curated provider_exclusive entries present before this run: extracted
+	// data may only overwrite these under ForceOverwriteExclusive.
+	preExisting := make(map[string]bool, len(caps.ProviderExclusive))
+	for name := range caps.ProviderExclusive {
+		preExisting[name] = true
+	}
+	overwritten := map[string]bool{}
+
+	applyField := func(ce *capyaml.CapabilityEntry, field, value string) {
+		switch field {
+		case "supported":
+			ce.Supported = value == "true"
+		case "mechanism":
+			ce.Mechanism = value
+		case "confidence":
+			ce.Confidence = value
+		}
+	}
+
+	// writeExclusive merges one extracted field into the provider_exclusive
+	// node "<ct>.<capKey>" (nested under subKey when non-empty), honoring the
+	// preserve-unless-forced rule for curated entries.
+	writeExclusive := func(ct, capKey, subKey, field, value string) {
+		name := ct + "." + capKey
+		if preExisting[name] {
+			if !opts.ForceOverwriteExclusive {
+				return
+			}
+			overwritten[name] = true
+		}
+		if caps.ProviderExclusive == nil {
+			caps.ProviderExclusive = make(map[string]capyaml.CapabilityEntry)
+		}
+		node := caps.ProviderExclusive[name]
+		if subKey == "" {
+			applyField(&node, field, value)
+		} else {
+			node.Supported = true
+			if node.Capabilities == nil {
+				node.Capabilities = make(map[string]capyaml.CapabilityEntry)
+			}
+			sub := node.Capabilities[subKey]
+			applyField(&sub, field, value)
+			node.Capabilities[subKey] = sub
+		}
+		caps.ProviderExclusive[name] = node
 	}
 
 	// Apply extracted dot-path mappings to the capability struct.
@@ -65,25 +130,28 @@ func SeedProviderCapabilities(opts SeedOptions) error {
 		switch {
 		case len(parts) == 2 && parts[1] == "supported":
 			ctEntry.Supported = value == "true"
+			caps.ContentTypes[ct] = ctEntry
 
 		case len(parts) == 4 && parts[1] == "capabilities":
 			capKey, field := parts[2], parts[3]
+			if _, canonical := reg[ct][capKey]; !canonical {
+				writeExclusive(ct, capKey, "", field, value)
+				continue
+			}
 			if ctEntry.Capabilities == nil {
 				ctEntry.Capabilities = make(map[string]capyaml.CapabilityEntry)
 			}
 			ce := ctEntry.Capabilities[capKey]
-			switch field {
-			case "supported":
-				ce.Supported = value == "true"
-			case "mechanism":
-				ce.Mechanism = value
-			case "confidence":
-				ce.Confidence = value
-			}
+			applyField(&ce, field, value)
 			ctEntry.Capabilities[capKey] = ce
+			caps.ContentTypes[ct] = ctEntry
 
 		case len(parts) == 5 && parts[1] == "capabilities":
 			capKey, subKey, field := parts[2], parts[3], parts[4]
+			if _, canonical := reg[ct][capKey]; !canonical {
+				writeExclusive(ct, capKey, subKey, field, value)
+				continue
+			}
 			if ctEntry.Capabilities == nil {
 				ctEntry.Capabilities = make(map[string]capyaml.CapabilityEntry)
 			}
@@ -93,16 +161,10 @@ func SeedProviderCapabilities(opts SeedOptions) error {
 				parent.Capabilities = make(map[string]capyaml.CapabilityEntry)
 			}
 			sub := parent.Capabilities[subKey]
-			switch field {
-			case "supported":
-				sub.Supported = value == "true"
-			case "mechanism":
-				sub.Mechanism = value
-			case "confidence":
-				sub.Confidence = value
-			}
+			applyField(&sub, field, value)
 			parent.Capabilities[subKey] = sub
 			ctEntry.Capabilities[capKey] = parent
+			caps.ContentTypes[ct] = ctEntry
 
 		case len(parts) == 4 && parts[1] == "events":
 			eventKey, field := parts[2], parts[3]
@@ -117,9 +179,18 @@ func SeedProviderCapabilities(opts SeedOptions) error {
 				ev.Blocking = value
 			}
 			ctEntry.Events[eventKey] = ev
+			caps.ContentTypes[ct] = ctEntry
 		}
+	}
 
-		caps.ContentTypes[ct] = ctEntry
+	if len(overwritten) > 0 {
+		names := make([]string, 0, len(overwritten))
+		for name := range overwritten {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+		fmt.Printf("WARNING: --force-overwrite-exclusive overwrote provider_exclusive entries for %s: %s\n",
+			opts.Provider, strings.Join(names, ", "))
 	}
 
 	f, err := os.Create(path)
