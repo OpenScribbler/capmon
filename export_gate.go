@@ -159,13 +159,16 @@ func firstViolation(err error) string {
 // sourcesDir — count and membership, both directions. The error names every
 // divergent slug and both counts.
 func assertProviderSet(exportedSlugs []string, sourcesDir string) error {
-	sourceSlugs, err := sourceManifestSlugs(sourcesDir)
+	sourceStatuses, err := sourceManifestStatuses(sourcesDir)
 	if err != nil {
 		return err
 	}
 
 	exportedSet := stringSet(exportedSlugs)
-	sourceSet := stringSet(sourceSlugs)
+	sourceSet := make(map[string]bool, len(sourceStatuses))
+	for s := range sourceStatuses {
+		sourceSet[s] = true
+	}
 
 	var divergent []string
 	for s := range exportedSet {
@@ -194,16 +197,17 @@ func assertProviderSet(exportedSlugs []string, sourcesDir string) error {
 	)
 }
 
-// sourceManifestSlugs gathers the slug of every source manifest under
-// sourcesDir, skipping _template.yaml, non-.yaml files (including
-// manifest.schema.json), and directories — the same selection LoadAllManifests
-// applies.
-func sourceManifestSlugs(sourcesDir string) ([]string, error) {
+// sourceManifestStatuses gathers slug → lifecycle status for every source
+// manifest under sourcesDir, skipping _template.yaml, non-.yaml files
+// (including manifest.schema.json), and directories — the same selection
+// LoadAllManifests applies. The key set doubles as the declared provider set
+// for the EXPORT_003 gate.
+func sourceManifestStatuses(sourcesDir string) (map[string]string, error) {
 	entries, err := os.ReadDir(sourcesDir)
 	if err != nil {
 		return nil, fmt.Errorf("read source manifests dir: %w", err)
 	}
-	var slugs []string
+	statuses := map[string]string{}
 	seen := map[string]string{}
 	for _, e := range entries {
 		name := e.Name()
@@ -215,7 +219,8 @@ func sourceManifestSlugs(sourcesDir string) ([]string, error) {
 			return nil, err
 		}
 		var m struct {
-			Slug string `yaml:"slug"`
+			Slug   string `yaml:"slug"`
+			Status string `yaml:"status"`
 		}
 		if err := yaml.Unmarshal(data, &m); err != nil {
 			return nil, fmt.Errorf("parse source manifest %s: %w", name, err)
@@ -229,9 +234,9 @@ func sourceManifestSlugs(sourcesDir string) ([]string, error) {
 			return nil, fmt.Errorf("duplicate source manifest slug %q in %s and %s", m.Slug, prev, name)
 		}
 		seen[m.Slug] = name
-		slugs = append(slugs, m.Slug)
+		statuses[m.Slug] = m.Status
 	}
-	return slugs, nil
+	return statuses, nil
 }
 
 // stringSet returns the set of distinct values in ss.

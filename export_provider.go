@@ -13,8 +13,11 @@ import (
 func buildProviderDoc(caps *capyaml.ProviderCapabilities, reg keyRegistry) (map[string]any, error) {
 	doc := map[string]any{
 		"schema_version": "1",
-		"status":         "live",
-		"slug":           caps.Slug,
+		// status is the published document's lifecycle (live → frozen/removed
+		// per the consumer contract), not the provider product's health — that
+		// is joined from the source manifest as provider_status.
+		"status": "live",
+		"slug":   caps.Slug,
 	}
 	displayName := caps.DisplayName
 	if displayName == "" {

@@ -307,6 +307,44 @@ func TestBuildAllAndPivotsShareNodeShape(t *testing.T) {
 	}
 }
 
+// TestProviderStatusJoin verifies the source-manifest lifecycle status lands
+// in each provider doc as provider_status, and that a baseline with no
+// manifest omits the field (absent = unknown; the EXPORT_003 gate catches the
+// set mismatch separately).
+func TestProviderStatusJoin(t *testing.T) {
+	opts := newExportFixture(t)
+	for name, body := range map[string]string{
+		"alpha.yaml": "schema_version: \"1\"\nslug: alpha\nstatus: active\n",
+		"bravo.yaml": "schema_version: \"1\"\nslug: bravo\nstatus: archived\n",
+		// charlie deliberately has no manifest.
+	} {
+		if err := os.WriteFile(filepath.Join(opts.SourcesDir, name), []byte(body), 0644); err != nil {
+			t.Fatalf("write manifest %s: %v", name, err)
+		}
+	}
+
+	dst := t.TempDir()
+	if err := writeExportTree(dst, opts); err != nil {
+		t.Fatalf("writeExportTree: %v", err)
+	}
+
+	for slug, want := range map[string]string{"alpha": "active", "bravo": "archived"} {
+		doc := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", slug+".json"))
+		if doc["provider_status"] != want {
+			t.Errorf("%s provider_status = %v, want %q", slug, doc["provider_status"], want)
+		}
+		// The document-lifecycle status stays live regardless of provider health.
+		if doc["status"] != "live" {
+			t.Errorf("%s status = %v, want \"live\"", slug, doc["status"])
+		}
+	}
+
+	charlie := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "charlie.json"))
+	if v, ok := charlie["provider_status"]; ok {
+		t.Errorf("charlie provider_status = %v, want field absent", v)
+	}
+}
+
 // TestExportTreeRealData runs the exporter over the committed docs/ tree. The
 // slice-2 relocation of non-canonical nodes has landed, so writeExportTree
 // builds all 15 provider docs cleanly.
@@ -350,6 +388,24 @@ func TestExportTreeRealData(t *testing.T) {
 		pm := mustMap(t, pv)
 		if pm["status"] != "tracked" {
 			t.Errorf("provider %v status = %v, want \"tracked\"", pm["slug"], pm["status"])
+		}
+	}
+
+	// Every committed baseline has a source manifest, so every real provider
+	// doc carries provider_status; the sunset providers surface as archived.
+	for _, p := range docs {
+		if filepath.Base(p) == "all.json" {
+			continue
+		}
+		doc := readJSONMap(t, p)
+		if s, _ := doc["provider_status"].(string); s == "" {
+			t.Errorf("%s: provider_status missing or empty", filepath.Base(p))
+		}
+	}
+	for slug, want := range map[string]string{"roo-code": "archived", "claude-code": "active"} {
+		doc := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", slug+".json"))
+		if doc["provider_status"] != want {
+			t.Errorf("%s provider_status = %v, want %q", slug, doc["provider_status"], want)
 		}
 	}
 }

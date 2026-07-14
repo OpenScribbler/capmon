@@ -9,6 +9,7 @@
   "properties": {
     "schema_version": {"type": "string"},
     "status": {"type": "string"},
+    "provider_status": {"type": "string"},
     "slug": {"type": "string"},
     "display_name": {"type": "string", "minLength": 1},
     "last_verified": {"type": "string"},

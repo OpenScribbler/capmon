@@ -20,14 +20,14 @@ fetch_tier: gh-api
 repo: RooVetGit/Roo-Code
 repo_branch: main
 
-successor:
-  slug: cline
-  display_name: Cline
-  repo: cline/cline
-  repo_branch: main
-  status: active
-  # Roo Code is a Cline fork; the official sunset post directs extension
-  # users to Cline ("have incorporated much of what we built").
+# No successor. Roo Code's own next product is Roomote (roomote.dev), a
+# Slack-first cloud agent outside capmon's scope. For extension users the
+# official sunset post recommends Cline as an alternative, not a successor:
+# "If you want a model-agnostic open-source extension, we recommend Cline.
+# They've incorporated much of what we built."
+#   https://roocode.com/blog/sunsetting-roo-code-extension-cloud-and-router
+#   (roocode.com now redirects to roomote.dev; archived copy verified 2026-07-13:
+#   https://web.archive.org/web/20260508092828/https://roocode.com/blog/sunsetting-roo-code-extension-cloud-and-router)
 
 change_detection:
   method: github-releases

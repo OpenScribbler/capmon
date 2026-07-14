@@ -75,6 +75,7 @@
       "supported": true
     }
   },
+  "provider_status": "archived",
   "references": {
     "spec_doc": {
       "url": "https://example.com/spec",
