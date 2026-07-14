@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:45:36Z
+# Generated at: 2026-07-14T18:55:16Z
 
 content_type: agents
 providers:
@@ -190,22 +190,22 @@ providers:
                 confidence: confirmed
             definition_format:
                 supported: true
-                mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key
+                mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key (documented under 'Configure' / 'Markdown' / 'Create agents')
                 confidence: confirmed
             invocation_patterns:
                 supported: true
                 capabilities:
                     at_mention:
                         supported: true
-                        mechanism: subagents invoked manually by @-mentioning the subagent name in a message; agent name derives from the filename
+                        mechanism: subagents invoked manually by @-mentioning the subagent name in a message; agent name derives from the filename (documented under 'Subagents')
                         confidence: confirmed
                     natural_language:
                         supported: true
-                        mechanism: subagents invoked automatically by primary agents for specialized tasks based on their description field
+                        mechanism: subagents invoked automatically by primary agents for specialized tasks based on their description field (documented under 'Subagents')
                         confidence: confirmed
             model_selection:
                 supported: true
-                mechanism: frontmatter model field (provider/model-id format) overrides the session default; subagents default to the invoking primary agent's model
+                mechanism: frontmatter model field (provider/model-id format) overrides the session default; subagents default to the invoking primary agent's model (documented under 'Model')
                 confidence: confirmed
             per_agent_mcp:
                 supported: false
@@ -213,11 +213,11 @@ providers:
                 confidence: confirmed
             subagent_spawning:
                 supported: true
-                mechanism: 'agents with mode: subagent (or all) are invocable from other agents via the Task tool, driven by the callee''s description; permission.task on the orchestrator controls which subagents it may invoke'
+                mechanism: 'agents with mode: subagent (or all) are invocable from other agents via the Task tool, driven by the callee''s description; permission.task on the orchestrator controls which subagents it may invoke (documented under ''Task permissions'')'
                 confidence: confirmed
             tool_restrictions:
                 supported: true
-                mechanism: permission frontmatter map configures ask/allow/deny per tool using named keys or wildcard glob patterns; fine-grained keys accept glob/pattern-to-action objects
+                mechanism: permission frontmatter map configures ask/allow/deny per tool using named keys or wildcard glob patterns; fine-grained keys accept glob/pattern-to-action objects (documented under 'Permissions')
                 confidence: confirmed
     roo-code:
         supported: true

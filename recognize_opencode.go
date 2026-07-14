@@ -59,7 +59,11 @@ func opencodeRulesLandmarkOptions() LandmarkOptions {
 // 'Model' heading (per-command model override), so a substring match adds
 // nothing and exact keeps the intent narrow. Both docs' claims are true and
 // curator-confirmed, and Required already gates this pattern on the agents
-// doc's presence.
+// doc's presence. Residual risk, accepted: landmarks merge across all cached
+// docs, so if the agents doc ever drops its 'Model' heading while the
+// commands doc keeps one, this pattern would still fire from the commands
+// landmark — the curated format YAML stays authoritative, and the snapshot
+// tests pin today's heading set so a docs change surfaces as a test update.
 //
 // Two keys are intentionally NOT emitted:
 //   - agent_scopes: supported and curator-confirmed
@@ -80,7 +84,7 @@ func opencodeAgentsLandmarkOptions() LandmarkOptions {
 	}
 	return AgentsLandmarkOptions(
 		AgentsLandmarkPattern("definition_format", "Create agents",
-			"markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt (documented under 'Configure' / 'Markdown' / 'Create agents')", required),
+			"markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key (documented under 'Configure' / 'Markdown' / 'Create agents')", required),
 		AgentsLandmarkPattern("invocation_patterns.at_mention", "Subagents",
 			"subagents invoked manually by @-mentioning the subagent name in a message; agent name derives from the filename (documented under 'Subagents')", required),
 		AgentsLandmarkPattern("invocation_patterns.natural_language", "Subagents",
@@ -111,7 +115,11 @@ func opencodeAgentsLandmarkOptions() LandmarkOptions {
 // heading (built-in agents). Required gates this pattern on the commands
 // doc's presence, and the key is curator-confirmed for commands
 // (built-in /init, /undo, /redo, /share, /help), so the cross-doc collision
-// cannot produce a false claim.
+// cannot produce a false claim today. Residual risk, accepted: if the
+// commands doc ever drops its 'Built-in' heading while the agents doc keeps
+// one, the merged-landmark context would still fire this pattern — the
+// curated format YAML stays authoritative, and the snapshot tests pin
+// today's heading set so a docs change surfaces as a test update.
 func opencodeCommandsLandmarkOptions() LandmarkOptions {
 	required := []StringMatcher{
 		{Kind: "substring", Value: "Create command files", CaseInsensitive: true},

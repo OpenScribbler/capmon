@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:45:36Z
+# Generated at: 2026-07-14T18:55:16Z
 
 content_type: mcp
 providers:
@@ -162,7 +162,7 @@ providers:
         capabilities:
             enterprise_management:
                 supported: true
-                mechanism: organizations publish default MCP server configs via a .well-known/opencode endpoint; local opencode.json values override remote defaults
+                mechanism: organizations publish default MCP server configs via a .well-known/opencode endpoint; local opencode.json values override remote defaults (documented under 'Enable' / 'Overriding remote defaults')
                 confidence: confirmed
             env_var_expansion:
                 supported: true
@@ -170,15 +170,15 @@ providers:
                 confidence: confirmed
             oauth_support:
                 supported: true
-                mechanism: 'OAuth 2.0 with Dynamic Client Registration (RFC 7591): 401 auto-detected, tokens stored in ~/.local/share/opencode/mcp-auth.json; oauth object for pre-registered credentials or oauth: false to disable'
+                mechanism: 'OAuth 2.0 with Dynamic Client Registration (RFC 7591): 401 auto-detected, tokens stored in ~/.local/share/opencode/mcp-auth.json; oauth object for pre-registered credentials or oauth: false to disable (documented under ''OAuth'' / ''Authenticating'' / ''OAuth Options'')'
                 confidence: confirmed
             tool_filtering:
                 supported: true
-                mechanism: global tools map keyed by server-name prefix with glob patterns (e.g. mymcp_*); per-agent access via the agent permission map
+                mechanism: global tools map keyed by server-name prefix with glob patterns (e.g. mymcp_*); per-agent access via the agent permission map (documented under 'Manage' / 'Global' / 'Per agent' / 'Glob patterns')
                 confidence: confirmed
             transport_types:
                 supported: true
-                mechanism: 'two types under the mcp key in opencode.json: local (stdio, launched via command array) and remote (HTTP/SSE streamable, connected via url)'
+                mechanism: 'two types under the mcp key in opencode.json: local (stdio, launched via command array) and remote (HTTP/SSE streamable, connected via url) (documented under ''Local'' / ''Remote'' headings)'
                 confidence: confirmed
     windsurf:
         supported: true

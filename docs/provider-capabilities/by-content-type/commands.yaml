@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:45:36Z
+# Generated at: 2026-07-14T18:55:16Z
 
 content_type: commands
 providers:
@@ -30,11 +30,11 @@ providers:
         capabilities:
             argument_substitution:
                 supported: true
-                mechanism: $ARGUMENTS carries all arguments as a single string; positional $1/$2/$3 carry individual arguments — substituted from user input at invocation time
+                mechanism: $ARGUMENTS carries all arguments as a single string; positional $1/$2/$3 carry individual arguments — substituted from user input at invocation time (documented under 'Arguments')
                 confidence: confirmed
             builtin_commands:
                 supported: true
-                mechanism: built-in /init, /undo, /redo, /share, /help; custom commands override built-ins when given the same name
+                mechanism: built-in /init, /undo, /redo, /share, /help; custom commands override built-ins when given the same name (documented under 'Built-in')
                 confidence: confirmed
     pi:
         supported: true
