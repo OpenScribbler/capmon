@@ -62,7 +62,7 @@
       "supported": true
     }
   },
-  "display_name": "synthetic",
+  "display_name": "Synthetic Provider",
   "provider_exclusive": {
     "skills.custom_thing": {
       "capabilities": {

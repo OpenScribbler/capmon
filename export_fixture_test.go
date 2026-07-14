@@ -185,9 +185,9 @@ func assertSyntheticProviderDoc(t *testing.T, outDir string) {
 
 	doc := readJSONMap(t, docPath)
 
-	// display_name slug fallback; empty last_verified omitted.
-	if doc["display_name"] != "synthetic" {
-		t.Errorf("display_name = %v, want slug fallback \"synthetic\"", doc["display_name"])
+	// Empty baseline display_name joins the manifest's; empty last_verified omitted.
+	if doc["display_name"] != "Synthetic Provider" {
+		t.Errorf("display_name = %v, want manifest \"Synthetic Provider\"", doc["display_name"])
 	}
 	if _, ok := doc["last_verified"]; ok {
 		t.Error("empty last_verified should be omitted from synthetic.json")

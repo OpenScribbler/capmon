@@ -1,6 +1,6 @@
 {
   "cadence": "daily",
-  "data_revision": "9468d74f87e4539a596bb12d13cc35e7fad33a25bc7847dba1d1a9887b0c6cb9",
+  "data_revision": "fb7aff4ed16bd398567814cbf0935f3901b6ce8f814f8d978ab9727f08d73520",
   "files": {
     "advisories.json": {
       "sha256": "deddbb22674d330c52383b1fc7022118e76d597abca1b7fb69e446151b352851"
@@ -24,7 +24,7 @@
       "sha256": "eb9459c9acbee3c2593469410c2a791c9ecfe3af0652031c528a6c8ea0c86e8f"
     },
     "capabilities/all.json": {
-      "sha256": "9468d74f87e4539a596bb12d13cc35e7fad33a25bc7847dba1d1a9887b0c6cb9"
+      "sha256": "fb7aff4ed16bd398567814cbf0935f3901b6ce8f814f8d978ab9727f08d73520"
     },
     "schemas/advisories.json": {
       "sha256": "dbd838d3b788a32875591a4397b775d0db80bb38b39e1bbb40d57ac72a2664c0"
@@ -63,7 +63,7 @@
     },
     {
       "path": "capabilities/synthetic.json",
-      "sha256": "a7b9a39b83d984ed56fda4b18c75379e957bae9228c8dad746058c73a338846a",
+      "sha256": "2bcd7574b9f1381cd565caabbcd1e1b1764f492bc1d6553aed099cd8fbae6e31",
       "slug": "synthetic",
       "status": "tracked"
     }

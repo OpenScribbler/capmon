@@ -106,11 +106,13 @@ func writeExportTree(dst string, opts ExportOptions) error {
 // loadProviderDocs builds one document map per capability baseline under
 // capsDir, skipping directories, non-.yaml files, and seed YAMLs (Slug == "").
 // A non-canonical node in any baseline propagates buildProviderDoc's
-// fail-closed EXPORT_001 error. statuses joins each provider's source-manifest
-// lifecycle status (active | archived | beta) into the doc as provider_status;
-// a slug with no manifest entry omits the field (absent = unknown), and the
-// EXPORT_003 provider-set gate guarantees that never reaches a real export.
-func loadProviderDocs(capsDir string, reg keyRegistry, statuses map[string]string) (map[string]map[string]any, error) {
+// fail-closed EXPORT_001 error. manifests joins each provider's
+// source-manifest lifecycle status (active | archived | beta) into the doc as
+// provider_status, and its display_name when the baseline leaves display_name
+// empty (baseline > manifest > slug fallback). A slug with no manifest entry
+// omits provider_status (absent = unknown), and the EXPORT_003 provider-set
+// gate guarantees that never reaches a real export.
+func loadProviderDocs(capsDir string, reg keyRegistry, manifests map[string]manifestJoinFields) (map[string]map[string]any, error) {
 	entries, err := os.ReadDir(capsDir)
 	if err != nil {
 		return nil, fmt.Errorf("read capabilities dir: %w", err)
@@ -131,8 +133,12 @@ func loadProviderDocs(capsDir string, reg keyRegistry, statuses map[string]strin
 		if err != nil {
 			return nil, err
 		}
-		if st := statuses[caps.Slug]; st != "" {
-			doc["provider_status"] = st
+		mf := manifests[caps.Slug]
+		if mf.Status != "" {
+			doc["provider_status"] = mf.Status
+		}
+		if caps.DisplayName == "" && mf.DisplayName != "" {
+			doc["display_name"] = mf.DisplayName
 		}
 		docs[caps.Slug] = doc
 	}

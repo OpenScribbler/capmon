@@ -197,17 +197,24 @@ func assertProviderSet(exportedSlugs []string, sourcesDir string) error {
 	)
 }
 
-// sourceManifestStatuses gathers slug → lifecycle status for every source
-// manifest under sourcesDir, skipping _template.yaml, non-.yaml files
-// (including manifest.schema.json), and directories — the same selection
-// LoadAllManifests applies. The key set doubles as the declared provider set
-// for the EXPORT_003 gate.
-func sourceManifestStatuses(sourcesDir string) (map[string]string, error) {
+// manifestJoinFields carries the per-provider source-manifest values the
+// exporter joins into published provider docs.
+type manifestJoinFields struct {
+	Status      string
+	DisplayName string
+}
+
+// sourceManifestStatuses gathers slug → join fields (lifecycle status,
+// display name) for every source manifest under sourcesDir, skipping
+// _template.yaml, non-.yaml files (including manifest.schema.json), and
+// directories — the same selection LoadAllManifests applies. The key set
+// doubles as the declared provider set for the EXPORT_003 gate.
+func sourceManifestStatuses(sourcesDir string) (map[string]manifestJoinFields, error) {
 	entries, err := os.ReadDir(sourcesDir)
 	if err != nil {
 		return nil, fmt.Errorf("read source manifests dir: %w", err)
 	}
-	statuses := map[string]string{}
+	fields := map[string]manifestJoinFields{}
 	seen := map[string]string{}
 	for _, e := range entries {
 		name := e.Name()
@@ -219,8 +226,9 @@ func sourceManifestStatuses(sourcesDir string) (map[string]string, error) {
 			return nil, err
 		}
 		var m struct {
-			Slug   string `yaml:"slug"`
-			Status string `yaml:"status"`
+			Slug        string `yaml:"slug"`
+			Status      string `yaml:"status"`
+			DisplayName string `yaml:"display_name"`
 		}
 		if err := yaml.Unmarshal(data, &m); err != nil {
 			return nil, fmt.Errorf("parse source manifest %s: %w", name, err)
@@ -239,9 +247,9 @@ func sourceManifestStatuses(sourcesDir string) (map[string]string, error) {
 			return nil, fmt.Errorf("source manifest %s: missing required field 'status'", name)
 		}
 		seen[m.Slug] = name
-		statuses[m.Slug] = m.Status
+		fields[m.Slug] = manifestJoinFields{Status: m.Status, DisplayName: m.DisplayName}
 	}
-	return statuses, nil
+	return fields, nil
 }
 
 // stringSet returns the set of distinct values in ss.
