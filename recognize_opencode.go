@@ -17,19 +17,13 @@ func init() {
 //     yields a single landmark "MCPClient" — a Go struct name, not heading
 //     evidence and not aligned to any of the 8 canonical MCP keys.
 //
-// NOTE (2026-07-14): docs/provider-formats/opencode.yaml DOES now carry a fully
-// curated mcp section — but for a different project. The format doc was
-// re-curated to track sst/opencode (opencode.ai, active), whereas the cached
-// sources above and this manifest's content_types still point at the legacy,
-// archived opencode-ai/opencode Go tree (and the crush schema). The two describe
-// different same-named projects — see the identity-divergence flag in
-// docs/provider-sources/opencode.yaml.
-//
-// Recognizer silence is still the right move against these caches — emitting any
-// canonical MCP key from the legacy opencode-ai / crush landmarks would either be
-// a false positive (crush schema fields attributed to opencode) or unanchored (a
-// struct name without semantic meaning). MCP recognition can be wired once the
-// cache is rebuilt from the project the format doc actually tracks (sst/opencode).
+// RESOLVED (2026-07-14, capmon-ctj): the identity divergence is fixed — the
+// manifest was re-onboarded to the active anomalyco/opencode (formerly
+// sst/opencode; opencode.ai), matching the format doc, and its mcp source is
+// now the opencode.ai/docs/mcp-servers.md mirror. The legacy opencode-ai /
+// crush cache entries described above no longer exist after refetch. MCP
+// recognition is wired in the follow-up recognizer PR against the rebuilt
+// docs-markdown cache.
 
 // Agents recognition is intentionally NOT wired for opencode.
 //
@@ -48,17 +42,13 @@ func init() {
 // source describes how the runtime emits events about ONE agent's
 // processing, not how multiple custom agents are defined or invoked.
 //
-// NOTE (2026-07-14): docs/provider-formats/opencode.yaml DOES now carry a fully
-// curated agents section — but for sst/opencode (opencode.ai, active), which the
-// format doc was re-curated to track. The cached agents source above is still the
-// legacy, archived opencode-ai/opencode Go runtime file — a different same-named
-// project. See the identity-divergence flag in docs/provider-sources/opencode.yaml.
-//
-// Recognizer silence is still the right move against this cache — emitting any
-// canonical agents key from the legacy AgentEvent runtime types would conflate
-// "agent runtime exists" with "user-defined custom agents are supported". Agents
-// recognition can be wired once the cache is rebuilt from the project the format
-// doc actually tracks (sst/opencode), whose agent format IS documented.
+// RESOLVED (2026-07-14, capmon-ctj): the identity divergence is fixed — the
+// manifest was re-onboarded to the active anomalyco/opencode (formerly
+// sst/opencode; opencode.ai), and its agents sources are now the
+// opencode.ai/docs/agents.md mirror plus the anomalyco config/agent.ts loader.
+// The legacy opencode-ai AgentEvent cache described above no longer exists
+// after refetch. Agents recognition is wired in the follow-up recognizer PR
+// against the rebuilt cache.
 
 // Commands recognition is intentionally NOT wired for opencode.
 //
@@ -71,28 +61,22 @@ func init() {
 // (argument_substitution, builtin_commands) can be anchored on a single
 // message-struct name.
 //
-// NOTE (2026-07-14): docs/provider-formats/opencode.yaml DOES now carry a fully
-// curated commands section — but for sst/opencode (opencode.ai, active), which
-// the format doc was re-curated to track. The cached commands source above is
-// still the legacy, archived opencode-ai/opencode Go TUI file — a different
-// same-named project. See the identity-divergence flag in
-// docs/provider-sources/opencode.yaml.
-//
-// Recognizer silence is still the right move against this cache — emitting any
-// commands key from the legacy CommandRunCustomMsg TUI dispatcher would conflate
-// "TUI dispatcher exists" with "slash-command authoring is supported". Commands
-// recognition can be wired once the cache is rebuilt from the project the format
-// doc actually tracks (sst/opencode), whose command format IS documented.
+// RESOLVED (2026-07-14, capmon-ctj): the identity divergence is fixed — the
+// manifest was re-onboarded to the active anomalyco/opencode (formerly
+// sst/opencode; opencode.ai), and its commands source is now the
+// opencode.ai/docs/commands.md mirror. The legacy opencode-ai TUI cache
+// described above no longer exists after refetch. Commands recognition is
+// wired in the follow-up recognizer PR against the rebuilt cache.
 
-// recognizeOpencode recognizes skills capabilities for the OpenCode provider.
-// OpenCode has no native skill format, so this recognizer uses the cross-provider
-// SKILL.md convention; the static scope paths merged below (.opencode/skill/ and
-// ~/.config/opencode/skills/) match the skills section of the format doc, which
-// now tracks the active sst/opencode (opencode.ai). GoStruct pattern will produce
-// output only if upstream extraction surfaces Skill.* fields. MCP, agents, and
-// commands recognition are intentionally absent — see the comment blocks
-// immediately above this function for rationale, including the sst/opencode vs
-// legacy opencode-ai/opencode source-identity divergence.
+// recognizeOpencode recognizes skills capabilities for the opencode provider
+// (anomalyco/opencode, formerly sst/opencode). opencode has no native skill
+// format, so this recognizer uses the cross-provider SKILL.md convention; the
+// static scope paths merged below (.opencode/skill/ and
+// ~/.config/opencode/skills/) match the skills section of the format doc.
+// GoStruct pattern will produce output only if upstream extraction surfaces
+// Skill.* fields. MCP, agents, and commands recognition are pending the
+// follow-up recognizer PR — see the comment blocks immediately above this
+// function.
 func recognizeOpencode(ctx RecognitionContext) RecognitionResult {
 	result := recognizeGoStruct(ctx.Fields, SkillsGoStructOptions())
 	if len(result) == 0 {

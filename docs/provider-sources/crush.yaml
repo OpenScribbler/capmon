@@ -1,5 +1,11 @@
 # Crush — Provider Source Manifest
 # Good source: public Go repo with JSON Schema. No hooks, no commands. Skills via Agent Skills standard.
+#
+# Lineage: the Crush team originally built opencode-ai/opencode (archived
+# read-only 2025-09-18, final release v0.0.55), then moved to Charm and built
+# Crush as that project's successor. Not to be confused with the ACTIVE
+# `opencode` provider capmon tracks — anomalyco/opencode (opencode.ai), an
+# unrelated project that shares the name; see docs/provider-sources/opencode.yaml.
 
 schema_version: "1" # Manifest format version — bump when the schema changes
 last_verified: "2026-03-30" # When URLs and data were last confirmed accurate

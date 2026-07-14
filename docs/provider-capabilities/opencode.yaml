@@ -2,4 +2,143 @@ schema_version: "1"
 slug: opencode
 display_name: ""
 last_verified: ""
-content_types: {}
+content_types:
+  skills:
+    supported: true
+    capabilities:
+      canonical_filename:
+        supported: true
+        mechanism: fixed filename SKILL.md inside the skill directory (Agent Skills spec)
+        confidence: confirmed
+      compatibility:
+        supported: true
+        mechanism: 'yaml frontmatter key: compatibility (optional)'
+        confidence: confirmed
+      description:
+        supported: true
+        mechanism: 'yaml frontmatter key: description (required)'
+        confidence: confirmed
+      display_name:
+        supported: true
+        mechanism: 'yaml frontmatter key: name (required)'
+        confidence: confirmed
+      global_scope:
+        supported: true
+        mechanism: cross-provider convention at ~/.config/opencode/skills/<name>/SKILL.md
+        confidence: confirmed
+      license:
+        supported: true
+        mechanism: 'yaml frontmatter key: license (optional)'
+        confidence: confirmed
+      metadata_map:
+        supported: true
+        mechanism: 'yaml frontmatter key: metadata (optional map)'
+        confidence: confirmed
+      project_scope:
+        supported: true
+        mechanism: cross-provider SKILL.md convention at .opencode/skill/<name>/SKILL.md
+        confidence: confirmed
+  rules:
+    supported: true
+    capabilities:
+      activation_mode:
+        supported: false
+        mechanism: rule files load unconditionally as context; no conditional activation syntax documented
+        confidence: inferred
+      auto_memory:
+        supported: false
+        mechanism: no runtime command documented for persisting notes into rule files
+        confidence: inferred
+      cross_provider_recognition:
+        supported: true
+        capabilities:
+          agents_md:
+            supported: true
+            mechanism: AGENTS.md read from project root and parent directories; global at ~/.config/opencode/AGENTS.md
+            confidence: confirmed
+          claude_md:
+            supported: true
+            mechanism: 'CLAUDE.md fallback at project root and ~/.claude/CLAUDE.md globally when no AGENTS.md exists; disable via OPENCODE_DISABLE_CLAUDE_CODE=1'
+            confidence: confirmed
+      file_imports:
+        supported: true
+        mechanism: instructions array in opencode.json (or the global ~/.config/opencode/opencode.json) lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context
+        confidence: confirmed
+      hierarchical_loading:
+        supported: true
+        mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md appended; all matching files combined
+        confidence: confirmed
+  hooks:
+    supported: false
+  mcp:
+    supported: true
+    capabilities:
+      enterprise_management:
+        supported: true
+        mechanism: organizations publish default MCP server configs via a .well-known/opencode endpoint; local opencode.json values override remote defaults
+        confidence: confirmed
+      env_var_expansion:
+        supported: true
+        mechanism: '{env:VAR_NAME} interpolation in remote server headers and oauth fields; local servers take an environment object of key-value pairs'
+        confidence: confirmed
+      oauth_support:
+        supported: true
+        mechanism: 'OAuth 2.0 with Dynamic Client Registration (RFC 7591): 401 auto-detected, tokens stored in ~/.local/share/opencode/mcp-auth.json; oauth object for pre-registered credentials or oauth: false to disable'
+        confidence: confirmed
+      tool_filtering:
+        supported: true
+        mechanism: global tools map keyed by server-name prefix with glob patterns (e.g. mymcp_*); per-agent access via the agent permission map
+        confidence: confirmed
+      transport_types:
+        supported: true
+        mechanism: 'two types under the mcp key in opencode.json: local (stdio, launched via command array) and remote (HTTP/SSE streamable, connected via url)'
+        confidence: confirmed
+  agents:
+    supported: true
+    capabilities:
+      agent_scopes:
+        supported: true
+        mechanism: 'two scopes, both loaded and coexisting: project (.opencode/agents/ or .opencode/agent/) and user-global (~/.config/opencode/agents/)'
+        confidence: confirmed
+      definition_format:
+        supported: true
+        mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key
+        confidence: confirmed
+      invocation_patterns:
+        supported: true
+        capabilities:
+          at_mention:
+            supported: true
+            mechanism: subagents invoked manually by @-mentioning the subagent name in a message; agent name derives from the filename
+            confidence: confirmed
+          natural_language:
+            supported: true
+            mechanism: subagents invoked automatically by primary agents for specialized tasks based on their description field
+            confidence: confirmed
+      model_selection:
+        supported: true
+        mechanism: frontmatter model field (provider/model-id format) overrides the session default; subagents default to the invoking primary agent's model
+        confidence: confirmed
+      per_agent_mcp:
+        supported: false
+        mechanism: no per-agent mcpServers field documented; agents inherit the workspace MCP configuration, with per-agent access gated via the permission map
+        confidence: confirmed
+      subagent_spawning:
+        supported: true
+        mechanism: 'agents with mode: subagent (or all) are invocable from other agents via the Task tool, driven by the callee''s description; permission.task on the orchestrator controls which subagents it may invoke'
+        confidence: confirmed
+      tool_restrictions:
+        supported: true
+        mechanism: permission frontmatter map configures ask/allow/deny per tool using named keys or wildcard glob patterns; fine-grained keys accept glob/pattern-to-action objects
+        confidence: confirmed
+  commands:
+    supported: true
+    capabilities:
+      argument_substitution:
+        supported: true
+        mechanism: $ARGUMENTS carries all arguments as a single string; positional $1/$2/$3 carry individual arguments — substituted from user input at invocation time
+        confidence: confirmed
+      builtin_commands:
+        supported: true
+        mechanism: built-in /init, /undo, /redo, /share, /help; custom commands override built-ins when given the same name
+        confidence: confirmed

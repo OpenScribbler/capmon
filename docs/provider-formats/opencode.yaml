@@ -5,7 +5,7 @@ category: cli
 # - required: true | false | null (null = source doesn't say)
 # - value_type: see allow-list in formatdoc_validate.go
 # - examples: [{title?, lang, code, note?}]
-last_fetched_at: "2026-07-14T00:38:38Z"
+last_fetched_at: "2026-07-14T18:33:51Z"
 last_changed_at: "2026-07-13T18:22:14Z"
 generation_method: subagent
 
@@ -57,16 +57,16 @@ content_types:
         confidence: confirmed
     provider_extensions: []
     loading_model: ""
-    notes: "OpenCode (sst/opencode, opencode.ai) has no native skill implementation — the cross-provider SKILL.md convention applies. All mappings are inferred from community convention and the human format doc, not from OpenCode's own source."
+    notes: "opencode (anomalyco/opencode — formerly sst/opencode — opencode.ai) has no native skill implementation — the cross-provider SKILL.md convention applies. All mappings are inferred from community convention and the human format doc, not from opencode's own source."
 
   rules:
     status: supported
     sources:
-      - uri: "https://opencode.ai/docs/rules/"
+      - uri: "https://opencode.ai/docs/rules.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:7193ac6a72ddac37f000ed5c5a7a4be667ed035d5637aacae9e7c472ae73e96d"
-        fetched_at: "2026-07-14T00:38:38Z"
+        fetch_method: md_url
+        content_hash: "sha256:dfb242d9a8c0cfb1c97cee74a895b56ba72cba64b558200f06eede4f5f93cb54"
+        fetched_at: "2026-07-14T18:33:51Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -119,16 +119,16 @@ content_types:
   agents:
     status: supported
     sources:
-      - uri: "https://opencode.ai/docs/agents/"
+      - uri: "https://opencode.ai/docs/agents.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:1da8aca036511883626f482fb40e74a2fcd236ab7369d8a9d28d383dcd8fb420"
-        fetched_at: "2026-07-14T00:38:38Z"
-      - uri: "https://raw.githubusercontent.com/sst/opencode/dev/packages/opencode/src/config/agent.ts"
+        fetch_method: md_url
+        content_hash: "sha256:7b7dfc8ca2fc363358d6c6f4625bc13d8386942f9b64b0fcaa711a5aeee56074"
+        fetched_at: "2026-07-14T18:33:51Z"
+      - uri: "https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/opencode/src/config/agent.ts"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:4844d4dfa48a516f5b134b0e310c3b0fc11292d0180b0b12ab8d96a43775efa7"
-        fetched_at: "2026-07-14T00:38:38Z"
+        fetched_at: "2026-07-14T18:33:51Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -184,7 +184,7 @@ content_types:
       - id: steps
         name: Per-step iteration limit
         summary: "Frontmatter steps field caps the number of agentic iterations before the agent is forced to respond with text only and summarize its work. Replaces the deprecated maxSteps field."
-        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/core/src/v1/config/agent.ts"
+        source_ref: "https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/v1/config/agent.ts"
         graduation_candidate: true
         conversion: translated
         provider_field: steps
@@ -205,14 +205,14 @@ content_types:
       - id: color
         name: Agent color tag
         summary: "Optional color hint for UI display of the agent. Accepts a hex color string (#RRGGBB) or a theme color name (primary, secondary, accent, success, warning, error, info)."
-        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/core/src/v1/config/agent.ts"
+        source_ref: "https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/v1/config/agent.ts"
         graduation_candidate: false
         conversion: embedded
         provider_field: color
       - id: hidden
         name: Hidden from pickers
         summary: "Boolean hidden flag (default: false) excludes a subagent from the @ autocomplete menu while still allowing programmatic invocation via the Task tool. Only applies to mode: subagent agents."
-        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/core/src/v1/config/agent.ts"
+        source_ref: "https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/v1/config/agent.ts"
         graduation_candidate: false
         conversion: embedded
         provider_field: hidden
@@ -226,7 +226,7 @@ content_types:
       - id: variant
         name: Default model variant
         summary: "Optional variant field specifies the default model variant for this agent. Applies only when using the agent's configured model."
-        source_ref: "https://raw.githubusercontent.com/sst/opencode/dev/packages/core/src/v1/config/agent.ts"
+        source_ref: "https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/core/src/v1/config/agent.ts"
         graduation_candidate: false
         conversion: embedded
         provider_field: variant
@@ -249,11 +249,11 @@ content_types:
   commands:
     status: supported
     sources:
-      - uri: "https://opencode.ai/docs/commands/"
+      - uri: "https://opencode.ai/docs/commands.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:9d4900e5e744946f37ab6192cb887d152616055a3e3be20df435f29a3438cbc8"
-        fetched_at: "2026-07-14T00:38:38Z"
+        fetch_method: md_url
+        content_hash: "sha256:7a1db15a20488c4c1813e135962480978788bf0509d866346d2e3cdde8a850e1"
+        fetched_at: "2026-07-14T18:33:51Z"
     canonical_mappings:
       argument_substitution:
         supported: true
@@ -310,11 +310,11 @@ content_types:
   mcp:
     status: supported
     sources:
-      - uri: "https://opencode.ai/docs/mcp-servers/"
+      - uri: "https://opencode.ai/docs/mcp-servers.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:3ce1f56ebbe2ffc03213188645126ab0f080461704d5351589b3e5c66819eb2a"
-        fetched_at: "2026-07-14T00:38:38Z"
+        fetch_method: md_url
+        content_hash: "sha256:a8c9af4721d0553baa517c4fbd3f064fceadc18bf37bf2def649b5ace3d89d6c"
+        fetched_at: "2026-07-14T18:33:51Z"
     canonical_mappings:
       transport_types:
         supported: true
