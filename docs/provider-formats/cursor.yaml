@@ -5,7 +5,7 @@ category: standalone-app
 # - required: true | false | null (null = source doesn't say)
 # - value_type: see allow-list in formatdoc_validate.go
 # - examples: [{title?, lang, code, note?}]
-last_fetched_at: "2026-07-14T00:38:11Z"
+last_fetched_at: "2026-07-14T18:58:14Z"
 last_changed_at: "2026-07-13T18:21:27Z"
 generation_method: subagent
 
@@ -13,11 +13,11 @@ content_types:
   rules:
     status: supported
     sources:
-      - uri: "https://cursor.com/docs/rules"
+      - uri: "https://cursor.com/docs/rules.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:ba7541afdade9cd8b10a2c7fa73a768769d2595a6f5c5f5803bd8770f1a653b7"
-        fetched_at: "2026-07-14T00:38:11Z"
+        fetch_method: md_url
+        content_hash: "sha256:cf6fc312cacbdab72daca7d7661b762f263662fcdeec58b0e11c6ed0ff78f7c3"
+        fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -121,11 +121,11 @@ content_types:
   skills:
     status: supported
     sources:
-      - uri: "https://cursor.com/docs/skills"
+      - uri: "https://cursor.com/docs/skills.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:515553610bca313a942694e602f3b862d3ef1bf1bd295375bfc2da7e1252a9b6"
-        fetched_at: "2026-07-14T00:38:11Z"
+        fetch_method: md_url
+        content_hash: "sha256:32d6836220da99f9f851a39031a188a887b6ea038a2730a288e8a3b820ca4064"
+        fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -224,11 +224,11 @@ content_types:
   hooks:
     status: supported
     sources:
-      - uri: "https://cursor.com/docs/hooks"
+      - uri: "https://cursor.com/docs/hooks.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:cad2718037d7fcc057ce2900c2f22a77158e5381fb201a59844124956b07186d"
-        fetched_at: "2026-07-14T00:38:11Z"
+        fetch_method: md_url
+        content_hash: "sha256:cfc732d8d2f210cc34f5eb060eba7fd65a891159dc1cdb228f6171fb9cd1018a"
+        fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       handler_types:
         supported: true
@@ -344,11 +344,11 @@ content_types:
   mcp:
     status: supported
     sources:
-      - uri: "https://cursor.com/docs/mcp"
+      - uri: "https://cursor.com/docs/mcp.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:21180b425e2816ac42aad4d84373cb3388d2f000423b91848de64d36c4f651d5"
-        fetched_at: "2026-07-14T00:38:11Z"
+        fetch_method: md_url
+        content_hash: "sha256:1bbd67fb28afd37b34ac961d63c0e1577f3ec4fe94ecab08b1bdefa4c751715d"
+        fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -446,11 +446,11 @@ content_types:
   agents:
     status: supported
     sources:
-      - uri: "https://cursor.com/docs/subagents"
+      - uri: "https://cursor.com/docs/subagents.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:de86cfdea7b58ad55fb9cfab7acf6752c73d3ec89bb4b01473807b518624a1f0"
-        fetched_at: "2026-07-14T00:38:11Z"
+        fetch_method: md_url
+        content_hash: "sha256:20689c5a050ba6d7a08e9e838ba976a5045c620a32216a8c90092085b19f29a0"
+        fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       definition_format:
         supported: true

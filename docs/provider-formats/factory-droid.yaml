@@ -1,7 +1,7 @@
 provider: factory-droid
 docs_url: "https://docs.factory.ai"
 category: cli
-last_fetched_at: "2026-07-14T00:38:11Z"
+last_fetched_at: "2026-07-14T18:58:19Z"
 last_changed_at: "2026-07-13T18:25:13Z"
 generation_method: subagent
 
@@ -9,11 +9,11 @@ content_types:
   skills:
     status: supported
     sources:
-      - uri: "https://docs.factory.ai/cli/configuration/skills"
+      - uri: "https://docs.factory.ai/cli/configuration/skills.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:e919c0aa4d47004e85b835112e50f03ed488ac64657f71be6417cecf69a446a6"
-        fetched_at: "2026-07-14T00:38:11Z"
+        fetch_method: md_url
+        content_hash: "sha256:44b3eeec8ee037c1c458bd193c0e8f5fda4861e5f366a10119ff9d0df2ddacf1"
+        fetched_at: "2026-07-14T18:58:19Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -270,11 +270,11 @@ content_types:
   mcp:
     status: supported
     sources:
-      - uri: "https://docs.factory.ai/cli/configuration/mcp"
+      - uri: "https://docs.factory.ai/cli/configuration/mcp.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:ef76c7f1c69d0a76683c384757fe94271f59f25a442e71580ab02aa34022c9ad"
-        fetched_at: "2026-07-14T00:38:11Z"
+        fetch_method: md_url
+        content_hash: "sha256:5e3778bd3492a80b59b350e763d2ab8fdea17dadcb571a1ca82c19567b34afc7"
+        fetched_at: "2026-07-14T18:58:19Z"
     canonical_mappings:
       transport_types:
         supported: true
