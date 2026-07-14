@@ -34,10 +34,15 @@ docs_conventions:
   auth_gated_paths:
     - "/auth/sign-in"
     - "/login"
-  # Known-dead path: the hooks.md page was retired in favor of an inline
-  # section at /manual?internal#hooks. Variant generator must not propose
-  # replacements for this path (e.g. /manual/hooks/index.md still 302s to
-  # /auth/sign-in, which is the bug pattern that triggered this bead).
+  # Known-dead paths: the hooks.md page was retired in early 2026, and the
+  # declarative-hooks model it documented is now gone entirely — Amp replaced
+  # it with a TypeScript Plugin API (see the hooks content type below). The
+  # former inline "#hooks" anchor on /manual?internal no longer exists (no
+  # "Hooks" heading remains); the live surfaces are the Plugins section
+  # (#plugins, #plugin-locations, #writing-plugins) and the /manual/plugin-api
+  # reference page. Variant generator must not propose replacements for these
+  # paths (e.g. /manual/hooks/index.md still 302s to /auth/sign-in, the bug
+  # pattern that triggered the original bead).
   retired_paths:
     - "/manual/hooks.md"
 
@@ -73,15 +78,32 @@ content_types:
 
   hooks:
     sources:
+      - url: https://ampcode.com/manual/plugin-api
+        type: docs
+        format: html
+        extracts: [plugin_api_reference, event_map, tool_call_result, register_tool, register_command]
+
+      - url: https://ampcode.com/manual?internal
+        type: docs
+        format: html
+        extracts: [plugin_locations, event_lifecycle, ui_and_ai_helpers, permissions_compat]
+
       - url: https://ampcode.com/manual/appendix/legacy-permissions-rules.txt
         type: docs
         format: markdown
         extracts: [permissions_schema, match_conditions]
-    # Amp supports hooks via amp.hooks array in settings JSON (tool:pre-execute / tool:post-execute).
-    # NOT file-based — stored as JSON config entries. Installers manage via JSON merge into settings.
-    # Note: ampcode.com/manual/hooks.md was retired; the hooks section now lives inline at
-    # ampcode.com/manual?internal#hooks (auth-gated). Recognition is anchored entirely on
-    # legacy-permissions-rules.txt — see recognize_amp.go (ampHooksLandmarkOptions).
+    # Amp's declarative hooks model (amp.hooks array, tool:pre-execute / tool:post-execute) was
+    # RETIRED in 2026-07 and replaced by a TypeScript Plugin API. Plugins are .ts files in
+    # .amp/plugins/ (+ ~/.config/amp/plugins/, and an experimental workspace-global location) that
+    # export a default function receiving a PluginAPI; amp.on() subscribes to session.start,
+    # agent.start, tool.call, tool.result, and agent.end. Handlers are TypeScript functions
+    # (not shell-command-only) and tool.call handlers can allow / reject-and-continue / modify /
+    # synthesize a call. The old ampcode.com/manual?internal#hooks anchor is DEAD; the Plugins
+    # section (#plugins, #plugin-locations, #writing-plugins, #permissions) plus the /manual/plugin-api
+    # reference page are the canonical surfaces. Legacy amp.permissions rules now run via an internal
+    # compatibility plugin (documented under #permissions) and stay documented at
+    # legacy-permissions-rules.txt — which remains the recognizer anchor (recognize_amp.go
+    # ampHooksLandmarkOptions).
 
   mcp:
     sources:

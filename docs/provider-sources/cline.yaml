@@ -3,7 +3,7 @@
 # llms.txt: https://docs.cline.bot/llms.txt
 
 schema_version: "1"
-last_verified: "2026-04-09"
+last_verified: "2026-07-14"
 
 slug: cline
 display_name: Cline
@@ -41,23 +41,38 @@ content_types:
     # Cross-tool compat: also reads .cursorrules, .windsurfrules, AGENTS.md.
 
   hooks:
+    # 2026-07-14 (issue #5, resolved): Cline ships TWO hook models split by surface.
+    # (A) Plugin model (SDK / CLI / Kanban only) — documented on the live plugin pages;
+    #     customization/hooks.md is now a stub redirecting there.
+    # (B) Filesystem-script model (VS Code / JetBrains) — LIVE but no longer documented;
+    #     tracked via extension source (hook-factory.ts imports the 8 hook data types,
+    #     disk.ts resolves the .clinerules/hooks + ~/Documents/Cline/Hooks paths).
+    # Filesystem model: 8 hook types (TaskStart, TaskResume, TaskCancel, TaskComplete,
+    #   PreToolUse, PostToolUse, UserPromptSubmit, PreCompact); JSON via stdin → JSON to
+    #   stdout ({cancel, contextModification?, errorMessage?}); shell/PowerShell; 30s timeout.
+    # Plugin model: AgentPlugin lifecycle handlers (beforeRun/afterRun/beforeModel/
+    #   afterModel/beforeTool/afterTool/onEvent), hook stages, hook policies (mode
+    #   blocking|async, timeoutMs, retries, failureMode fail_open|fail_closed, …).
     sources:
-      - url: https://docs.cline.bot/customization/hooks.md
+      - url: https://docs.cline.bot/sdk/plugins.md
         type: docs
         format: markdown
         extracts: [event_names, hook_config_fields, event_io_schemas, config_examples, features]
-    # ⚠ 2026-07-13 (issue #5): customization/hooks.md is now a stub redirecting to
-    # the SDK plugin docs (/customization/plugins, /sdk/plugins). Hooks moved from
-    # the filesystem-script model below to TypeScript plugin lifecycle handlers
-    # (beforeTool/afterTool/…, hook stages, hook policies with mode blocking|async).
-    # Re-point pending maintainer decision (the plugins Warning says the new model
-    # doesn't yet apply to VSCode/JetBrains, so the old model may persist there).
-    # OLD (filesystem) model, may still apply to VSCode/JetBrains:
-    # 9 events: TaskStart, TaskResume, TaskCancel, TaskComplete, PreToolUse,
-    #           PostToolUse, UserPromptSubmit, Notification, PreCompact
-    # Hook I/O: JSON via stdin → JSON to stdout ({cancel, contextModification?, errorMessage?}).
-    # Shell scripts (bash/PowerShell). 30s timeout. 50KB max context modification.
-    # Stored in .clinerules/hooks/ (project) or ~/Documents/Cline/Hooks/ (global).
+
+      - url: https://docs.cline.bot/customization/plugins.md
+        type: docs
+        format: markdown
+        extracts: [file_locations, config_examples, features]
+
+      - url: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/hooks/hook-factory.ts
+        type: source-code
+        format: typescript
+        extracts: [event_names, event_io_schemas, hook_config_fields]
+
+      - url: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts
+        type: source-code
+        format: typescript
+        extracts: [file_locations]
 
   mcp:
     sources:
@@ -100,3 +115,12 @@ content_types:
         type: docs
         format: markdown
         extracts: [file_format, file_locations, features]
+
+      # 2026-07-14 (issue #5): user-authored Workflows doc removed but the feature is
+      # live in the extension — track via source. workflows.ts refreshes global +
+      # workspace workflow toggles against .clinerules/workflows and ~/Documents/Cline/
+      # Workflows (paths resolved in disk.ts, already tracked under hooks).
+      - url: https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/context/instructions/user-instructions/workflows.ts
+        type: source-code
+        format: typescript
+        extracts: [file_locations, file_format]
