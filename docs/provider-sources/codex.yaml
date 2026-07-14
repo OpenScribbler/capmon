@@ -103,6 +103,48 @@ content_types:
         format: json-schema
         extracts: [event_io_schemas]
 
+      # Compact lifecycle hooks (PreCompact/PostCompact, openai/codex #19905)
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/pre-compact.command.input.schema.json
+        type: schema
+        format: json-schema
+        extracts: [event_io_schemas]
+
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/pre-compact.command.output.schema.json
+        type: schema
+        format: json-schema
+        extracts: [event_io_schemas]
+
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/post-compact.command.input.schema.json
+        type: schema
+        format: json-schema
+        extracts: [event_io_schemas]
+
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/post-compact.command.output.schema.json
+        type: schema
+        format: json-schema
+        extracts: [event_io_schemas]
+
+      # Subagent lifecycle hooks (SubagentStart/SubagentStop, #22782, #22873)
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/subagent-start.command.input.schema.json
+        type: schema
+        format: json-schema
+        extracts: [event_io_schemas]
+
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/subagent-start.command.output.schema.json
+        type: schema
+        format: json-schema
+        extracts: [event_io_schemas]
+
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/subagent-stop.command.input.schema.json
+        type: schema
+        format: json-schema
+        extracts: [event_io_schemas]
+
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/hooks/schema/generated/subagent-stop.command.output.schema.json
+        type: schema
+        format: json-schema
+        extracts: [event_io_schemas]
+
       # TypeScript type definitions for event names and handler config
       - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/app-server-protocol/schema/typescript/v2/HookEventName.ts
         type: source-code

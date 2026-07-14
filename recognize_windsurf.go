@@ -83,9 +83,17 @@ func windsurfHooksLandmarkOptions() LandmarkOptions {
 // evidence: transport_types, env_var_expansion, tool_filtering, marketplace,
 // enterprise_management.
 //
-// Three keys are intentionally absent:
-//   - oauth_support: no OAuth heading; curator confirms windsurf does not
-//     document OAuth 2.0 for remote servers.
+// Three keys are not emitted as landmarks here:
+//   - oauth_support: NOT emitted by the recognizer, but NOT because windsurf
+//     lacks OAuth. The MCP doc DOES document it — "Devin Desktop also supports
+//     OAuth for each transport type" — and docs/provider-formats/windsurf.yaml
+//     curates oauth_support: supported: true / confidence: confirmed accordingly.
+//     It is unemitted here only because that single prose sentence carries no
+//     dedicated OAuth heading for a substring landmark to anchor on; the curated
+//     format-YAML value is authoritative.
+//     Verified live: https://docs.devin.ai/desktop/cascade/mcp.md on 2026-07-14.
+//     The page documents OAuth for each transport type (stdio, Streamable HTTP,
+//     SSE) in prose, but with no OAuth heading to gate a landmark emission.
 //   - auto_approve: no auto-approve heading; curator confirms windsurf does
 //     not support pre-configured auto-approval.
 //   - resource_referencing: no @-mention or resources heading; curator

@@ -19,6 +19,14 @@ content_types:
         fetch_method: gh_raw
         content_hash: "sha256:35cd5e8a17aedc0a7c70c58d24875270b6227b1b760224f0d27cd7b609928977"
         fetched_at: "2026-07-14T00:38:09Z"
+      # Skill locations table (incl. the org/enterprise-hosted 'Remote' scope)
+      # is documented here — evidence for shared_scope, which the how-to/concept
+      # sources above have not yet caught up to.
+      - uri: "https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/copilot-cli-reference/cli-command-reference.md"
+        type: documentation
+        fetch_method: gh_raw
+        content_hash: "sha256:a75ac9768545181709a1a44c7f8bb169b18441ca3d88e5198acaa824ea38d5c8"
+        fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       display_name:
         supported: true

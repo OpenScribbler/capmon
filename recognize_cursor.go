@@ -150,14 +150,19 @@ func cursorSkillsLandmarkOptions() LandmarkOptions {
 //     YAML lines 212–215).
 //
 // Six other canonical hooks keys are intentionally unmapped:
-//   - handler_types: NOT emitted — the format-YAML curator marks
-//     handler_types: supported: false confirmed (line 188–191: "Cursor hooks
-//     execute shell commands only"). The cache landmarks "Command-Based Hooks"
-//     and "Prompt-Based Hooks" suggest the curator's claim may be outdated
-//     (Cursor appears to have added prompt-based hooks since the YAML was
-//     curated), but the recognizer must not contradict a confirmed curator
-//     judgment. If the curator's claim is wrong, that is a format-YAML edit,
-//     not a recognizer emission.
+//   - handler_types: NOT emitted — but for a curation reason, not a
+//     capability one. The format-YAML curator now marks handler_types:
+//     supported: true confirmed (two handler types: command shell scripts
+//     over stdio JSON, and prompt LLM-evaluated conditions), which the cache
+//     landmarks "Command-Based Hooks" and "Prompt-Based Hooks" corroborate.
+//     Emission stays off here because that supported claim is a hand-curated
+//     master judgment: the recognizer defers to the curator rather than
+//     re-deriving handler_types from a landmark, so the confirmed curated
+//     value is the single source of truth (a landmark-inferred emission would
+//     only be redundant). This comment previously said the curator marked
+//     handler_types supported: false; that was stale — see docs/provider-formats/cursor.yaml.
+//   - decision_control: documented as exit-code semantics in body prose; no
+//     dedicated heading.
 //   - decision_control: documented as exit-code semantics in body prose; no
 //     dedicated heading.
 //   - input_modification, async_execution, context_injection,

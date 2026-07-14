@@ -101,6 +101,11 @@ content_types:
         fetch_method: gh_raw
         content_hash: "sha256:d00eeaef22453de4756a9862d8467750f772e239c4ee9b6f755709429b47c2cf"
         fetched_at: "2026-07-14T00:38:36Z"
+      - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/tools/memory.md"
+        type: documentation
+        fetch_method: gh_raw
+        content_hash: "sha256:f441a575c49c629875423e76476454f24e5bee8e9aa71a8453f0993e310f54e1"
+        fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       activation_mode:
         supported: false

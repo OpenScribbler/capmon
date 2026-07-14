@@ -17,14 +17,19 @@ func init() {
 //     yields a single landmark "MCPClient" — a Go struct name, not heading
 //     evidence and not aligned to any of the 8 canonical MCP keys.
 //
-// docs/provider-formats/opencode.yaml has no curated mcp section either —
-// opencode is archived and the human-edited curator skipped MCP entirely.
+// NOTE (2026-07-14): docs/provider-formats/opencode.yaml DOES now carry a fully
+// curated mcp section — but for a different project. The format doc was
+// re-curated to track sst/opencode (opencode.ai, active), whereas the cached
+// sources above and this manifest's content_types still point at the legacy,
+// archived opencode-ai/opencode Go tree (and the crush schema). The two describe
+// different same-named projects — see the identity-divergence flag in
+// docs/provider-sources/opencode.yaml.
 //
-// Recognizer silence is the right move — emitting any canonical MCP key
-// based on these landmarks would either be a false positive (crush schema
-// fields incorrectly attributed to opencode) or unanchored (struct name
-// without semantic meaning). MCP recognition can be wired once a correct
-// opencode MCP source is added to the cache.
+// Recognizer silence is still the right move against these caches — emitting any
+// canonical MCP key from the legacy opencode-ai / crush landmarks would either be
+// a false positive (crush schema fields attributed to opencode) or unanchored (a
+// struct name without semantic meaning). MCP recognition can be wired once the
+// cache is rebuilt from the project the format doc actually tracks (sst/opencode).
 
 // Agents recognition is intentionally NOT wired for opencode.
 //
@@ -43,14 +48,17 @@ func init() {
 // source describes how the runtime emits events about ONE agent's
 // processing, not how multiple custom agents are defined or invoked.
 //
-// docs/provider-formats/opencode.yaml has no curated agents section —
-// opencode is archived (charmbracelet/crush is its evolution) and the
-// human-edited curator skipped agents entirely.
+// NOTE (2026-07-14): docs/provider-formats/opencode.yaml DOES now carry a fully
+// curated agents section — but for sst/opencode (opencode.ai, active), which the
+// format doc was re-curated to track. The cached agents source above is still the
+// legacy, archived opencode-ai/opencode Go runtime file — a different same-named
+// project. See the identity-divergence flag in docs/provider-sources/opencode.yaml.
 //
-// Recognizer silence is the right move — emitting any canonical agents key
-// based on AgentEvent runtime types would conflate "agent runtime exists"
-// with "user-defined custom agents are supported". The latter is not
-// documented in any cached opencode source.
+// Recognizer silence is still the right move against this cache — emitting any
+// canonical agents key from the legacy AgentEvent runtime types would conflate
+// "agent runtime exists" with "user-defined custom agents are supported". Agents
+// recognition can be wired once the cache is rebuilt from the project the format
+// doc actually tracks (sst/opencode), whose agent format IS documented.
 
 // Commands recognition is intentionally NOT wired for opencode.
 //
@@ -63,24 +71,28 @@ func init() {
 // (argument_substitution, builtin_commands) can be anchored on a single
 // message-struct name.
 //
-// docs/provider-formats/opencode.yaml has no curated commands section —
-// opencode is archived (charmbracelet/crush is its evolution) and the
-// human-edited curator skipped commands entirely.
+// NOTE (2026-07-14): docs/provider-formats/opencode.yaml DOES now carry a fully
+// curated commands section — but for sst/opencode (opencode.ai, active), which
+// the format doc was re-curated to track. The cached commands source above is
+// still the legacy, archived opencode-ai/opencode Go TUI file — a different
+// same-named project. See the identity-divergence flag in
+// docs/provider-sources/opencode.yaml.
 //
-// Recognizer silence is the right move — emitting any commands key based on
-// CommandRunCustomMsg would conflate "TUI dispatcher exists" with "slash-
-// command authoring is supported". The latter is not documented in any
-// cached opencode source. Commands recognition can be wired once a
-// documentation source (or a typed source enumerating built-in /-commands)
-// is added to the cache.
+// Recognizer silence is still the right move against this cache — emitting any
+// commands key from the legacy CommandRunCustomMsg TUI dispatcher would conflate
+// "TUI dispatcher exists" with "slash-command authoring is supported". Commands
+// recognition can be wired once the cache is rebuilt from the project the format
+// doc actually tracks (sst/opencode), whose command format IS documented.
 
 // recognizeOpencode recognizes skills capabilities for the OpenCode provider.
-// OpenCode is archived; it has no native skill implementation, so this
-// recognizer uses the cross-provider SKILL.md convention. GoStruct pattern
-// will produce output only if upstream extraction surfaces Skill.* fields
-// (unlikely for an archived project). MCP, agents, and commands recognition
-// are intentionally absent — see the comment blocks immediately above this
-// function for rationale.
+// OpenCode has no native skill format, so this recognizer uses the cross-provider
+// SKILL.md convention; the static scope paths merged below (.opencode/skill/ and
+// ~/.config/opencode/skills/) match the skills section of the format doc, which
+// now tracks the active sst/opencode (opencode.ai). GoStruct pattern will produce
+// output only if upstream extraction surfaces Skill.* fields. MCP, agents, and
+// commands recognition are intentionally absent — see the comment blocks
+// immediately above this function for rationale, including the sst/opencode vs
+// legacy opencode-ai/opencode source-identity divergence.
 func recognizeOpencode(ctx RecognitionContext) RecognitionResult {
 	result := recognizeGoStruct(ctx.Fields, SkillsGoStructOptions())
 	if len(result) == 0 {
