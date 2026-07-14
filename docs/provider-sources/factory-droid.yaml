@@ -28,36 +28,32 @@ content_types:
   # Hook schema matches Claude Code's format.
   # ─────────────────────────────────────────────────────────────────────
 
-  # docs.factory.ai is server-rendered now (2026-07-13): a plain HTTP GET returns
-  # the full page content, not an empty JS shell. All docs.factory.ai sources
-  # therefore use fetch_method: readability (Mozilla Readability over the HTTP
-  # response) and format: markdown — the same plain-HTTP Mintlify path Cline and
-  # other Mintlify providers use, so chromedp is no longer required.
+  # docs.factory.ai is server-rendered now (2026-07-13): plain HTTP returns full
+  # content, so chromedp is no longer required. Doc sources point at Mintlify's
+  # markdown mirror (<page>.md, format: markdown) on the default HTTP path —
+  # the same pattern as cline's docs.cline.bot sources.
   # llms.txt is a plain text manifest, so it stays on the http path.
 
   rules:
     sources:
       # URL moved 2026-07-13: the AGENTS.md doc relocated from
       # /cli/configuration (now the Sandbox page) to /cli/configuration/agents-md.
-      - url: https://docs.factory.ai/cli/configuration/agents-md
+      - url: https://docs.factory.ai/cli/configuration/agents-md.md
         type: docs
         format: markdown
-        fetch_method: readability
         extracts: [file_format, file_locations]
     # Format: AGENTS.md in project root (plain Markdown, no frontmatter)
     # Cross-provider convention shared with Cursor, Windsurf, etc.
 
   hooks:
     sources:
-      - url: https://docs.factory.ai/cli/configuration/hooks-guide
+      - url: https://docs.factory.ai/cli/configuration/hooks-guide.md
         type: docs
         format: markdown
-        fetch_method: readability
         extracts: [event_names, hook_config_fields, matcher_format, exit_codes]
-      - url: https://docs.factory.ai/reference/hooks-reference
+      - url: https://docs.factory.ai/reference/hooks-reference.md
         type: docs
         format: markdown
-        fetch_method: readability
         extracts: [event_names, event_io_schemas, hook_decisions, exit_codes]
     # Events: PreToolUse, PostToolUse, UserPromptSubmit, Stop, SessionStart,
     #         SessionEnd, PreCompact, SubagentStart, SubagentStop
@@ -66,10 +62,9 @@ content_types:
 
   mcp:
     sources:
-      - url: https://docs.factory.ai/cli/configuration/mcp
+      - url: https://docs.factory.ai/cli/configuration/mcp.md
         type: docs
         format: markdown
-        fetch_method: readability
         extracts: [server_config_fields, transport_types, oauth_support, tool_filtering, marketplace]
     # Mintlify docs, server-rendered — plain HTTP + readability (no chromedp).
     # Transports: stdio, http
@@ -80,28 +75,25 @@ content_types:
 
   skills:
     sources:
-      - url: https://docs.factory.ai/cli/configuration/skills
+      - url: https://docs.factory.ai/cli/configuration/skills.md
         type: docs
         format: markdown
-        fetch_method: readability
         extracts: [file_format, frontmatter_fields, file_locations]
     # Format: .factory/skills/<name>/SKILL.md (Markdown + YAML frontmatter)
 
   agents:
     sources:
-      - url: https://docs.factory.ai/cli/configuration/custom-droids
+      - url: https://docs.factory.ai/cli/configuration/custom-droids.md
         type: docs
         format: markdown
-        fetch_method: readability
         extracts: [file_format, config_fields, file_locations]
     # Format: .factory/droids/<name>.md (Markdown + YAML frontmatter)
     # Called "Custom Droids" — specialized subagents with model/tool restrictions
 
   commands:
     sources:
-      - url: https://docs.factory.ai/cli/configuration/custom-slash-commands
+      - url: https://docs.factory.ai/cli/configuration/custom-slash-commands.md
         type: docs
         format: markdown
-        fetch_method: readability
         extracts: [file_format, file_locations, config_fields]
     # Format: .factory/commands/<name>.md (Markdown or shebang script)
