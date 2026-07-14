@@ -1,7 +1,7 @@
 provider: cline
 docs_url: "https://docs.cline.bot"
 category: ide-extension
-last_fetched_at: "2026-07-14T01:27:39Z"
+last_fetched_at: "2026-07-14T18:58:16Z"
 last_changed_at: "2026-05-06T00:00:00Z"
 generation_method: subagent
 
@@ -14,11 +14,11 @@ content_types:
         fetch_method: md_url
         content_hash: "sha256:6f8562d51b02f3bdb9616d7efda38ea8b7799dfc06693720b6056307a21a3512"
         fetched_at: "2026-07-14T01:27:39Z"
-      - uri: "https://docs.cline.bot/customization/skills"
+      - uri: "https://docs.cline.bot/customization/skills.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:50da82a4295473e551fc7c5932e6f2e2ccc432629dca65c164d6e22d980ee690"
-        fetched_at: "2026-07-14T01:27:39Z"
+        fetch_method: md_url
+        content_hash: "sha256:6f8562d51b02f3bdb9616d7efda38ea8b7799dfc06693720b6056307a21a3512"
+        fetched_at: "2026-07-14T18:58:16Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -125,11 +125,11 @@ content_types:
   rules:
     status: supported
     sources:
-      - uri: "https://docs.cline.bot/customization/cline-rules"
+      - uri: "https://docs.cline.bot/customization/cline-rules.md"
         type: documentation
-        fetch_method: readability
-        content_hash: "sha256:921e9732295adb9cd1485d396dd3afeee0b63aee1c053a260eabd682546de941"
-        fetched_at: "2026-07-14T01:27:39Z"
+        fetch_method: md_url
+        content_hash: "sha256:1ddee314416b3f9c30e370ae6dcef8d421fc6825d269d9e50431b3637d77b74f"
+        fetched_at: "2026-07-14T18:58:16Z"
     canonical_mappings:
       activation_mode:
         supported: true
