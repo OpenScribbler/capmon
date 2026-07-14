@@ -181,6 +181,57 @@ content_types:
 
 // TestBackfillFormatDoc_ForceOverwrites asserts that Force=true re-fetches and
 // overwrites an already-populated content_hash.
+// TestBackfillFormatDoc_SkipsLocalFileSources: local_file sources live in the
+// repo (their "uri" is a bare filename) — the check path skips them and
+// backfill must too, even under --force, or it errors on every one with
+// "unsupported protocol scheme".
+func TestBackfillFormatDoc_SkipsLocalFileSources(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "test-provider.yaml")
+
+	initial := `provider: test-provider
+docs_url: "https://example.com/docs"
+category: cli
+last_fetched_at: "2026-04-11T00:00:00Z"
+generation_method: human-edited
+content_types:
+  hooks:
+    status: supported
+    sources:
+      - uri: "hooks-example.json"
+        type: example
+        fetch_method: local_file
+      - uri: "https://example.com/hooks.md"
+        type: documentation
+        fetch_method: md_url
+        content_hash: "sha256:stale"
+        fetched_at: "2026-04-11T00:00:00Z"
+    canonical_mappings: {}
+    provider_extensions: []
+`
+	if err := os.WriteFile(path, []byte(initial), 0644); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	fetcher := &stubFetcher{
+		responses: map[string][]byte{
+			"https://example.com/hooks.md": []byte("hooks doc"),
+			// No stub for hooks-example.json — a fetch attempt fails the run.
+		},
+	}
+
+	result, err := capmon.BackfillFormatDoc(context.Background(), path, fetcher, capmon.BackfillOptions{Force: true})
+	if err != nil {
+		t.Fatalf("BackfillFormatDoc with local_file source: %v", err)
+	}
+	if result.Updated != 1 {
+		t.Errorf("Updated = %d, want 1 (only the HTTP source)", result.Updated)
+	}
+	if len(fetcher.calls) != 1 || fetcher.calls[0].URI != "https://example.com/hooks.md" {
+		t.Errorf("fetcher calls = %+v, want exactly the HTTP source", fetcher.calls)
+	}
+}
+
 func TestBackfillFormatDoc_ForceOverwrites(t *testing.T) {
 	dir := t.TempDir()
 	uri := "https://example.com/src.md"

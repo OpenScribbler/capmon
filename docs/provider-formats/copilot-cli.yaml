@@ -1,7 +1,7 @@
 provider: copilot-cli
 docs_url: "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/copilot-cli"
 category: cli
-last_fetched_at: "2026-07-13T06:30:00Z"
+last_fetched_at: "2026-07-14T00:38:09Z"
 last_changed_at: "2026-05-06T14:00:00Z"
 generation_method: subagent
 
@@ -13,12 +13,12 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:7561360cf4ae22092ddc8c9f8761c7543b2b600a6915cdee4f0ad7fffada73ef"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
       - uri: "https://raw.githubusercontent.com/github/docs/main/content/copilot/how-tos/copilot-cli/customize-copilot/add-skills.md"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:35cd5e8a17aedc0a7c70c58d24875270b6227b1b760224f0d27cd7b609928977"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -141,17 +141,17 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:4bce9a8d737beb700f50f6b080bfa04fa8201c09464f464c9da39a8c0a64a2ce"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
       - uri: "https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/custom-instructions-support.md"
         type: reference
         fetch_method: http
-        content_hash: "sha256:bdd5c946a90a483d10e981bd3e593b8a72441060884e9e8dd2fc6ccfac5f8229"
-        fetched_at: "2026-07-13T18:14:05Z"
+        content_hash: "sha256:79ecb44c8a2082f7e91bb3c0d677d0f9786ede70dcb0080bf3a862bf2e449bea"
+        fetched_at: "2026-07-14T00:38:09Z"
       - uri: "https://raw.githubusercontent.com/github/docs/main/content/copilot/reference/customization-cheat-sheet.md"
         type: reference
         fetch_method: http
         content_hash: "sha256:88e506ab4e50a2fcc33a15cfab1e23018a45c5641c4a1e6cbf54891ef5755af0"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -242,17 +242,17 @@ content_types:
         type: reference
         fetch_method: http
         content_hash: "sha256:27e7b5d49c76da9cb7f407bc02541f2f7608caf5711151f90033304d7c5d6c60"
-        fetched_at: "2026-07-13T06:30:00Z"
+        fetched_at: "2026-07-14T00:38:09Z"
       - uri: "https://raw.githubusercontent.com/github/docs/main/content/copilot/how-tos/copilot-cli/customize-copilot/use-hooks.md"
         type: documentation
         fetch_method: http
         content_hash: "sha256:cbaee9b31093bbacf888908bc8672f36d62383f14fd2c841f9aaf5ea56dba523"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
       - uri: "https://raw.githubusercontent.com/github/docs/main/content/copilot/concepts/agents/copilot-cli/about-copilot-cli.md"
         type: documentation
         fetch_method: http
         content_hash: "sha256:3b134531f4c1a70d062e9e8e79fb3827ea052074e1afe577f98f501d9ddc6925"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       handler_types:
         supported: true
@@ -342,12 +342,12 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:17b2ca97d71fd9e0351dc257e94bb1cad748cb93e33f3689df54535554770a40"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
       - uri: "https://raw.githubusercontent.com/github/docs/main/content/copilot/concepts/context/mcp.md"
         type: documentation
         fetch_method: http
         content_hash: "sha256:5b4fccdfc7e572844728924307f2c5b667f4a46f57d36bdf51dd734d8b66acfe"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -460,12 +460,12 @@ content_types:
         type: reference
         fetch_method: http
         content_hash: "sha256:e86409198672a4e40e3d33156d5311e81a050036f7fd4c89ca3fb0b747416240"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
       - uri: "https://raw.githubusercontent.com/github/docs/main/content/copilot/how-tos/copilot-cli/customize-copilot/create-custom-agents-for-cli.md"
         type: documentation
         fetch_method: http
         content_hash: "sha256:3d60d2d600ab321f7e053b7ff8cdd2b69f02f3d23ee64f7411204556e9a24c5e"
-        fetched_at: "2026-04-11T21:46:21.364812422Z"
+        fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -562,7 +562,7 @@ content_types:
         type: reference
         fetch_method: http
         content_hash: "sha256:a75ac9768545181709a1a44c7f8bb169b18441ca3d88e5198acaa824ea38d5c8"
-        fetched_at: "2026-07-13T18:14:05Z"
+        fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       argument_substitution:
         supported: false

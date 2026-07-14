@@ -18,7 +18,7 @@ category: cli
 #   3. Analogy with the preceding OpenCode format (the archived ancestor and
 #      Crush's sibling successor sst/opencode).
 # Confirmed facts are backed by direct upstream source references.
-last_fetched_at: "2026-07-13T18:19:35Z"
+last_fetched_at: "2026-07-14T00:38:10Z"
 last_changed_at: "2026-07-13T18:19:35Z"
 generation_method: subagent
 
@@ -30,7 +30,7 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:49d307d00f042927acb7d0803de4be39e624bab6c87027d028bd5d36e26b74f3"
-        fetched_at: "2026-07-13T18:19:35Z"
+        fetched_at: "2026-07-14T00:38:10Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -87,12 +87,12 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:b38132f342380acc7e14339b7017b2a7657ef4a7cd87167515d312d4408b43b4"
-        fetched_at: "2026-07-13T18:19:35Z"
+        fetched_at: "2026-07-14T00:38:10Z"
       - uri: "https://raw.githubusercontent.com/charmbracelet/crush/main/internal/skills/builtin/crush-config/SKILL.md"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:37b7354933cf27eb4748e07844f677bda2ed5275a5c3af3043f70e7e4dd64f1d"
-        fetched_at: "2026-07-13T18:19:35Z"
+        fetched_at: "2026-07-14T00:38:10Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -168,12 +168,12 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:003a7e66fb928e9df8de5316ba9381fde8668f92ac908fff45f7918f27c6fe2e"
-        fetched_at: "2026-07-13T18:19:35Z"
+        fetched_at: "2026-07-14T00:38:10Z"
       - uri: "https://raw.githubusercontent.com/charmbracelet/crush/main/README.md"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:a47c3f00da5857478bfa5f32ac4f2413474149dc4bca1c6fbf178a6593fd7791"
-        fetched_at: "2026-07-13T18:19:35Z"
+        fetched_at: "2026-07-14T00:38:10Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -253,17 +253,17 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:003a7e66fb928e9df8de5316ba9381fde8668f92ac908fff45f7918f27c6fe2e"
-        fetched_at: "2026-07-13T18:19:35Z"
+        fetched_at: "2026-07-14T00:38:10Z"
       - uri: "https://raw.githubusercontent.com/charmbracelet/crush/main/AGENTS.md"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:49d307d00f042927acb7d0803de4be39e624bab6c87027d028bd5d36e26b74f3"
-        fetched_at: "2026-07-13T18:19:35Z"
+        fetched_at: "2026-07-14T00:38:10Z"
       - uri: "https://raw.githubusercontent.com/charmbracelet/crush/main/internal/skills/builtin/crush-config/SKILL.md"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:37b7354933cf27eb4748e07844f677bda2ed5275a5c3af3043f70e7e4dd64f1d"
-        fetched_at: "2026-07-13T18:19:35Z"
+        fetched_at: "2026-07-14T00:38:10Z"
     canonical_mappings:
       handler_types:
         supported: true

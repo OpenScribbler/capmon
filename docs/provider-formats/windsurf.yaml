@@ -4,7 +4,7 @@ provider: windsurf
 # 1:1 page mapping. Slug stays `windsurf` (rename tracked separately).
 docs_url: "https://docs.devin.ai"
 category: standalone-app
-last_fetched_at: "2026-07-13T18:23:29Z"
+last_fetched_at: "2026-07-14T00:38:47Z"
 last_changed_at: "2026-07-13T18:23:29Z"
 generation_method: subagent
 
@@ -16,7 +16,7 @@ content_types:
         type: documentation
         fetch_method: md_url
         content_hash: "sha256:dd8cc997ea7a6b9088155609fd924f8187e095bffe6ef2e3d2da993ca5a85dda"
-        fetched_at: "2026-07-13T18:23:29Z"
+        fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -125,12 +125,12 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:8de4729b80d441bfb2c1bf862dde70d1706c9bf955118cd4264767d3bd0c8666"
-        fetched_at: "2026-07-13T18:23:29Z"
+        fetched_at: "2026-07-14T00:38:47Z"
       - uri: "https://docs.devin.ai/desktop/cascade/agents-md.md"
         type: documentation
         fetch_method: http
         content_hash: "sha256:4a890fc87f992fc59dd80be1d82ed1724c90f6a66047eca07b5790ff510e60a5"
-        fetched_at: "2026-07-13T18:23:29Z"
+        fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -221,7 +221,7 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:113fadf3c87376b60aaa311c3ba82e6265af39c9093695cccaef82b37d785b54"
-        fetched_at: "2026-07-13T18:23:29Z"
+        fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       handler_types:
         supported: false
@@ -325,7 +325,7 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:422f88f292a0542548262e3b496362c219db95d15d657a1c831724af98e9230a"
-        fetched_at: "2026-07-13T18:23:29Z"
+        fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -438,7 +438,7 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:633482172f0ef1da0b9326d38dff10bc9be34606e953a24d4514c04f4ad86376"
-        fetched_at: "2026-07-13T18:23:29Z"
+        fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       argument_substitution:
         supported: false

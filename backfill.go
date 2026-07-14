@@ -135,6 +135,11 @@ func BackfillFormatDoc(ctx context.Context, path string, fetcher SourceFetcher, 
 			if fmVal := findMappingValue(src, "fetch_method"); fmVal != nil {
 				p.fetchMethod = fmVal.Value
 			}
+			// local_file sources live in the repo; drift is detected by git,
+			// not HTTP — same skip the check path applies (runSourceCheck).
+			if p.fetchMethod == "local_file" {
+				continue
+			}
 			if p.existingHash != "" && !opts.Force {
 				continue
 			}

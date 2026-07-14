@@ -1,9 +1,60 @@
 package capmon
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 )
+
+// TestFetchForCheckPinsHeaders asserts the check fetch path pins its content
+// negotiation: UA capmon/1.0, Accept text/markdown for *.md paths and */*
+// otherwise, Accept-Encoding identity. These headers ARE the baseline-hash
+// contract — several hosts (Mintlify, code.claude.com) vary bytes on them, so
+// any change here invalidates every content_hash in docs/provider-formats/.
+func TestFetchForCheckPinsHeaders(t *testing.T) {
+	var got http.Header
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		got = r.Header.Clone()
+		_, _ = w.Write([]byte("ok"))
+	}))
+	defer srv.Close()
+
+	for path, wantAccept := range map[string]string{
+		"/docs/en/hooks.md": "text/markdown",
+		"/docs/hooks":       "*/*",
+	} {
+		if _, _, _, err := fetchForCheck(context.Background(), srv.URL+path); err != nil {
+			t.Fatalf("fetchForCheck(%s): %v", path, err)
+		}
+		if ua := got.Get("User-Agent"); ua != "capmon/1.0" {
+			t.Errorf("%s: User-Agent = %q, want capmon/1.0", path, ua)
+		}
+		if a := got.Get("Accept"); a != wantAccept {
+			t.Errorf("%s: Accept = %q, want %q", path, a, wantAccept)
+		}
+		if ae := got.Get("Accept-Encoding"); ae != "identity" {
+			t.Errorf("%s: Accept-Encoding = %q, want identity", path, ae)
+		}
+	}
+}
+
+// TestCheckFetchRejectsNonIdentityEncoding: a server that ignores the
+// requested identity encoding and compresses anyway would otherwise have its
+// wire bytes hashed — fail loudly instead (surfaces as a fetch-error issue).
+func TestCheckFetchRejectsNonIdentityEncoding(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Encoding", "gzip")
+		_, _ = w.Write([]byte("\x1f\x8b compressed junk"))
+	}))
+	defer srv.Close()
+
+	_, _, _, err := fetchForCheck(context.Background(), srv.URL+"/doc")
+	if err == nil || !strings.Contains(err.Error(), "Content-Encoding") {
+		t.Fatalf("want Content-Encoding error, got %v", err)
+	}
+}
 
 func TestBuildProviderIssueBody_HashChanges(t *testing.T) {
 	batch := &providerBatch{

@@ -1,7 +1,7 @@
 provider: kiro
 docs_url: "https://kiro.dev/docs"
 category: standalone-app
-last_fetched_at: "2026-07-13T18:27:50Z"
+last_fetched_at: "2026-07-14T00:38:37Z"
 last_changed_at: "2026-07-13T18:27:50Z"
 generation_method: subagent
 
@@ -12,8 +12,8 @@ content_types:
       - uri: "https://kiro.dev/docs/powers/create/"
         type: documentation
         fetch_method: html_url
-        content_hash: "sha256:c16d683d22b8a7674334865a8be49bd9b82974c9ddf575a10e51e57c9eec7cc4"
-        fetched_at: "2026-07-13T18:27:50Z"
+        content_hash: "sha256:a69022fac56682b8c3af6a342902e0de04942c83310b91b6f86f6707b6e83d12"
+        fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -124,8 +124,8 @@ content_types:
       - uri: "https://kiro.dev/docs/steering/"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:3009f4a25ecd89c0ccf4265bd991107f58cf825f3807030734d8a0022b9df817"
-        fetched_at: "2026-07-13T18:27:50Z"
+        content_hash: "sha256:6ecca92ef30585750917534c6f30b2653afaf023164acbbd6b0d29a78f09ab03"
+        fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -193,8 +193,8 @@ content_types:
       - uri: "https://kiro.dev/docs/hooks/"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:298f9df9b3d0f7dd9450b27e22ae6afd124a26aae2680e57f714f903f67f46da"
-        fetched_at: "2026-07-13T18:27:50Z"
+        content_hash: "sha256:61b6df009a0c3d8a325053812195c2b7ebdbde77d83efb8e454b23b86afac4fa"
+        fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       handler_types:
         supported: true
@@ -277,8 +277,8 @@ content_types:
       - uri: "https://kiro.dev/docs/mcp/configuration/"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:fa30fe0a5cfd961edac3a8f15f31853986bce3ec7157dfb755a1883f71d3594b"
-        fetched_at: "2026-07-13T18:27:50Z"
+        content_hash: "sha256:eedf3711138620a95df292b2acd1c54ce8e276e10ed6166871f23ccb1989c572"
+        fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -361,8 +361,8 @@ content_types:
       - uri: "https://kiro.dev/docs/cli/custom-agents/configuration-reference/"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:2d369a5d3260214675754f064bd4e4f4b5010433bd7d7e872265c6c8f387da7e"
-        fetched_at: "2026-07-13T18:27:50Z"
+        content_hash: "sha256:9c3fe9c0e9c53204675fec08337e94335d68de8f74ac121b3a55ecf6e38547c6"
+        fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       definition_format:
         supported: true

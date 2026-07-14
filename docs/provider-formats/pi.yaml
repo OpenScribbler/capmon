@@ -1,7 +1,7 @@
 provider: pi
 docs_url: "https://github.com/badlogic/pi-mono"
 category: cli
-last_fetched_at: "2026-07-13T18:18:57Z"
+last_fetched_at: "2026-07-14T00:38:39Z"
 last_changed_at: "2026-07-13T18:18:57Z"
 generation_method: subagent
 
@@ -13,12 +13,12 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:de38956dcdb3f060b62a891c23b5c0facc568d26039cd0addd6d5adfbed2762f"
-        fetched_at: "2026-07-13T18:18:57Z"
+        fetched_at: "2026-07-14T00:38:39Z"
       - uri: "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/src/core/skills.ts"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:2f56a637c7231f112331a9636ccef2d1d2ae36fc2fee3916b892e053a63ff8f6"
-        fetched_at: "2026-07-13T18:18:57Z"
+        fetched_at: "2026-07-14T00:38:39Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -157,7 +157,7 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:de38956dcdb3f060b62a891c23b5c0facc568d26039cd0addd6d5adfbed2762f"
-        fetched_at: "2026-07-13T18:18:57Z"
+        fetched_at: "2026-07-14T00:38:39Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -203,17 +203,17 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:34af039f195c2d62ce808c39b21c5ff0aece734077df20b5631a290ba74a83dc"
-        fetched_at: "2026-07-13T18:18:57Z"
+        fetched_at: "2026-07-14T00:38:39Z"
       - uri: "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/extensions.md"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:55e6437f74a088ad99dd8094bb6e95ca40e8c1f913c1e973c62dd9fe1b80cd3a"
-        fetched_at: "2026-07-13T18:18:57Z"
+        fetched_at: "2026-07-14T00:38:39Z"
       - uri: "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/src/core/extensions/runner.ts"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:28145c7509df9e3e11978996ec4db7b48bb850674466c711c97505abd6533109"
-        fetched_at: "2026-07-13T18:18:57Z"
+        fetched_at: "2026-07-14T00:38:39Z"
     canonical_mappings:
       handler_types:
         supported: true
@@ -346,7 +346,7 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:0346823712eb033333a5d5bab1ea17a3e70a911670db1342df0df0c8bc75bdc4"
-        fetched_at: "2026-07-13T18:18:57Z"
+        fetched_at: "2026-07-14T00:38:39Z"
     canonical_mappings:
       argument_substitution:
         supported: true
