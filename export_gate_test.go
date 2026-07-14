@@ -70,13 +70,13 @@ func requireStructured(t *testing.T, err error, code string) output.StructuredEr
 }
 
 // writeSourceManifests writes a minimal source manifest per slug under a fresh
-// temp dir and returns it. Each file carries only the slug field — the shape
-// assertProviderSet reads to derive the authoritative provider set.
+// temp dir and returns it. Each file carries the slug and status fields — the
+// shape sourceManifestStatuses reads to derive the authoritative provider set.
 func writeSourceManifests(t *testing.T, slugs ...string) string {
 	t.Helper()
 	dir := t.TempDir()
 	for _, slug := range slugs {
-		body := "schema_version: \"1\"\nslug: " + slug + "\n"
+		body := "schema_version: \"1\"\nslug: " + slug + "\nstatus: active\n"
 		if err := os.WriteFile(filepath.Join(dir, slug+".yaml"), []byte(body), 0644); err != nil {
 			t.Fatalf("write source manifest %s: %v", slug, err)
 		}
@@ -183,7 +183,7 @@ func TestFreezeFieldsOptionalFromLaunch(t *testing.T) {
 // the gate must reject the sources dir itself.
 func TestSourceManifestDuplicateSlugFailsClosed(t *testing.T) {
 	dir := writeSourceManifests(t, "alpha")
-	dup := "schema_version: \"1\"\nslug: alpha\n"
+	dup := "schema_version: \"1\"\nslug: alpha\nstatus: active\n"
 	if err := os.WriteFile(filepath.Join(dir, "alpha-copy.yaml"), []byte(dup), 0644); err != nil {
 		t.Fatalf("write duplicate manifest: %v", err)
 	}
@@ -191,5 +191,21 @@ func TestSourceManifestDuplicateSlugFailsClosed(t *testing.T) {
 	err := assertProviderSet([]string{"alpha"}, dir)
 	if err == nil || !strings.Contains(err.Error(), "duplicate source manifest slug") {
 		t.Fatalf("assertProviderSet with duplicate manifest slugs: want duplicate error, got %v", err)
+	}
+}
+
+// TestSourceManifestMissingStatusFailsClosed: the manifest schema requires
+// status; a manifest that omits it must fail the export rather than silently
+// publishing a provider doc without provider_status.
+func TestSourceManifestMissingStatusFailsClosed(t *testing.T) {
+	dir := t.TempDir()
+	body := "schema_version: \"1\"\nslug: alpha\n"
+	if err := os.WriteFile(filepath.Join(dir, "alpha.yaml"), []byte(body), 0644); err != nil {
+		t.Fatalf("write manifest: %v", err)
+	}
+
+	_, err := sourceManifestStatuses(dir)
+	if err == nil || !strings.Contains(err.Error(), "missing required field 'status'") {
+		t.Fatalf("sourceManifestStatuses with status-less manifest: want missing-status error, got %v", err)
 	}
 }

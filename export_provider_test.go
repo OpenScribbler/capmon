@@ -150,8 +150,8 @@ func TestBuildProviderDocKeyMetadata(t *testing.T) {
 		t.Fatalf("buildProviderDoc: %v", err)
 	}
 
-	if doc["schema_version"] != "1" {
-		t.Errorf("schema_version = %v, want \"1\"", doc["schema_version"])
+	if doc["schema_version"] != "2" {
+		t.Errorf("schema_version = %v, want \"2\"", doc["schema_version"])
 	}
 	if doc["status"] != "live" {
 		t.Errorf("status = %v, want \"live\"", doc["status"])

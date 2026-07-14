@@ -36,7 +36,12 @@ func writeExportTree(dst string, opts ExportOptions) error {
 		return err
 	}
 
-	providerDocs, err := loadProviderDocs(opts.CapsDir, reg)
+	statuses, err := sourceManifestStatuses(opts.SourcesDir)
+	if err != nil {
+		return err
+	}
+
+	providerDocs, err := loadProviderDocs(opts.CapsDir, reg, statuses)
 	if err != nil {
 		return err
 	}
@@ -101,8 +106,11 @@ func writeExportTree(dst string, opts ExportOptions) error {
 // loadProviderDocs builds one document map per capability baseline under
 // capsDir, skipping directories, non-.yaml files, and seed YAMLs (Slug == "").
 // A non-canonical node in any baseline propagates buildProviderDoc's
-// fail-closed EXPORT_001 error.
-func loadProviderDocs(capsDir string, reg keyRegistry) (map[string]map[string]any, error) {
+// fail-closed EXPORT_001 error. statuses joins each provider's source-manifest
+// lifecycle status (active | archived | beta) into the doc as provider_status;
+// a slug with no manifest entry omits the field (absent = unknown), and the
+// EXPORT_003 provider-set gate guarantees that never reaches a real export.
+func loadProviderDocs(capsDir string, reg keyRegistry, statuses map[string]string) (map[string]map[string]any, error) {
 	entries, err := os.ReadDir(capsDir)
 	if err != nil {
 		return nil, fmt.Errorf("read capabilities dir: %w", err)
@@ -122,6 +130,9 @@ func loadProviderDocs(capsDir string, reg keyRegistry) (map[string]map[string]an
 		doc, err := buildProviderDoc(caps, reg)
 		if err != nil {
 			return nil, err
+		}
+		if st := statuses[caps.Slug]; st != "" {
+			doc["provider_status"] = st
 		}
 		docs[caps.Slug] = doc
 	}

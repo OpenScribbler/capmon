@@ -1,6 +1,6 @@
 {
   "cadence": "daily",
-  "data_revision": "9bed42972791aa2eae575e9c4c21fccd033eeae0b521d085758d66bb4592ec6d",
+  "data_revision": "9468d74f87e4539a596bb12d13cc35e7fad33a25bc7847dba1d1a9887b0c6cb9",
   "files": {
     "advisories.json": {
       "sha256": "deddbb22674d330c52383b1fc7022118e76d597abca1b7fb69e446151b352851"
@@ -24,7 +24,7 @@
       "sha256": "eb9459c9acbee3c2593469410c2a791c9ecfe3af0652031c528a6c8ea0c86e8f"
     },
     "capabilities/all.json": {
-      "sha256": "9bed42972791aa2eae575e9c4c21fccd033eeae0b521d085758d66bb4592ec6d"
+      "sha256": "9468d74f87e4539a596bb12d13cc35e7fad33a25bc7847dba1d1a9887b0c6cb9"
     },
     "schemas/advisories.json": {
       "sha256": "dbd838d3b788a32875591a4397b775d0db80bb38b39e1bbb40d57ac72a2664c0"
@@ -42,13 +42,13 @@
       "sha256": "7030a7fc064eedf1b1366fcea88ba383b0d3578fb2ab4a1fb4d4ca4df665a916"
     },
     "schemas/provider-capabilities.json": {
-      "sha256": "72ffa98d3e40a89c072af6ee7fff204fb63fc1b7569ee8cf726d5a7830233d65"
+      "sha256": "d2c2aed3a99a2ddb9f3d2a9aa1af9ed2adb7d8ec21cf428c419634a0c3571b98"
     },
     "spec/canonical-keys.json": {
       "sha256": "2224ad6005678f8af2b608689c6af8973fb9ce697de94c6bf6e5082dd3ede379"
     },
     "spec/field-semantics.md": {
-      "sha256": "2f10a4853cc7c0171359d321a502760fc29a42e543f254983506004b649512bb"
+      "sha256": "8e39e0ece917446e78ca83d822e8b16663e166aa87c9b6b76149b8eb3c272e0a"
     }
   },
   "generated_at": "2026-01-01T00:00:00Z",
@@ -57,13 +57,13 @@
     {
       "last_verified": "2026-07-10",
       "path": "capabilities/alpha.json",
-      "sha256": "ba53a1e876979aba7c87a2eed008dc70576870827eef9f2a0032a42b142b0082",
+      "sha256": "d7b6fd67b54c54824515b72801fac47d9514e9388e36825b9e44119298cead4c",
       "slug": "alpha",
       "status": "tracked"
     },
     {
       "path": "capabilities/synthetic.json",
-      "sha256": "f237b0c66dbf9277ff152ec0e802918f73149944fa778b3d867bb9764602f3cd",
+      "sha256": "a7b9a39b83d984ed56fda4b18c75379e957bae9228c8dad746058c73a338846a",
       "slug": "synthetic",
       "status": "tracked"
     }
