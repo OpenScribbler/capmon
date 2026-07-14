@@ -35,3 +35,42 @@ content_types:
             supported: true
             mechanism: 'instructions are always-on context: personal ~/.config/zed/AGENTS.md applies to every project, and the first-match project-root instruction file applies to the current project, overriding personal on conflict (documented under ''Personal Instructions'' / ''Project Instructions'')'
             confidence: inferred
+  skills:
+    supported: true
+    capabilities:
+      display_name:
+        supported: true
+        mechanism: 'yaml frontmatter key: name (required); lowercase letters/numbers/hyphens, 1-64 chars, should match the skill folder name and doubles as the identifier'
+        confidence: confirmed
+      description:
+        supported: true
+        mechanism: 'yaml frontmatter key: description (required); the agent uses it to decide when to auto-invoke; keep under 1024 bytes'
+        confidence: confirmed
+      disable_model_invocation:
+        supported: true
+        mechanism: 'yaml frontmatter key: disable-model-invocation (optional bool, default false); hides the skill from the autonomous catalog while leaving it slash/@-invocable'
+        confidence: confirmed
+      auto_invocable:
+        supported: true
+        mechanism: the agent sees a catalog of installed skills (name + description) and auto-invokes the one whose description matches the task; opt out via disable-model-invocation
+        confidence: confirmed
+      user_invocable:
+        supported: true
+        mechanism: skills are user-invocable via / slash command or @skill mention, injecting the skill instructions as context (shown as a crease button)
+        confidence: confirmed
+      project_scope:
+        supported: true
+        mechanism: project-local skills live in <worktree>/.agents/skills/<name>/SKILL.md and load only from trusted worktrees
+        confidence: confirmed
+      global_scope:
+        supported: true
+        mechanism: global skills live in ~/.agents/skills/<name>/SKILL.md and apply to every project
+        confidence: confirmed
+      canonical_filename:
+        supported: true
+        mechanism: SKILL.md is the required fixed filename inside each skill folder (YAML frontmatter + Markdown body)
+        confidence: confirmed
+      skill_bundled_resources:
+        supported: true
+        mechanism: a skill folder may co-locate scripts/, references/, and assets/ subfolders that the agent loads on demand via read_file/list_directory
+        confidence: confirmed

@@ -118,6 +118,135 @@ func TestRecognizeZed_NoLandmarks(t *testing.T) {
 	}
 }
 
+// realZedSkillsLandmarks is a snapshot of the headings extracted from zed's
+// Skills HTML doc (zed.dev/docs/ai/skills) as of 2026-07-14 — the content
+// type onboarded in bead capmon-zbm after zed's 2026-07 docs restructure
+// replaced the Rules Library with Skills.
+//
+// Three canonical skills keys have heading-level evidence: canonical_filename
+// ("SKILL.md format"), disable_model_invocation ("Preventing Autonomous
+// Invocation"), and skill_bundled_resources ("Bundled Resources"). project_scope
+// and global_scope are merged as confirmed static facts (their paths are body
+// prose under "Where Skills Live", not headings).
+var realZedSkillsLandmarks = []string{
+	"Skills",
+	"Adding Skills",
+	"From the skills.sh Registry",
+	"Managing Skills",
+	"Sharing Skills",
+	"Using Skills",
+	"Manual Invocation",
+	"Preventing Autonomous Invocation",
+	"Skill Format",
+	"Folder Structure",
+	"SKILL.md format",
+	"Frontmatter Fields",
+	"Name Validation",
+	"Bundled Resources",
+	"Writing Effective Instructions",
+	"Where Skills Live",
+	"Project-local Skills and Trust",
+	"Override Behavior",
+	"Editing Skill Files",
+	"Agent Path Boundaries",
+	"Limitations",
+}
+
+// TestRecognizeZed_RealSkillsLandmarks proves skills recognition emits three
+// canonical skills keys at "inferred" confidence (canonical_filename,
+// disable_model_invocation, skill_bundled_resources) plus project_scope and
+// global_scope merged as "confirmed" static facts. Keys that lack heading
+// evidence (display_name, description, auto_invocable, user_invocable,
+// custom_filename) must NOT be emitted by the recognizer — they are curated in
+// the format doc instead.
+func TestRecognizeZed_RealSkillsLandmarks(t *testing.T) {
+	merged := append([]string{}, realZedRulesLandmarks...)
+	merged = append(merged, realZedSkillsLandmarks...)
+	result := capmon.RecognizeWithContext("zed", capmon.RecognitionContext{
+		Provider:  "zed",
+		Format:    "html",
+		Landmarks: merged,
+	})
+
+	if result.Status != capmon.StatusRecognized {
+		t.Fatalf("status = %q, want %q (missing=%v)", result.Status, capmon.StatusRecognized, result.MissingAnchors)
+	}
+	caps := result.Capabilities
+	if caps["skills.supported"] != "true" {
+		t.Error("skills.supported missing")
+	}
+	skillsInferred := []string{
+		"canonical_filename",
+		"disable_model_invocation",
+		"skill_bundled_resources",
+	}
+	for _, c := range skillsInferred {
+		key := "skills.capabilities." + c + ".supported"
+		if caps[key] != "true" {
+			t.Errorf("%s missing", key)
+		}
+		if got := caps["skills.capabilities."+c+".confidence"]; got != "inferred" {
+			t.Errorf("skills.%s.confidence = %q, want inferred", c, got)
+		}
+	}
+	skillsConfirmed := []string{
+		"project_scope",
+		"global_scope",
+	}
+	for _, c := range skillsConfirmed {
+		key := "skills.capabilities." + c + ".supported"
+		if caps[key] != "true" {
+			t.Errorf("%s missing", key)
+		}
+		if got := caps["skills.capabilities."+c+".confidence"]; got != "confirmed" {
+			t.Errorf("skills.%s.confidence = %q, want confirmed", c, got)
+		}
+	}
+	for _, absent := range []string{
+		"skills.capabilities.display_name.supported",
+		"skills.capabilities.description.supported",
+		"skills.capabilities.auto_invocable.supported",
+		"skills.capabilities.user_invocable.supported",
+		"skills.capabilities.custom_filename.supported",
+	} {
+		if _, has := caps[absent]; has {
+			t.Errorf("%s should NOT be emitted by the recognizer (curated in format doc, no heading evidence)", absent)
+		}
+	}
+}
+
+// TestRecognizeZed_SkillsAnchorsMissing proves the required-anchor guard
+// suppresses skills emission when "Where Skills Live" is absent. Merged with
+// rules landmarks to prove the guard fires even amid other content-type
+// vocabulary.
+func TestRecognizeZed_SkillsAnchorsMissing(t *testing.T) {
+	mutated := []string{}
+	for _, lm := range realZedSkillsLandmarks {
+		if lm == "Where Skills Live" {
+			continue
+		}
+		mutated = append(mutated, lm)
+	}
+	merged := append([]string{}, realZedRulesLandmarks...)
+	merged = append(merged, mutated...)
+	result := capmon.RecognizeWithContext("zed", capmon.RecognitionContext{
+		Provider:  "zed",
+		Format:    "html",
+		Landmarks: merged,
+	})
+	if _, has := result.Capabilities["skills.supported"]; has {
+		t.Error("skills.supported should NOT be present when 'Where Skills Live' anchor is missing")
+	}
+	for _, absent := range []string{
+		"skills.capabilities.canonical_filename.supported",
+		"skills.capabilities.project_scope.supported",
+	} {
+		if _, has := result.Capabilities[absent]; has {
+			t.Errorf("%s should NOT be present without required anchor", absent)
+		}
+	}
+}
+
 // realZedMcpLandmarks is a snapshot of headings extracted from zed's MCP
 // HTML doc (.capmon-cache/zed/mcp.1/extracted.json — zed.dev/docs/ai/mcp)
 // as of 2026-04-16.
