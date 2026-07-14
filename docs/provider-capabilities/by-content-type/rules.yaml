@@ -269,7 +269,7 @@ providers:
                         confidence: inferred
             hierarchical_loading:
                 supported: true
-                mechanism: .windsurf/rules scanned in current workspace, sub-directories, and parent dirs up to git root (documented under 'Rules Discovery' / 'Rules Storage Locations')
+                mechanism: .devin/rules/ (preferred; .windsurf/rules/ legacy fallback) scanned in current workspace, sub-directories, and parent dirs up to git root (documented under 'Rules Discovery' / 'Rules Storage Locations')
                 confidence: inferred
     zed:
         supported: true

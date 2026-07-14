@@ -197,6 +197,70 @@ func assertProviderSet(exportedSlugs []string, sourcesDir string) error {
 	)
 }
 
+// publishedSlugsLockName is the committed record of every slug published under
+// the current major, one per line, next to the source manifests. ADR-0013:
+// within a major the file is append-only — a slug rename cannot ship as
+// delete-plus-add.
+const publishedSlugsLockName = "published-slugs.lock"
+
+// assertPublishedSlugs fails closed with EXPORT_005 unless the exported
+// provider set exactly matches the published-slugs lock under sourcesDir. A
+// lock slug absent from the export is a slug-permanence violation (the rename
+// case ADR-0013 forbids); an exported slug absent from the lock is a new
+// provider onboarded without its lock line. A missing or unreadable lock also
+// fails closed — deleting the file must not bypass the gate.
+func assertPublishedSlugs(exportedSlugs []string, sourcesDir string) error {
+	lockPath := filepath.Join(sourcesDir, publishedSlugsLockName)
+	data, err := os.ReadFile(lockPath)
+	if err != nil {
+		return output.NewStructuredError(
+			"EXPORT_005",
+			fmt.Sprintf("published-slugs lock unreadable: %v", err),
+			fmt.Sprintf("Restore %s — the committed record of every published slug (ADR-0013). The gate fails closed without it.", lockPath),
+		)
+	}
+
+	lockSet := map[string]bool{}
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		lockSet[line] = true
+	}
+
+	exportedSet := stringSet(exportedSlugs)
+	var vanished, unlocked []string
+	for s := range lockSet {
+		if !exportedSet[s] {
+			vanished = append(vanished, s)
+		}
+	}
+	for s := range exportedSet {
+		if !lockSet[s] {
+			unlocked = append(unlocked, s)
+		}
+	}
+	if len(vanished) == 0 && len(unlocked) == 0 {
+		return nil
+	}
+	sort.Strings(vanished)
+	sort.Strings(unlocked)
+
+	var parts []string
+	if len(vanished) > 0 {
+		parts = append(parts, "published slugs missing from the export: "+strings.Join(vanished, ", "))
+	}
+	if len(unlocked) > 0 {
+		parts = append(parts, "exported slugs not in the lock: "+strings.Join(unlocked, ", "))
+	}
+	return output.NewStructuredError(
+		"EXPORT_005",
+		"slug-permanence mismatch: "+strings.Join(parts, "; "),
+		"Slugs are permanent within a major (ADR-0013): a slug in published-slugs.lock must keep exporting — never delete its lock line to make this pass. For a newly onboarded provider, append its slug to the lock.",
+	)
+}
+
 // manifestJoinFields carries the per-provider source-manifest values the
 // exporter joins into published provider docs.
 type manifestJoinFields struct {

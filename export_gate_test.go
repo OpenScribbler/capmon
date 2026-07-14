@@ -151,6 +151,40 @@ func TestAssertProviderSetMismatch(t *testing.T) {
 	}
 }
 
+// TestAssertPublishedSlugsPermanence drives the slug-permanence gate (ADR-0013)
+// over a temp lock: a lock matching the exported set passes with comments and
+// blank lines ignored; a lock slug absent from the export (the forbidden rename
+// case) and an exported slug absent from the lock (onboarding without a lock
+// line) each fail closed with EXPORT_005 naming the slug; a missing lockfile
+// fails closed rather than bypassing the gate.
+func TestAssertPublishedSlugsPermanence(t *testing.T) {
+	sourcesDir := t.TempDir()
+	lock := "# committed record (ADR-0013)\n\nalpha\nbravo\n"
+	if err := os.WriteFile(filepath.Join(sourcesDir, publishedSlugsLockName), []byte(lock), 0644); err != nil {
+		t.Fatalf("write published-slugs lock: %v", err)
+	}
+
+	// Matching set (order-independent) passes; comments and blanks are ignored.
+	if err := assertPublishedSlugs([]string{"bravo", "alpha"}, sourcesDir); err != nil {
+		t.Fatalf("assertPublishedSlugs on a matching set: %v", err)
+	}
+
+	// Rename case: bravo vanished from the export, charlie appeared. The error
+	// names both divergences.
+	err := assertPublishedSlugs([]string{"alpha", "charlie"}, sourcesDir)
+	se := requireStructured(t, err, "EXPORT_005")
+	if !strings.Contains(se.Error(), "bravo") {
+		t.Errorf("EXPORT_005 does not name the vanished published slug: %v", se)
+	}
+	if !strings.Contains(se.Error(), "charlie") {
+		t.Errorf("EXPORT_005 does not name the unlocked exported slug: %v", se)
+	}
+
+	// Missing lockfile: fails closed, never bypasses the gate.
+	err = assertPublishedSlugs([]string{"alpha"}, t.TempDir())
+	requireStructured(t, err, "EXPORT_005")
+}
+
 // TestFreezeFieldsOptionalFromLaunch stages a valid tree, then adds the freeze
 // fields (status "frozen", superseded_by, frozen_at) to a per-provider document
 // and to v1/index.json, and re-validates. Both schemas must still accept the

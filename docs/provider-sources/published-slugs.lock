@@ -1,0 +1,20 @@
+# Every provider slug published under v1 — append-only within the major.
+# The export gate (EXPORT_005) fails closed unless this set exactly matches
+# the exported provider set. Never remove a line to make the gate pass: slugs
+# are permanent within a major (ADR-0013). Onboarding a new provider appends
+# its slug here.
+amp
+claude-code
+cline
+codex
+copilot-cli
+crush
+cursor
+factory-droid
+gemini-cli
+kiro
+opencode
+pi
+roo-code
+windsurf
+zed
