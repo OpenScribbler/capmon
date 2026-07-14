@@ -40,6 +40,22 @@ func TestFetchForCheckPinsHeaders(t *testing.T) {
 	}
 }
 
+// TestCheckFetchRejectsNonIdentityEncoding: a server that ignores the
+// requested identity encoding and compresses anyway would otherwise have its
+// wire bytes hashed — fail loudly instead (surfaces as a fetch-error issue).
+func TestCheckFetchRejectsNonIdentityEncoding(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Encoding", "gzip")
+		_, _ = w.Write([]byte("\x1f\x8b compressed junk"))
+	}))
+	defer srv.Close()
+
+	_, _, _, err := fetchForCheck(context.Background(), srv.URL+"/doc")
+	if err == nil || !strings.Contains(err.Error(), "Content-Encoding") {
+		t.Fatalf("want Content-Encoding error, got %v", err)
+	}
+}
+
 func TestBuildProviderIssueBody_HashChanges(t *testing.T) {
 	batch := &providerBatch{
 		changes: []sourceChange{

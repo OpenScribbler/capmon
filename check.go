@@ -306,26 +306,33 @@ func logOrCreateFetchErrorIssue(contentType, sourceURI, reason string, batch *pr
 	})
 }
 
-// fetchForCheck makes a direct HTTP GET and returns the body, Content-Type header,
-// final URL (after redirects), and any error. Uses the same httpDoer as FetchSource
-// so it is overridable in tests via SetHTTPClientForTest.
-//
-// Content negotiation is pinned so the bytes — and therefore every
-// content_hash baseline — are deterministic and reproducible outside Go:
+// HTTPDoer is the minimal client surface CheckFetch needs; callers pass their
+// own (test-overridable) client.
+type HTTPDoer interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
+// CheckFetch performs the canonical baseline fetch: a direct HTTP GET with
+// pinned content negotiation, returning the body, Content-Type header, final
+// URL (after redirects), and any error. EVERY code path that computes or
+// compares a content_hash baseline (capmon check, capmon backfill, capmon
+// hash-url, provmon's source-hash checker) MUST fetch through this function —
+// the pinned headers ARE the hash contract:
+//   - User-Agent: capmon/1.0
 //   - Accept: text/markdown for *.md paths (code.claude.com intermittently
 //     serves rendered HTML without it), */* otherwise (curl's default;
 //     Mintlify hosts vary bytes on its absence).
 //   - Accept-Encoding: identity, so the transport's implicit gzip never
-//     shapes the hashed bytes.
+//     shapes the hashed bytes. A response that ignores the request and
+//     compresses anyway fails loudly instead of hashing wire bytes.
 //
 // The canonical hash recipe is therefore:
 //
 //	curl -H 'User-Agent: capmon/1.0' -H 'Accept: <as above>' \
 //	     -H 'Accept-Encoding: identity' -L <url> | sha256sum
 //
-// or, without remembering any of that, `capmon hash-url <url>` — which calls
-// this function. `capmon backfill` writes baselines through this same path.
-func fetchForCheck(ctx context.Context, rawURL string) (body []byte, contentType, finalURL string, err error) {
+// or, without remembering any of that, `capmon hash-url <url>`.
+func CheckFetch(ctx context.Context, doer HTTPDoer, rawURL string) (body []byte, contentType, finalURL string, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, "", "", fmt.Errorf("create request: %w", err)
@@ -337,13 +344,16 @@ func fetchForCheck(ctx context.Context, rawURL string) (body []byte, contentType
 		req.Header.Set("Accept", "*/*")
 	}
 	req.Header.Set("Accept-Encoding", "identity")
-	resp, err := httpDoer.Do(req)
+	resp, err := doer.Do(req)
 	if err != nil {
 		return nil, "", "", err
 	}
 	defer resp.Body.Close() //nolint:errcheck // best-effort close on response body
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return nil, "", "", fmt.Errorf("unexpected status %d", resp.StatusCode)
+	}
+	if ce := resp.Header.Get("Content-Encoding"); ce != "" && !strings.EqualFold(ce, "identity") {
+		return nil, "", "", fmt.Errorf("unexpected Content-Encoding %q (requested identity)", ce)
 	}
 	body, err = io.ReadAll(resp.Body)
 	if err != nil {
@@ -356,4 +366,10 @@ func fetchForCheck(ctx context.Context, rawURL string) (body []byte, contentType
 		fu = resp.Request.URL.String()
 	}
 	return body, ct, fu, nil
+}
+
+// fetchForCheck is CheckFetch over the package httpDoer (overridable in tests
+// via SetHTTPClientForTest).
+func fetchForCheck(ctx context.Context, rawURL string) (body []byte, contentType, finalURL string, err error) {
+	return CheckFetch(ctx, httpDoer, rawURL)
 }

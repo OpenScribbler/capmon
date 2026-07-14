@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"strings"
 
@@ -159,11 +157,13 @@ func findSourceRef(doc *capmon.FormatDoc, url string) (capmon.SourceRef, bool) {
 
 // fetchSourceBytes retrieves a source body and returns (body, contentType,
 // finalURL, err). For fetchMethod == "chromedp" it delegates to
-// capmon.FetchChromedp with a scratch cache dir; otherwise it does a direct
-// HTTP GET via provmon's overridable httpClient (so tests can redirect to an
-// httptest server). This deliberately does NOT reuse capmon.FetchSource —
-// that path bakes in a 7-second retry budget and persistent caching that
-// provmon's ephemeral drift reports do not need.
+// capmon.FetchChromedp with a scratch cache dir; otherwise it fetches through
+// capmon.CheckFetch — the canonical baseline fetch — over provmon's
+// overridable httpClient (so tests can redirect to an httptest server). The
+// hashes computed here are compared against FormatDoc content_hash baselines,
+// which are written through the same CheckFetch headers; fetching any other
+// way produces false drift on hosts that vary bytes by header (Mintlify,
+// code.claude.com).
 func fetchSourceBytes(ctx context.Context, fetchMethod, slug, rawURL string) ([]byte, string, string, error) {
 	if fetchMethod == "chromedp" {
 		tmpCache, err := os.MkdirTemp("", "capmon-provmon-chromedp-*")
@@ -178,29 +178,7 @@ func fetchSourceBytes(ctx context.Context, fetchMethod, slug, rawURL string) ([]
 		return entry.Raw, "text/html", rawURL, nil
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
-	if err != nil {
-		return nil, "", "", fmt.Errorf("create request: %w", err)
-	}
-	req.Header.Set("User-Agent", "capmon-provider-monitor/1.0")
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return nil, "", "", err
-	}
-	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, "", "", fmt.Errorf("unexpected status %d", resp.StatusCode)
-	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, "", "", fmt.Errorf("read body: %w", err)
-	}
-	ct := resp.Header.Get("Content-Type")
-	finalURL := rawURL
-	if resp.Request != nil && resp.Request.URL != nil {
-		finalURL = resp.Request.URL.String()
-	}
-	return body, ct, finalURL, nil
+	return capmon.CheckFetch(ctx, httpClient, rawURL)
 }
 
 // isHTMLContentType reports whether the Content-Type header indicates HTML.
