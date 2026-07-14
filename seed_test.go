@@ -160,8 +160,32 @@ provider_exclusive:
 	if got := caps.ProviderExclusive["skills.creation_workflow"].Mechanism; got != "freshly extracted text" {
 		t.Errorf("with force: mechanism = %q, want freshly extracted text", got)
 	}
+	// Overwrite means overwrite: the node is reset before extracted fields
+	// land, so the stale curated confidence must NOT survive as a merge.
+	if got := caps.ProviderExclusive["skills.creation_workflow"].Confidence; got != "" {
+		t.Errorf("with force: stale confidence %q survived — forced collision merged instead of overwriting", got)
+	}
 	if _, ok := caps.ProviderExclusive["hooks.custom_event"]; !ok {
 		t.Error("with force: untouched hooks.custom_event was removed — section cleared wholesale")
+	}
+}
+
+// TestSeedProviderCapabilities_BareSeedNeedsNoRegistry: stub creation and
+// events-only seeds never consult the canonical-key registry, so they must
+// work with an unresolvable CanonicalKeysPath (the registry loads lazily).
+func TestSeedProviderCapabilities_BareSeedNeedsNoRegistry(t *testing.T) {
+	capsDir := t.TempDir()
+	err := capmon.SeedProviderCapabilities(capmon.SeedOptions{
+		CapsDir:           capsDir,
+		Provider:          "test-provider",
+		CanonicalKeysPath: filepath.Join(t.TempDir(), "does-not-exist.yaml"),
+		Extracted: map[string]string{
+			"hooks.supported": "true",
+			"hooks.events.before_tool_execute.native_name": "PreToolUse",
+		},
+	})
+	if err != nil {
+		t.Fatalf("bare seed without registry: %v", err)
 	}
 }
 

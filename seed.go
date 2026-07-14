@@ -39,13 +39,24 @@ func SeedProviderCapabilities(opts SeedOptions) error {
 
 	path := filepath.Join(opts.CapsDir, opts.Provider+".yaml")
 
-	keysPath := opts.CanonicalKeysPath
-	if keysPath == "" {
-		keysPath = "docs/spec/canonical-keys.yaml"
-	}
-	reg, err := loadKeyRegistry(keysPath)
-	if err != nil {
-		return fmt.Errorf("load canonical-key registry: %w", err)
+	// The registry is only consulted for capability dot-paths, so load it
+	// lazily — bare stub creation and supported/events-only seeds must not
+	// gain a cwd-sensitive dependency on the registry file.
+	var reg keyRegistry
+	loadReg := func() (keyRegistry, error) {
+		if reg != nil {
+			return reg, nil
+		}
+		keysPath := opts.CanonicalKeysPath
+		if keysPath == "" {
+			keysPath = "docs/spec/canonical-keys.yaml"
+		}
+		r, err := loadKeyRegistry(keysPath)
+		if err != nil {
+			return nil, fmt.Errorf("load canonical-key registry: %w", err)
+		}
+		reg = r
+		return reg, nil
 	}
 
 	var caps capyaml.ProviderCapabilities
@@ -81,14 +92,20 @@ func SeedProviderCapabilities(opts SeedOptions) error {
 
 	// writeExclusive merges one extracted field into the provider_exclusive
 	// node "<ct>.<capKey>" (nested under subKey when non-empty), honoring the
-	// preserve-unless-forced rule for curated entries.
+	// preserve-unless-forced rule for curated entries. A forced collision
+	// RESETS the curated node before the first extracted field lands —
+	// overwrite means overwrite, not a half-old/half-new merge where stale
+	// curated fields survive because the extraction didn't re-emit them.
 	writeExclusive := func(ct, capKey, subKey, field, value string) {
 		name := ct + "." + capKey
 		if preExisting[name] {
 			if !opts.ForceOverwriteExclusive {
 				return
 			}
-			overwritten[name] = true
+			if !overwritten[name] {
+				overwritten[name] = true
+				delete(caps.ProviderExclusive, name)
+			}
 		}
 		if caps.ProviderExclusive == nil {
 			caps.ProviderExclusive = make(map[string]capyaml.CapabilityEntry)
@@ -134,7 +151,11 @@ func SeedProviderCapabilities(opts SeedOptions) error {
 
 		case len(parts) == 4 && parts[1] == "capabilities":
 			capKey, field := parts[2], parts[3]
-			if _, canonical := reg[ct][capKey]; !canonical {
+			r, err := loadReg()
+			if err != nil {
+				return err
+			}
+			if _, canonical := r[ct][capKey]; !canonical {
 				writeExclusive(ct, capKey, "", field, value)
 				continue
 			}
@@ -148,7 +169,11 @@ func SeedProviderCapabilities(opts SeedOptions) error {
 
 		case len(parts) == 5 && parts[1] == "capabilities":
 			capKey, subKey, field := parts[2], parts[3], parts[4]
-			if _, canonical := reg[ct][capKey]; !canonical {
+			r, err := loadReg()
+			if err != nil {
+				return err
+			}
+			if _, canonical := r[ct][capKey]; !canonical {
 				writeExclusive(ct, capKey, subKey, field, value)
 				continue
 			}
