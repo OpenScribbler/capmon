@@ -67,6 +67,9 @@ func RunExport(opts ExportOptions) error {
 	if err := assertProviderSet(slugs, opts.SourcesDir); err != nil {
 		return err
 	}
+	if err := assertPublishedSlugs(slugs, opts.SourcesDir); err != nil {
+		return err
+	}
 
 	return replaceOutDir(stageDir, opts.OutDir, parent)
 }

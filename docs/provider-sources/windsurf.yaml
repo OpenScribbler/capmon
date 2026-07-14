@@ -3,13 +3,14 @@
 # Rebrand (2026-07): Windsurf is now "Devin Desktop" by Cognition. Docs moved
 # 1:1 from docs.windsurf.com/windsurf/cascade/* to docs.devin.ai/desktop/cascade/*
 # (old URLs 301 across domains, which capmon's fetch validity rejects — hence the
-# direct devin.ai URLs below). Slug stays `windsurf`; rename tracked separately.
+# direct devin.ai URLs below). Slug stays `windsurf` permanently within v1 per
+# ADR-0013 (display-level rename only); display_name carries the rebrand.
 
 schema_version: "1"
-last_verified: "2026-07-13"
+last_verified: "2026-07-14"
 
 slug: windsurf
-display_name: Windsurf
+display_name: Devin Desktop # formerly Windsurf
 vendor: Cognition
 status: active
 fetch_tier: llms-txt
