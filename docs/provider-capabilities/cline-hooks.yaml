@@ -3,56 +3,56 @@ content_type: hooks
 format: ""
 proposed_mappings:
     - canonical_key: async_execution
-      supported: false
-      mechanism: Cline hooks run synchronously before/after tool events; no async execution documented
+      supported: true
+      mechanism: 'Plugin hook policies (mode: async) run hooks off the critical path on SDK/CLI/Kanban (sdk/plugins hook policies table); filesystem-script hooks on VS Code/JetBrains remain synchronous with a 30s HOOK_EXECUTION_TIMEOUT_MS (hook-factory.ts)'
       source_field: ""
       source_value: ""
       confidence: inferred
     - canonical_key: context_injection
       supported: true
-      mechanism: 'context_modification_output: Cline hooks can inject additional context into the agent''s session via hook output'
+      mechanism: Filesystem hooks inject context via the contextModification stdout field on VS Code/JetBrains (hook-factory.ts); the plugin before_agent_start hook stage injects context or modifies the prompt on SDK/CLI/Kanban (sdk/plugins)
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: decision_control
       supported: true
-      mechanism: 'pre_tool_use_cancellation: PreToolUse hooks can cancel (block) the tool invocation; no allow or modify sub-capabilities documented'
+      mechanism: Filesystem PreToolUse hooks cancel (block) a tool invocation by returning cancel:true on VS Code/JetBrains (hook-factory.ts); the plugin tool_call_before hook stage blocks tool calls on SDK/CLI/Kanban (sdk/plugins). No allow or modify sub-capabilities on either surface
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: handler_types
       supported: false
-      mechanism: Cline hooks execute shell commands only; no HTTP, LLM prompt, or agent handler types documented
+      mechanism: 'Neither surface documents the canonical shell/HTTP/LLM-prompt/agent handler-type selection: filesystem hooks (VS Code/JetBrains) execute shell or PowerShell scripts only; plugin hooks (SDK/CLI/Kanban) are in-process TypeScript AgentPlugin handlers'
       source_field: ""
       source_value: ""
       confidence: inferred
     - canonical_key: hook_scopes
       supported: true
-      mechanism: 'global_and_project_hooks: Cline supports global (user-wide) and project-level hook configuration'
+      mechanism: 'Both surfaces support global + project scope: filesystem hooks in .clinerules/hooks (project) and ~/Documents/Cline/Hooks (global) per disk.ts; plugins in .cline/plugins (project) and ~/.cline/plugins (global) per customization/plugins'
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: input_modification
       supported: true
-      mechanism: 'context_modification_output: Cline PreToolUse hooks can return modified context/input before tool execution'
+      mechanism: Filesystem PreToolUse hooks return modified context/input before tool execution via contextModification on VS Code/JetBrains (hook-factory.ts); the plugin before_agent_start / tool_call_before stages inject or modify prompt and messages on SDK/CLI/Kanban (sdk/plugins)
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: json_io_protocol
       supported: true
-      mechanism: Hooks receive a JSON object via stdin (taskId, hookName, clineVersion, timestamp, workspaceRoots, userId, model, plus hook-specific fields) and return JSON to stdout with cancel (bool), contextModification (string), and errorMessage (string); debug output goes to stderr
+      mechanism: The filesystem-script model (VS Code/JetBrains) receives a JSON object via stdin and returns JSON to stdout with cancel (bool), contextModification (string), and errorMessage (string), debug to stderr — verified in hook-factory.ts. This is NOT the mechanism on the plugin model (SDK/CLI/Kanban), which uses in-process TypeScript AgentPlugin handlers rather than stdin/stdout JSON
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: matcher_patterns
       supported: false
-      mechanism: Cline hooks fire on configured lifecycle events; no per-tool pattern matching documented
+      mechanism: 'Neither surface documents per-tool pattern matching: filesystem PreToolUse and plugin tool_call_before both fire for every tool call regardless of tool identity'
       source_field: ""
       source_value: ""
       confidence: inferred
     - canonical_key: permission_control
       supported: false
-      mechanism: Cline hooks can cancel tool invocations (decision_control) but cannot grant/deny tool availability
+      mechanism: 'Neither surface grants/denies tool availability: hooks can only block/cancel a specific tool call (decision_control). The plugin approval-policy concept governs blocking a call, not tool-availability permissioning'
       source_field: ""
       source_value: ""
       confidence: inferred

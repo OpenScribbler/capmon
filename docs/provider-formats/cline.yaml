@@ -1,7 +1,7 @@
 provider: cline
 docs_url: "https://docs.cline.bot"
 category: ide-extension
-last_fetched_at: "2026-07-14T00:38:04Z"
+last_fetched_at: "2026-07-14T01:27:39Z"
 last_changed_at: "2026-05-06T00:00:00Z"
 generation_method: subagent
 
@@ -13,12 +13,12 @@ content_types:
         type: documentation
         fetch_method: md_url
         content_hash: "sha256:6f8562d51b02f3bdb9616d7efda38ea8b7799dfc06693720b6056307a21a3512"
-        fetched_at: "2026-07-14T00:38:04Z"
+        fetched_at: "2026-07-14T01:27:39Z"
       - uri: "https://docs.cline.bot/customization/skills"
         type: documentation
         fetch_method: readability
         content_hash: "sha256:50da82a4295473e551fc7c5932e6f2e2ccc432629dca65c164d6e22d980ee690"
-        fetched_at: "2026-07-14T00:38:04Z"
+        fetched_at: "2026-07-14T01:27:39Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -129,7 +129,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:921e9732295adb9cd1485d396dd3afeee0b63aee1c053a260eabd682546de941"
-        fetched_at: "2026-07-14T00:38:04Z"
+        fetched_at: "2026-07-14T01:27:39Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -190,125 +190,169 @@ content_types:
 
   hooks:
     status: supported
+    # 2026-07-14 (issue #5, resolved): the dedicated hooks doc
+    # (docs.cline.bot/customization/hooks) is a 2-line stub redirecting to the SDK
+    # Plugins page. Cline now ships TWO hook models split by surface: (1) the
+    # filesystem-script model — named scripts under .clinerules/hooks + ~/Documents/
+    # Cline/Hooks, JSON via stdin/stdout {cancel, contextModification, errorMessage},
+    # 8 hook types, 30s timeout — remains LIVE on the VS Code / JetBrains extensions
+    # (verified in extension source: hook-factory.ts, disk.ts); and (2) the TypeScript
+    # AgentPlugin model — lifecycle handlers + hook stages + hook policies — which the
+    # plugins doc's own Warning scopes to SDK / CLI / Kanban ONLY. Sources below track
+    # both: the live plugin docs (plugin model) and two GitHub raw source files (the
+    # filesystem model, whose docs page is now a stub).
     sources:
-      - uri: "https://docs.cline.bot/customization/hooks"
+      - uri: "https://docs.cline.bot/sdk/plugins.md"
         type: documentation
-        fetch_method: http
-        content_hash: "sha256:34b4fde7a939bfb4dbad20965e19697acedbf1b1ac0901dd7fa1bf949bccc4ac"
-        fetched_at: "2026-07-14T00:38:04Z"
+        fetch_method: md_url
+        content_hash: "sha256:aa7c7012bac7c3612372a22303558c30a968e77b14a2ef6f56c245b9240ea74d"
+        fetched_at: "2026-07-14T01:27:39Z"
+      - uri: "https://docs.cline.bot/customization/plugins.md"
+        type: documentation
+        fetch_method: md_url
+        content_hash: "sha256:77d98f0d9c37eb92ad49cf15454cbd0c56823907a0c9b9d8423e4d98d34c8217"
+        fetched_at: "2026-07-14T01:27:39Z"
+      - uri: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/hooks/hook-factory.ts"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:1e22d8e8e7764e9a4b89390a4cbc51ae1c71a81c05358898939dcf8b6919543b"
+        fetched_at: "2026-07-14T01:27:39Z"
+      - uri: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:db1c0421bb2a77e9befcaafdf83acfa62e4f6629b3a0e655684d8e9073495e22"
+        fetched_at: "2026-07-14T01:27:39Z"
     canonical_mappings:
       handler_types:
         supported: false
-        mechanism: "Cline hooks execute shell commands only; no HTTP, LLM prompt, or agent handler types documented"
+        mechanism: "Neither surface documents the canonical shell/HTTP/LLM-prompt/agent handler-type selection: filesystem hooks (VS Code/JetBrains) execute shell or PowerShell scripts only; plugin hooks (SDK/CLI/Kanban) are in-process TypeScript AgentPlugin handlers"
         confidence: inferred
       matcher_patterns:
         supported: false
-        mechanism: "Cline hooks fire on configured lifecycle events; no per-tool pattern matching documented"
+        mechanism: "Neither surface documents per-tool pattern matching: filesystem PreToolUse and plugin tool_call_before both fire for every tool call regardless of tool identity"
         confidence: inferred
       decision_control:
         supported: true
-        mechanism: "pre_tool_use_cancellation: PreToolUse hooks can cancel (block) the tool invocation; no allow or modify sub-capabilities documented"
+        mechanism: "Filesystem PreToolUse hooks cancel (block) a tool invocation by returning cancel:true on VS Code/JetBrains (hook-factory.ts); the plugin tool_call_before hook stage blocks tool calls on SDK/CLI/Kanban (sdk/plugins). No allow or modify sub-capabilities on either surface"
         confidence: confirmed
       input_modification:
         supported: true
-        mechanism: "context_modification_output: Cline PreToolUse hooks can return modified context/input before tool execution"
+        mechanism: "Filesystem PreToolUse hooks return modified context/input before tool execution via contextModification on VS Code/JetBrains (hook-factory.ts); the plugin before_agent_start / tool_call_before stages inject or modify prompt and messages on SDK/CLI/Kanban (sdk/plugins)"
         confidence: confirmed
       async_execution:
-        supported: false
-        mechanism: "Cline hooks run synchronously before/after tool events; no async execution documented"
+        supported: true
+        mechanism: "Plugin hook policies (mode: async) run hooks off the critical path on SDK/CLI/Kanban (sdk/plugins hook policies table); filesystem-script hooks on VS Code/JetBrains remain synchronous with a 30s HOOK_EXECUTION_TIMEOUT_MS (hook-factory.ts)"
         confidence: inferred
       hook_scopes:
         supported: true
-        mechanism: "global_and_project_hooks: Cline supports global (user-wide) and project-level hook configuration"
+        mechanism: "Both surfaces support global + project scope: filesystem hooks in .clinerules/hooks (project) and ~/Documents/Cline/Hooks (global) per disk.ts; plugins in .cline/plugins (project) and ~/.cline/plugins (global) per customization/plugins"
         confidence: confirmed
       json_io_protocol:
         supported: true
-        mechanism: "Hooks receive a JSON object via stdin (taskId, hookName, clineVersion, timestamp, workspaceRoots, userId, model, plus hook-specific fields) and return JSON to stdout with cancel (bool), contextModification (string), and errorMessage (string); debug output goes to stderr"
+        mechanism: "The filesystem-script model (VS Code/JetBrains) receives a JSON object via stdin and returns JSON to stdout with cancel (bool), contextModification (string), and errorMessage (string), debug to stderr — verified in hook-factory.ts. This is NOT the mechanism on the plugin model (SDK/CLI/Kanban), which uses in-process TypeScript AgentPlugin handlers rather than stdin/stdout JSON"
         confidence: confirmed
       context_injection:
         supported: true
-        mechanism: "context_modification_output: Cline hooks can inject additional context into the agent's session via hook output"
+        mechanism: "Filesystem hooks inject context via the contextModification stdout field on VS Code/JetBrains (hook-factory.ts); the plugin before_agent_start hook stage injects context or modifies the prompt on SDK/CLI/Kanban (sdk/plugins)"
         confidence: confirmed
       permission_control:
         supported: false
-        mechanism: "Cline hooks can cancel tool invocations (decision_control) but cannot grant/deny tool availability"
+        mechanism: "Neither surface grants/denies tool availability: hooks can only block/cancel a specific tool call (decision_control). The plugin approval-policy concept governs blocking a call, not tool-availability permissioning"
         confidence: inferred
     provider_extensions:
+      # ── Filesystem-script model (VS Code / JetBrains) ────────────────────
       - id: eight_hook_types
-        name: Eight Named Hook Types
-        summary: "Eight lifecycle hook types: TaskStart, TaskResume, TaskCancel, TaskComplete, PreToolUse, PostToolUse, UserPromptSubmit, PreCompact."
-        source_ref: "https://docs.cline.bot/customization/hooks#hook-types"
+        name: Eight Named Hook Types (Filesystem Model, VS Code/JetBrains)
+        summary: "Filesystem-script model exposes eight named hook types — TaskStart, TaskResume, TaskCancel, TaskComplete, PreToolUse, PostToolUse, UserPromptSubmit, PreCompact — whose data types are imported in hook-factory.ts."
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/hooks/hook-factory.ts"
         graduation_candidate: true
         conversion: translated
       - id: context_modification_output
-        name: contextModification Output Field for Injecting Conversation Context
-        summary: "Hook stdout JSON `contextModification` (string) injects text into the active conversation as runtime context."
-        source_ref: "https://docs.cline.bot/customization/hooks#context-modification"
+        name: contextModification Output Field for Injecting Conversation Context (Filesystem Model)
+        summary: "Filesystem hook stdout JSON `contextModification` (string) injects text into the active conversation as runtime context on VS Code/JetBrains; validated in hook-factory.ts."
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/hooks/hook-factory.ts"
         graduation_candidate: true
         provider_field: "contextModification"
         conversion: embedded
       - id: global_and_project_hooks
-        name: Global and Project Hook Scopes with Additive Execution
-        summary: "Global (~/Documents/Cline/Hooks) and project (.clinerules/hooks) hooks both run for the same event; global first, then workspace."
-        source_ref: "https://docs.cline.bot/customization/hooks#hook-locations"
+        name: Global and Project Hook Scopes with Additive Execution (Filesystem Model)
+        summary: "Global (~/Documents/Cline/Hooks) and project (.clinerules/hooks) filesystem hooks both run for the same event; directories resolved in disk.ts (hooksDir, ensureHooksDirectoryExists)."
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts"
         graduation_candidate: true
         conversion: not-portable
       - id: platform_specific_file_format
-        name: Platform-Specific Hook File Format
-        summary: "Hook filenames are platform-sensitive: Windows uses <HookName>.ps1, macOS/Linux uses extensionless <HookName>; mismatches are silently skipped."
-        source_ref: "https://docs.cline.bot/customization/hooks#quick-start-your-first-hook"
+        name: Platform-Specific Hook File Format (Filesystem Model)
+        summary: "Filesystem hook filenames are platform-sensitive: Windows uses <HookName>.ps1, macOS/Linux uses extensionless <HookName>; mismatches are silently skipped. Filesystem model only."
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts"
         graduation_candidate: false
         conversion: not-portable
       - id: pre_tool_use_cancellation
-        name: PreToolUse Can Cancel Tool Execution Before It Happens
-        summary: "PreToolUse hooks block tool execution by returning `cancel: true` with an `errorMessage`; PostToolUse can stop the task but not undo the call."
-        source_ref: "https://docs.cline.bot/customization/hooks#pretooluse"
+        name: PreToolUse Can Cancel Tool Execution Before It Happens (Filesystem Model)
+        summary: "Filesystem PreToolUse hooks block tool execution by returning `cancel: true` with an `errorMessage`; PostToolUse can stop the task but not undo the call. Output contract validated in hook-factory.ts."
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/hooks/hook-factory.ts"
         graduation_candidate: true
         provider_field: "cancel"
         conversion: embedded
       - id: model_info_in_hook_input
-        name: Active Model Provider and Slug in Hook Input
-        summary: "Hook input JSON includes a `model` object with provider and slug, enabling model-aware logic in hook scripts."
-        source_ref: "https://docs.cline.bot/customization/hooks#input-structure"
+        name: Active Model Provider and Slug in Hook Input (Filesystem Model)
+        summary: "Filesystem hook input JSON includes a `model` object with provider and slug, enabling model-aware logic in hook scripts on VS Code/JetBrains."
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/hooks/hook-factory.ts"
         graduation_candidate: true
         provider_field: "model"
         conversion: not-portable
+      # ── TypeScript AgentPlugin model (SDK / CLI / Kanban only) ───────────
+      - id: plugin_lifecycle_hooks
+        name: Plugin Lifecycle Hook Handlers (SDK/CLI/Kanban)
+        summary: "AgentPlugin `hooks` object exposes beforeRun/afterRun/beforeModel/afterModel/beforeTool/afterTool/onEvent handlers, driven by a richer hook-stage list (session_start, run_start, tool_call_before, tool_call_after, run_end, error, …)."
+        source_ref: "https://docs.cline.bot/sdk/plugins.md#hook-stages"
+        graduation_candidate: true
+        conversion: not-portable
+      - id: plugin_hook_policies
+        name: Plugin Hook Policies (SDK/CLI/Kanban)
+        summary: "Per-hook policies control execution: mode blocking|async, timeoutMs, retries, retryDelayMs, failureMode fail_open|fail_closed, maxConcurrency, queueLimit. Applies only to the plugin model."
+        source_ref: "https://docs.cline.bot/sdk/plugins.md#hook-policies"
+        graduation_candidate: true
+        conversion: not-portable
     loading_model: >
-      Hooks are executable scripts (bash/shell on macOS/Linux, PowerShell on Windows) invoked
-      by Cline at fixed lifecycle points. They receive a JSON object via stdin containing
-      taskId, hookName, clineVersion, timestamp (string ms since epoch), workspaceRoots
-      (array), userId, model (provider + slug), and a hook-specific field (e.g., preToolUse,
-      taskStart). They return JSON to stdout with cancel (bool), contextModification (string),
-      and errorMessage (string). Debug output must go to stderr. Hooks are discovered by
-      filename matching the hook type name in the hooks directory.
-    notes: >
-      CLI support: hooks can be enabled per-task via cline "..." -s hooks_enabled=true or
-      globally via cline config set hooks-enabled=true. The timestamp field is a string
-      (milliseconds since epoch), not a number — this is a migration note for older scripts.
-      workspaceRoots replaces the old singular workspacePath field.
+      Cline ships two hook models simultaneously, split by surface.
 
-      ⚠ DRIFT FLAG (2026-07-13, issue #5): The dedicated hooks doc
-      (docs.cline.bot/customization/hooks) is now a 2-line stub reading "See details under
-      SDK Hooks page / See details under SDK Plugins" and the content moved into the Cline
-      SDK plugin system (docs.cline.bot/customization/plugins, /sdk/plugins,
-      /sdk/guides/writing-plugins). The NEW model replaces the filesystem-script model
-      (extensionless/.ps1 files named after the hook type in .clinerules/hooks/ or
-      ~/Documents/Cline/Hooks, JSON via stdin/stdout with cancel/contextModification/
-      errorMessage, eight named hook types) with TypeScript plugin lifecycle handlers
-      (beforeRun/afterRun/beforeModel/afterModel/beforeTool/afterTool/onEvent), a richer
-      hook-stage list (session_start, run_start, tool_call_before, tool_call_after, run_end,
-      error, …), and hook policies (mode blocking|async, timeoutMs, retries, failureMode
-      fail_open|fail_closed, maxConcurrency, queueLimit). This implies real canonical-key
-      changes NOT yet applied here: async_execution false→true, decision_control/
-      input_modification/context_injection now via plugin hook stages, json_io_protocol
-      (stdin/stdout JSON) likely no longer the mechanism, and eight_hook_types /
-      platform_specific_file_format obsolete. AMBIGUITY held for maintainer: the plugins doc
-      warns "This feature currently only applies to Cline SDK, CLI, and Kanban. Not
-      applicable on VSCode and JetBrains Extension for now" — so the OLD filesystem hook
-      model may STILL be the VSCode/JetBrains mechanism, i.e. the two models may coexist by
-      surface. Full re-curation deferred: requires re-pointing hooks sources to the plugin
-      docs, refetching cache, and a maintainer decision on the dual-model split. The
-      canonical_mappings above still describe the OLD model pending that decision.
+      (1) Filesystem-script model — LIVE on the VS Code and JetBrains extensions. Hooks are
+      executable scripts (bash/shell on macOS/Linux, PowerShell on Windows) invoked at fixed
+      lifecycle points. They receive a JSON object via stdin (taskId, hookName, clineVersion,
+      timestamp as string ms since epoch, workspaceRoots array, userId, model provider+slug,
+      plus a hook-specific field such as preToolUse or taskStart) and return JSON to stdout
+      with cancel (bool), contextModification (string), and errorMessage (string); debug goes
+      to stderr. Hooks are discovered by filename matching the hook type name in the hooks
+      directory (.clinerules/hooks or ~/Documents/Cline/Hooks). A 30s execution timeout
+      applies (HOOK_EXECUTION_TIMEOUT_MS in hook-factory.ts). Verified in extension source
+      (apps/vscode/src/core/hooks/hook-factory.ts, apps/vscode/src/core/storage/disk.ts).
+
+      (2) TypeScript AgentPlugin model — SDK / CLI / Kanban ONLY (the plugins doc's Warning
+      excludes VS Code / JetBrains). Plugins export an AgentPlugin whose `hooks` object
+      implements beforeRun/afterRun/beforeModel/afterModel/beforeTool/afterTool/onEvent, run
+      against a richer hook-stage pipeline (session_start, run_start, tool_call_before,
+      tool_call_after, run_end, error, …), and are governed by hook policies (mode
+      blocking|async, timeoutMs, retries, retryDelayMs, failureMode fail_open|fail_closed,
+      maxConcurrency, queueLimit). Plugins install via `cline plugin install` and load from
+      .cline/plugins (project) or ~/.cline/plugins (global).
+    notes: >
+      Dual-model note (2026-07-14, issue #5 resolved): Cline supports two hook models split by
+      surface, and capability claims above are provider-level (supported: true when ANY surface
+      supports the capability; the mechanism prose names the surface split). The dedicated hooks
+      doc (docs.cline.bot/customization/hooks) is a 2-line stub redirecting to SDK Plugins; the
+      filesystem-script model it used to document is no longer on that page but remains LIVE on
+      the VS Code / JetBrains extensions — confirmed against extension source (hook-factory.ts
+      imports all eight hook data types; disk.ts resolves the .clinerules/hooks and
+      ~/Documents/Cline/Hooks paths). The TypeScript AgentPlugin model (customization/plugins,
+      sdk/plugins) applies only to SDK / CLI / Kanban per that page's own Warning. async_execution
+      is therefore true (plugin mode: async), while json_io_protocol stays true as the VS Code /
+      JetBrains filesystem mechanism. Plugin-model claims carry confidence: inferred (docs-only);
+      filesystem-model claims stay confirmed where source-verified in hook-factory.ts.
+
+      Filesystem CLI/config detail: hooks can be enabled per-task via cline "..." -s
+      hooks_enabled=true or globally via cline config set hooks-enabled=true. The timestamp field
+      is a string (ms since epoch), not a number. workspaceRoots replaces the old singular
+      workspacePath field.
 
   mcp:
     status: supported
@@ -319,7 +363,7 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:e96de3f1379d982c44d0798c87b21b77c26d8ed828f1c3da5bce0461c4a662e3"
-        fetched_at: "2026-07-14T00:38:04Z"
+        fetched_at: "2026-07-14T01:27:39Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -405,7 +449,15 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:862aed093eaf078024c30cb21247f8e612865a3dbd3e387cea5ed53304fd9648"
-        fetched_at: "2026-07-14T00:38:04Z"
+        fetched_at: "2026-07-14T01:27:39Z"
+      # 2026-07-14 (issue #5): the dedicated Workflows doc was removed
+      # (customization/workflows.md → cline-rules.md). The user-authored Workflow
+      # feature is still live in the extension; track it via source instead.
+      - uri: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/context/instructions/user-instructions/workflows.ts"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: "sha256:9593de93efe9ea2b9d06d8f8a2b4c53a96f161f430256928a18ca5cff136e0df"
+        fetched_at: "2026-07-14T01:27:39Z"
     canonical_mappings:
       argument_substitution:
         supported: false
@@ -419,26 +471,30 @@ content_types:
       - id: filename_as_command_name
         name: Filename as Command Name (Workflows)
         summary: "Markdown filenames under the workflows directory become the invocation trigger; users type /<filename>.md including the .md extension in chat."
-        source_ref: "https://docs.cline.bot/customization/workflows.md"
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/context/instructions/user-instructions/workflows.ts"
         graduation_candidate: true
+        graduation_notes: "Docs page removed 2026-07 (customization/workflows redirects to cline-rules.md); feature verified live in extension source (workflows.ts, disk.ts). Confidence: inferred."
         conversion: preserved
       - id: two_scope_loading
         name: Two-Scope Workflow Loading (Project and Global)
         summary: "Project workflows in .clinerules/workflows/ and global workflows in ~/Documents/Cline/Workflows/ are both discovered; project scope wins on name collision."
-        source_ref: "https://docs.cline.bot/customization/workflows.md"
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts"
         graduation_candidate: true
+        graduation_notes: "Docs page removed 2026-07; verified live in disk.ts (GlobalFileNames.workflows = .clinerules/workflows) and workflows.ts (ensureWorkflowsDirectoryExists → ~/Documents/Cline/Workflows). Confidence: inferred."
         conversion: not-portable
       - id: plain_markdown_body
         name: Plain Markdown Instruction Body (No Frontmatter)
         summary: "Workflow files have no documented frontmatter schema; the entire markdown body is instruction text for the agent to execute as a multi-step workflow."
-        source_ref: "https://docs.cline.bot/customization/workflows.md"
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/context/instructions/user-instructions/workflows.ts"
         graduation_candidate: false
+        graduation_notes: "Docs page removed 2026-07; feature verified live in extension source (workflows.ts). Confidence: inferred."
         conversion: preserved
       - id: xml_tool_syntax_in_workflows
         name: XML Tool Syntax in Workflow Bodies
         summary: "Workflow markdown bodies can include XML tool syntax (e.g., <execute_command>, <read_file>, <ask_followup_question>) for precise tool invocation control alongside natural language steps."
-        source_ref: "https://docs.cline.bot/customization/workflows.md"
+        source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/context/instructions/user-instructions/workflows.ts"
         graduation_candidate: false
+        graduation_notes: "Docs page removed 2026-07; feature verified live in extension source (workflows.ts). Confidence: inferred."
         conversion: not-portable
       - id: builtin_slash_commands
         name: Built-In Slash Commands
@@ -477,19 +533,18 @@ content_types:
       and none is required. Invocation includes the .md extension (e.g., /deploy.md, not
       /deploy). Project workflows take precedence over global workflows on name collision.
 
-      ⚠ DRIFT FLAG (2026-07-13, issue #5): The dedicated Workflows documentation page was
-      removed — customization/workflows.md redirects to cline-rules.md,
+      Workflow re-anchor (2026-07-14, issue #5 resolved): The dedicated Workflows documentation
+      page was removed — customization/workflows.md redirects to cline-rules.md,
       features/slash-commands/workflows.md returns 404, and no workflows page remains in the
-      llms.txt sitemap (verified 2026-07-13). The surviving commands doc (using-commands) now
-      documents built-in slash commands plus 'Skills via Slash Commands' as the reusable
-      user-triggered mechanism, but no longer describes user-authored Workflow markdown files.
-      Consequence held for maintainer: the four workflow-based provider_extensions
+      llms.txt sitemap. The user-authored Workflow feature is NOT gone from the product: it is
+      verified live in extension source. The four workflow provider_extensions
       (filename_as_command_name, two_scope_loading, plain_markdown_body,
-      xml_tool_syntax_in_workflows) now cite a removed page and their supported: mechanism has
-      no live doc evidence. It is UNVERIFIED whether the Workflows feature was removed from the
-      product or merely undocumented (superseded by slash-invocable skills). Left in place
-      pending a maintainer decision; /explain-changes was also dropped from the slash-command
-      table.
+      xml_tool_syntax_in_workflows) have been re-anchored from the dead docs page to the live
+      source files (workflows.ts refreshes global + workspace workflow toggles against
+      GlobalFileNames.workflows = .clinerules/workflows and ensureWorkflowsDirectoryExists →
+      ~/Documents/Cline/Workflows; both resolved in disk.ts). Their confidence is now inferred
+      (source-verified but no docs page). /explain-changes was dropped from the slash-command
+      table in 2026-07.
 
   agents:
     status: unsupported

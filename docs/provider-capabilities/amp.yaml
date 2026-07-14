@@ -6,13 +6,41 @@ content_types:
   hooks:
     supported: true
     capabilities:
+      async_execution:
+        supported: false
+        mechanism: plugin event handlers are async TypeScript functions awaited inline in the request/response flow (a tool.call blocks until the handler resolves); no fire-and-forget or background hook execution is documented
+        confidence: inferred
+      context_injection:
+        supported: true
+        mechanism: 'agent.start handlers return {message: {content, display?}} to append context after the user''s message; tool.result handlers rewrite tool results; agent.end can continue the loop (Plugin API, experimental)'
+        confidence: inferred
+      decision_control:
+        supported: true
+        mechanism: 'a tool.call handler returns {action: allow | reject-and-continue | modify | synthesize | error} deciding each tool invocation (Plugin API, experimental)'
+        confidence: inferred
+      handler_types:
+        supported: true
+        mechanism: TypeScript handlers via amp.on(event, handler) run in Amp's Bun runtime; handlers can shell out (ctx.$), call amp.ai.ask, or register tools/commands (Plugin API, experimental)
+        confidence: inferred
+      hook_scopes:
+        supported: true
+        mechanism: three plugin load locations — project .amp/plugins/*.ts, user ~/.config/amp/plugins/*.ts, and a workspace-configured global location (Plugin API, experimental)
+        confidence: inferred
+      input_modification:
+        supported: true
+        mechanism: 'a tool.call handler returns {action: modify, input} to replace the tool''s input arguments before it executes (Plugin API, experimental)'
+        confidence: inferred
+      json_io_protocol:
+        supported: false
+        mechanism: plugins are in-process TypeScript modules exchanging typed event objects and return values through the @ampcode/plugin PluginAPI, not a serialized JSON stdin/stdout protocol
+        confidence: inferred
       matcher_patterns:
         supported: true
-        mechanism: per-tool input matching documented under 'Match Conditions' / 'Regular Expression Patterns' headings (hook_match_input_contains)
+        mechanism: amp.on() subscriptions carry no declarative matcher (handlers discriminate in code); declarative glob/regex matching survives in legacy amp.permissions rules enforced via the internal compat plugin
         confidence: inferred
       permission_control:
         supported: true
-        mechanism: hooks integrate with amp's permission system to control tool availability (documented under 'How Permissions Work' / 'Add Rules' headings)
+        mechanism: a tool.call handler decides each invocation; legacy amp.permissions / amp.guardedFiles.allowlist rules are enforced via an internal compat plugin (Plugin API, experimental)
         confidence: inferred
   mcp:
     supported: true

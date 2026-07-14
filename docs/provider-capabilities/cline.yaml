@@ -13,21 +13,41 @@ content_types:
   hooks:
     supported: true
     capabilities:
+      async_execution:
+        supported: true
+        mechanism: 'plugin hook policies (mode: async) run hooks off the critical path on SDK/CLI/Kanban; filesystem-script hooks on VS Code/JetBrains remain synchronous with a 30s timeout'
+        confidence: inferred
       context_injection:
         supported: true
-        mechanism: context injection documented under 'Context Modification' heading
-        confidence: inferred
-      handler_types:
+        mechanism: filesystem hooks inject context via the contextModification stdout field on VS Code/JetBrains; the plugin before_agent_start hook stage injects context or modifies the prompt on SDK/CLI/Kanban
+        confidence: confirmed
+      decision_control:
         supported: true
-        mechanism: hook handler types documented under 'Hook Types' heading
+        mechanism: 'filesystem PreToolUse hooks block a tool invocation by returning cancel: true on VS Code/JetBrains; the plugin tool_call_before hook stage blocks tool calls on SDK/CLI/Kanban'
+        confidence: confirmed
+      handler_types:
+        supported: false
+        mechanism: 'neither surface documents handler-type selection: filesystem hooks (VS Code/JetBrains) execute shell or PowerShell scripts only; plugin hooks (SDK/CLI/Kanban) are TypeScript lifecycle handlers only'
         confidence: inferred
       hook_scopes:
         supported: true
-        mechanism: hook scopes documented under 'Hook Locations' heading (project + global)
-        confidence: inferred
+        mechanism: 'both surfaces support global + project scope: filesystem hooks in .clinerules/hooks (project) and ~/Documents/Cline/Hooks (global); plugins in .cline/plugins (project) and ~/.cline/plugins (global)'
+        confidence: confirmed
+      input_modification:
+        supported: true
+        mechanism: filesystem PreToolUse hooks return modified context/input before tool execution via contextModification on VS Code/JetBrains; the plugin before_agent_start / tool_call_before stages modify input on SDK/CLI/Kanban
+        confidence: confirmed
       json_io_protocol:
         supported: true
-        mechanism: JSON I/O protocol documented under 'Input Structure' / 'Output Structure' headings
+        mechanism: the filesystem-script model (VS Code/JetBrains) receives JSON via stdin and returns JSON to stdout with cancel, contextModification, and errorMessage fields; NOT the plugin mechanism (in-process TypeScript)
+        confidence: confirmed
+      matcher_patterns:
+        supported: false
+        mechanism: 'neither surface documents per-tool pattern matching: filesystem PreToolUse and plugin tool_call_before both fire for every tool call regardless of tool identity'
+        confidence: inferred
+      permission_control:
+        supported: false
+        mechanism: 'neither surface grants/denies tool availability: hooks can only block/cancel a specific tool call (decision_control); the plugin approval-policy concept governs blocking a call, not tool-availability permissioning'
         confidence: inferred
   mcp:
     supported: true
