@@ -314,7 +314,7 @@ func TestBuildAllAndPivotsShareNodeShape(t *testing.T) {
 func TestProviderStatusJoin(t *testing.T) {
 	opts := newExportFixture(t)
 	for name, body := range map[string]string{
-		"alpha.yaml": "schema_version: \"1\"\nslug: alpha\nstatus: active\n",
+		"alpha.yaml": "schema_version: \"1\"\nslug: alpha\nstatus: active\ndisplay_name: Manifest Alpha\n",
 		"bravo.yaml": "schema_version: \"1\"\nslug: bravo\nstatus: archived\n",
 		// charlie deliberately has no manifest.
 	} {
@@ -342,6 +342,16 @@ func TestProviderStatusJoin(t *testing.T) {
 	charlie := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "charlie.json"))
 	if v, ok := charlie["provider_status"]; ok {
 		t.Errorf("charlie provider_status = %v, want field absent", v)
+	}
+
+	// display_name precedence: a non-empty baseline value beats the manifest;
+	// a provider with no manifest keeps the slug fallback.
+	alpha := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "alpha.json"))
+	if alpha["display_name"] != "Alpha" {
+		t.Errorf("alpha display_name = %v, want baseline \"Alpha\" (manifest must not win over a set baseline)", alpha["display_name"])
+	}
+	if charlie["display_name"] != "charlie" {
+		t.Errorf("charlie display_name = %v, want slug fallback \"charlie\"", charlie["display_name"])
 	}
 }
 
@@ -407,6 +417,13 @@ func TestExportTreeRealData(t *testing.T) {
 		if doc["provider_status"] != want {
 			t.Errorf("%s provider_status = %v, want %q", slug, doc["provider_status"], want)
 		}
+	}
+
+	// Every committed baseline leaves display_name empty, so the manifest
+	// display name joins in — the published value must not be the slug.
+	rooCode := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "roo-code.json"))
+	if rooCode["display_name"] != "Roo Code" {
+		t.Errorf("roo-code display_name = %v, want manifest \"Roo Code\"", rooCode["display_name"])
 	}
 }
 
