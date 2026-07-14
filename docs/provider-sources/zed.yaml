@@ -33,10 +33,13 @@ config_schema:
 content_types:
 
   # ── Support summary ───────────────────────────────────────────────────
-  # Zed supports: rules (.rules file), mcp, agents (builtin profiles: write/ask/minimal — not user-definable), commands (builtin slash commands only — not user-definable)
-  # Not supported: hooks, skills
+  # Zed supports: rules (.rules/AGENTS.md instructions), skills (Agent Skills — SKILL.md), mcp, agents (builtin profiles: write/ask/minimal — not user-definable), commands (builtin slash commands only — not user-definable)
+  # Not supported: hooks
   # Zed's 'agent profiles' are builtin (write/ask/minimal) — not user-definable files.
-  # Slash commands are builtin too. hooks and skills stubs are correct.
+  # Slash commands are builtin too. The hooks stub is correct.
+  # Skills onboarded 2026-07-14 (bead capmon-zbm): the 2026-07 docs restructure
+  # replaced the Rules Library with Skills (reusable on-demand instruction
+  # packages), documented at zed.dev/docs/ai/skills.
   # ─────────────────────────────────────────────────────────────────────
 
   rules:
@@ -69,7 +72,15 @@ content_types:
     # MCP configured in Zed settings JSON under agent profiles.
 
   skills:
-    supported: false
+    sources:
+      - url: https://zed.dev/docs/ai/skills
+        type: docs
+        format: html
+        extracts: [file_format, file_locations, frontmatter, invocation]
+    # Agent Skills: a named folder containing SKILL.md (YAML frontmatter +
+    # Markdown body). Discovered from ~/.agents/skills/ (global) and
+    # <worktree>/.agents/skills/ (project-local). Source-hash change detection
+    # mirrors the other zed docs sources.
 
   agents:
     supported: false

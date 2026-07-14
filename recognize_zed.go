@@ -148,6 +148,57 @@ func zedAgentsLandmarkOptions() LandmarkOptions {
 	)
 }
 
+// zedSkillsLandmarkOptions returns the landmark patterns for Zed's Skills
+// documentation. Anchors derived from the live HTML doc at
+// zed.dev/docs/ai/skills.
+//
+// Verified live: https://zed.dev/docs/ai/skills on 2026-07-14. Zed's 2026-07
+// docs restructure replaced the retired Rules Library with Skills: reusable,
+// on-demand instruction packages invoked by name (drift bead capmon-zbm). Zed
+// now implements a subset of the Agent Skills open standard — a named folder
+// containing a SKILL.md (YAML frontmatter + Markdown body), discovered from
+// ~/.agents/skills/ (global) and <worktree>/.agents/skills/ (project-local).
+//
+// The doc is rich (13 H2/H3/H4 headings). Three canonical skills keys have
+// direct heading-level evidence and are anchored here at inferred confidence:
+//   - canonical_filename → "SKILL.md format" (H3) — the heading names the
+//     required fixed filename.
+//   - disable_model_invocation → "Preventing Autonomous Invocation" (H3) —
+//     the section documenting the disable-model-invocation frontmatter toggle.
+//   - skill_bundled_resources → "Bundled Resources" (H3) — documents the
+//     scripts/, references/, and assets/ subfolders loaded on demand.
+//
+// project_scope and global_scope are documented in body prose under "Where
+// Skills Live" (not a heading that names either path), so they are merged in
+// recognizeZed as confirmed static facts rather than anchored here — mirroring
+// the cursor skills recognizer.
+//
+// The remaining canonical keys (display_name, description, auto_invocable,
+// user_invocable, custom_filename, license, compatibility, metadata_map,
+// version, shared_scope) are curated in docs/provider-formats/zed.yaml —
+// their evidence is frontmatter-table / body prose, not heading text, so
+// substring landmark matching cannot anchor them.
+//
+// Required anchors are unique to the skills doc:
+//   - "Skill Format"    — H2; no other zed doc uses this heading.
+//   - "Where Skills Live" — H2; unique to the skills doc.
+//
+// Neither appears in zed's rules, mcp, or agents docs.
+func zedSkillsLandmarkOptions() LandmarkOptions {
+	required := []StringMatcher{
+		{Kind: "substring", Value: "Skill Format", CaseInsensitive: true},
+		{Kind: "substring", Value: "Where Skills Live", CaseInsensitive: true},
+	}
+	return SkillsLandmarkOptions(
+		SkillsLandmarkPattern("canonical_filename", "SKILL.md format",
+			"SKILL.md is the required fixed skill filename inside each skill folder, documented under the 'SKILL.md format' heading", required),
+		SkillsLandmarkPattern("disable_model_invocation", "Preventing Autonomous Invocation",
+			"disable-model-invocation: true frontmatter hides a skill from the agent's autonomous catalog while leaving it slash/@-invocable, documented under the 'Preventing Autonomous Invocation' heading", required),
+		SkillsLandmarkPattern("skill_bundled_resources", "Bundled Resources",
+			"a skill folder may co-locate scripts/, references/, and assets/ subfolders that the agent loads on demand via read_file/list_directory, documented under the 'Bundled Resources' heading", required),
+	)
+}
+
 // Commands recognition is intentionally NOT wired for zed.
 //
 // The cached commands source (.capmon-cache/zed/commands.0/extracted.json,
@@ -180,16 +231,24 @@ func zedAgentsLandmarkOptions() LandmarkOptions {
 // once a zed docs page documenting /-command authoring (extension or
 // otherwise) and argument substitution semantics is added to the cache.
 
-// recognizeZed recognizes rules + mcp + agents capabilities for the Zed
-// provider. Zed does not support Agent Skills, so skills emission is
-// intentionally a no-op (confirmed-negative signal). Rules, MCP, and agents
-// recognition use landmark matching from zed's HTML docs at
-// zed.dev/docs/ai/{rules,mcp,agent-settings}. Commands recognition is
-// intentionally absent — see the comment block immediately above this
-// function for rationale.
+// recognizeZed recognizes rules + skills + mcp + agents capabilities for the
+// Zed provider. All use landmark matching from zed's HTML docs at
+// zed.dev/docs/ai/{instructions,skills,mcp,agent-settings}. Skills became a
+// first-class content type in zed's 2026-07 docs restructure (bead
+// capmon-zbm); after a successful skills recognition, the two documented
+// install locations are merged in as confirmed static evidence (their paths
+// live in body prose under "Where Skills Live", not in headings — mirroring
+// the cursor skills recognizer). Commands recognition is intentionally absent
+// — see the comment block above zedSkillsLandmarkOptions' sibling
+// (the commands rationale block) for details.
 func recognizeZed(ctx RecognitionContext) RecognitionResult {
 	rulesResult := recognizeLandmarks(ctx, zedRulesLandmarkOptions())
+	skillsResult := recognizeLandmarks(ctx, zedSkillsLandmarkOptions())
+	if len(skillsResult.Capabilities) > 0 {
+		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "project_scope", "project-local skills live in <worktree>/.agents/skills/<name>/SKILL.md and load only from trusted worktrees", "confirmed"))
+		mergeInto(skillsResult.Capabilities, capabilityDotPaths("skills", "global_scope", "global skills live in ~/.agents/skills/<name>/SKILL.md and apply to every project", "confirmed"))
+	}
 	mcpResult := recognizeLandmarks(ctx, zedMcpLandmarkOptions())
 	agentsResult := recognizeLandmarks(ctx, zedAgentsLandmarkOptions())
-	return mergeRecognitionResults(rulesResult, mcpResult, agentsResult)
+	return mergeRecognitionResults(rulesResult, skillsResult, mcpResult, agentsResult)
 }

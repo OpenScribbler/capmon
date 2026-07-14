@@ -1,0 +1,94 @@
+provider: zed
+content_type: skills
+format: ""
+proposed_mappings:
+    - canonical_key: auto_invocable
+      supported: true
+      mechanism: 'By default the agent picks up skills autonomously: it sees a catalog of every installed skill (name + description) in its system prompt and calls the skill tool when a task matches a skill''s description. Semantic description matching, opt-out via disable-model-invocation — functionally the canonical auto_invocable capability.'
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: canonical_filename
+      supported: true
+      mechanism: SKILL.md is the required fixed filename inside each skill folder (starts with YAML frontmatter, followed by Markdown instructions).
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: compatibility
+      supported: false
+      mechanism: Not currently a frontmatter field (only name, description, disable-model-invocation are recognized today; further Agent Skills spec fields are planned).
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: custom_filename
+      supported: false
+      mechanism: The skill file name is fixed as SKILL.md; only the containing folder name varies (and serves as the skill identifier). No custom filename is supported.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: description
+      supported: true
+      mechanism: 'yaml frontmatter key: description (required). States what the skill does and when to use it; the agent uses it to decide when to auto-invoke. Keep under 1024 bytes — longer descriptions still load but surface a warning.'
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: disable_model_invocation
+      supported: true
+      mechanism: 'yaml frontmatter key: disable-model-invocation (optional bool, default false). When true the skill is hidden from the agent''s autonomous catalog but stays invocable by the user via slash command or @-mention — useful for deploy/release procedures you do not want the agent triggering.'
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: display_name
+      supported: true
+      mechanism: 'yaml frontmatter key: name (required). Lowercase letters, numbers, and hyphens only; 1-64 characters; no leading/trailing or consecutive hyphens. Should match the skill''s folder name and doubles as the skill identifier; skills with invalid names fail to load.'
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: global_scope
+      supported: true
+      mechanism: Global skills live in ~/.agents/skills/<name>/SKILL.md and apply to every project. The agent can read global skill resources even though they are outside the current project.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: license
+      supported: false
+      mechanism: Not currently a frontmatter field. The docs list only name, description, and disable-model-invocation, and state further Agent Skills spec fields are planned 'in the near future'.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: metadata_map
+      supported: false
+      mechanism: Not currently a frontmatter field (only name, description, disable-model-invocation are recognized today; further Agent Skills spec fields are planned).
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: project_scope
+      supported: true
+      mechanism: Project-local skills live in <worktree>/.agents/skills/<name>/SKILL.md and apply only to the current project. They load only from trusted worktrees — skills from a freshly cloned or untrusted project are excluded from the catalog and slash commands until trust is granted.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: shared_scope
+      supported: false
+      mechanism: Zed loads skills from exactly two locations (global ~/.agents/skills/ and project-local <worktree>/.agents/skills/); no organization/enterprise scope is documented, and 'No remote registry' — Zed does not discover or load skills from remote locations at runtime.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: skill_bundled_resources
+      supported: true
+      mechanism: A skill folder may co-locate scripts/ (scripts the agent can run), references/ (additional documentation), and assets/ (templates and static files) alongside SKILL.md. The agent loads them on demand via the read_file and list_directory tools; the SKILL.md body links to them (progressive disclosure).
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: user_invocable
+      supported: true
+      mechanism: 'All installed skills are user-invocable: type / in the message editor and select a skill by name, or @skill to pick one from the completion menu. Both inject the skill''s instructions as context (shown as a clickable crease button). disable-model-invocation: true removes only the model''s autonomous invocation, leaving the skill user-invocable.'
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: version
+      supported: false
+      mechanism: Not currently a frontmatter field (only name, description, disable-model-invocation are recognized today; further Agent Skills spec fields are planned).
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
