@@ -13,11 +13,6 @@ content_types:
         type: documentation
         fetch_method: md_url
         content_hash: "sha256:6f8562d51b02f3bdb9616d7efda38ea8b7799dfc06693720b6056307a21a3512"
-        fetched_at: "2026-07-14T01:27:39Z"
-      - uri: "https://docs.cline.bot/customization/skills.md"
-        type: documentation
-        fetch_method: md_url
-        content_hash: "sha256:6f8562d51b02f3bdb9616d7efda38ea8b7799dfc06693720b6056307a21a3512"
         fetched_at: "2026-07-14T18:58:16Z"
     canonical_mappings:
       display_name:
