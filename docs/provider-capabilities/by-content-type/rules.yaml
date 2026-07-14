@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T01:32:30Z
+# Generated at: 2026-07-14T18:33:51Z
 
 content_type: rules
 providers:
@@ -234,6 +234,36 @@ providers:
                 supported: true
                 mechanism: 'three-tier scope: workspace + global + team steering (documented under ''Workspace steering'' / ''Global steering'' / ''Team steering'')'
                 confidence: inferred
+    opencode:
+        supported: true
+        capabilities:
+            activation_mode:
+                supported: false
+                mechanism: rule files load unconditionally as context; no conditional activation syntax documented
+                confidence: inferred
+            auto_memory:
+                supported: false
+                mechanism: no runtime command documented for persisting notes into rule files
+                confidence: inferred
+            cross_provider_recognition:
+                supported: true
+                capabilities:
+                    agents_md:
+                        supported: true
+                        mechanism: AGENTS.md read from project root and parent directories; global at ~/.config/opencode/AGENTS.md
+                        confidence: confirmed
+                    claude_md:
+                        supported: true
+                        mechanism: CLAUDE.md fallback at project root and ~/.claude/CLAUDE.md globally when no AGENTS.md exists; disable via OPENCODE_DISABLE_CLAUDE_CODE=1
+                        confidence: confirmed
+            file_imports:
+                supported: true
+                mechanism: instructions array in opencode.json lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context
+                confidence: confirmed
+            hierarchical_loading:
+                supported: true
+                mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md appended; all matching files combined
+                confidence: confirmed
     windsurf:
         supported: true
         capabilities:

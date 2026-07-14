@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T01:32:30Z
+# Generated at: 2026-07-14T18:33:51Z
 
 content_type: agents
 providers:
@@ -181,6 +181,44 @@ providers:
                 supported: true
                 mechanism: per-agent tool allowlist with exact matches, wildcard patterns, and MCP tool patterns documented under 'Tools field' / 'AllowedTools field' / 'ToolsSettings field' headings
                 confidence: inferred
+    opencode:
+        supported: true
+        capabilities:
+            agent_scopes:
+                supported: true
+                mechanism: 'two scopes, both loaded and coexisting: project (.opencode/agents/ or .opencode/agent/) and user-global (~/.config/opencode/agents/)'
+                confidence: confirmed
+            definition_format:
+                supported: true
+                mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key
+                confidence: confirmed
+            invocation_patterns:
+                supported: true
+                capabilities:
+                    at_mention:
+                        supported: true
+                        mechanism: subagents invoked manually by @-mentioning the subagent name in a message; agent name derives from the filename
+                        confidence: confirmed
+                    natural_language:
+                        supported: true
+                        mechanism: subagents invoked automatically by primary agents for specialized tasks based on their description field
+                        confidence: confirmed
+            model_selection:
+                supported: true
+                mechanism: frontmatter model field (provider/model-id format) overrides the session default; subagents default to the invoking primary agent's model
+                confidence: confirmed
+            per_agent_mcp:
+                supported: false
+                mechanism: no per-agent mcpServers field documented; agents inherit the workspace MCP configuration, with per-agent access gated via the permission map
+                confidence: confirmed
+            subagent_spawning:
+                supported: true
+                mechanism: 'agents with mode: subagent (or all) are invocable from other agents via the Task tool, driven by the callee''s description; permission.task on the orchestrator controls which subagents it may invoke'
+                confidence: confirmed
+            tool_restrictions:
+                supported: true
+                mechanism: permission frontmatter map configures ask/allow/deny per tool using named keys or wildcard glob patterns; fine-grained keys accept glob/pattern-to-action objects
+                confidence: confirmed
     roo-code:
         supported: true
         capabilities:

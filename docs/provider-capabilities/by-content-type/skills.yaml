@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T01:49:39Z
+# Generated at: 2026-07-14T18:33:51Z
 
 content_type: skills
 providers:
@@ -174,6 +174,41 @@ providers:
             project_scope:
                 supported: true
                 mechanism: Self-contained directory installed via Kiro Powers panel (UI installation, no fixed filesystem path)
+                confidence: confirmed
+    opencode:
+        supported: true
+        capabilities:
+            canonical_filename:
+                supported: true
+                mechanism: fixed filename SKILL.md inside the skill directory (Agent Skills spec)
+                confidence: confirmed
+            compatibility:
+                supported: true
+                mechanism: 'yaml frontmatter key: compatibility (optional)'
+                confidence: confirmed
+            description:
+                supported: true
+                mechanism: 'yaml frontmatter key: description (required)'
+                confidence: confirmed
+            display_name:
+                supported: true
+                mechanism: 'yaml frontmatter key: name (required)'
+                confidence: confirmed
+            global_scope:
+                supported: true
+                mechanism: cross-provider convention at ~/.config/opencode/skills/<name>/SKILL.md
+                confidence: confirmed
+            license:
+                supported: true
+                mechanism: 'yaml frontmatter key: license (optional)'
+                confidence: confirmed
+            metadata_map:
+                supported: true
+                mechanism: 'yaml frontmatter key: metadata (optional map)'
+                confidence: confirmed
+            project_scope:
+                supported: true
+                mechanism: cross-provider SKILL.md convention at .opencode/skill/<name>/SKILL.md
                 confidence: confirmed
     pi:
         supported: true

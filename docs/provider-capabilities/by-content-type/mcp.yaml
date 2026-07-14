@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T01:32:30Z
+# Generated at: 2026-07-14T18:33:51Z
 
 content_type: mcp
 providers:
@@ -157,6 +157,29 @@ providers:
                 supported: true
                 mechanism: transport types (stdio for local, HTTPS/HTTP for remote) documented under 'Local server' / 'Remote server' configuration sub-headings
                 confidence: inferred
+    opencode:
+        supported: true
+        capabilities:
+            enterprise_management:
+                supported: true
+                mechanism: organizations publish default MCP server configs via a .well-known/opencode endpoint; local opencode.json values override remote defaults
+                confidence: confirmed
+            env_var_expansion:
+                supported: true
+                mechanism: '{env:VAR_NAME} interpolation in remote server headers and oauth fields; local servers take an environment object of key-value pairs'
+                confidence: confirmed
+            oauth_support:
+                supported: true
+                mechanism: 'OAuth 2.0 with Dynamic Client Registration (RFC 7591): 401 auto-detected, tokens stored in ~/.local/share/opencode/mcp-auth.json; oauth object for pre-registered credentials or oauth: false to disable'
+                confidence: confirmed
+            tool_filtering:
+                supported: true
+                mechanism: global tools map keyed by server-name prefix with glob patterns (e.g. mymcp_*); per-agent access via the agent permission map
+                confidence: confirmed
+            transport_types:
+                supported: true
+                mechanism: 'two types under the mcp key in opencode.json: local (stdio, launched via command array) and remote (HTTP/SSE streamable, connected via url)'
+                confidence: confirmed
     windsurf:
         supported: true
         capabilities:

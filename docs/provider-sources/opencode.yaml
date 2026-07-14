@@ -1,125 +1,101 @@
-# OpenCode / Crush — Provider Source Manifest
-# Good sources: both repos have root-level JSON Schema. OpenCode is archived, Crush is the active successor.
+# opencode — Provider Source Manifest
+# The active opencode: anomalyco/opencode (opencode.ai), by Anomaly — the
+# company formerly known as SST. The repo was sst/opencode until the 2026 org
+# rename; old sst raw URLs still serve 200 directly (no redirect).
 #
-# ⚠ IDENTITY / SOURCE DIVERGENCE (flagged 2026-07-14): There are TWO distinct
-# projects named "opencode". The header/repo/successor below describe the
-# ORIGINAL opencode-ai/opencode — confirmed archived read-only on GitHub
-# (archived=true, last push 2025-09-18), whose team moved to Charm and built the
-# active successor charmbracelet/crush. That lineage is accurate and is what the
-# locked status (archived) + successor (crush) refer to. HOWEVER the paired
-# format doc docs/provider-formats/opencode.yaml has been re-curated to track a
-# SEPARATE, active same-named project — sst/opencode (opencode.ai, dev branch,
-# TypeScript) — which is neither archived nor succeeded by crush. The content_types
-# sources below still point at the legacy opencode-ai/opencode Go tree, so the
-# manifest and its format doc now describe different projects. Reconciling this
-# fully (either re-onboard the manifest to sst/opencode as active, or re-point the
-# format doc back to the archived opencode-ai/crush lineage) needs a human call;
-# status and successor slug are intentionally left unchanged pending that decision.
+# ⚠ NAME COLLISION (resolved 2026-07-14, capmon-ctj): a different, unrelated
+# project also carried this name — opencode-ai/opencode, archived read-only
+# 2025-09-18, whose team moved to Charm and built charmbracelet/crush. This
+# manifest originally described that dead project and was re-onboarded to the
+# active anomalyco/opencode. The opencode-ai → crush lineage history lives on
+# docs/provider-sources/crush.yaml.
 
 schema_version: "1"
-last_verified: "2026-03-27"
+last_verified: "2026-07-14"
 
 slug: opencode
-display_name: OpenCode
-vendor: opencode-ai # archived; team subsequently built the successor Crush at Charm
-status: archived
+display_name: opencode # brand is lowercase (opencode.ai)
+vendor: Anomaly # formerly SST; GitHub org renamed sst → anomalyco
+status: active
 fetch_tier: gh-api
-repo: opencode-ai/opencode
-repo_branch: main
-
-successor:
-  slug: crush
-  display_name: Crush
-  repo: charmbracelet/crush
-  repo_branch: main
-  status: active
-  # Crush has auto-updated schema.json via CI workflow (.github/workflows/schema-update.yml)
-  # Schema also hosted at https://charm.land/crush.json
+repo: anomalyco/opencode
+repo_branch: dev
 
 change_detection:
   method: github-releases
-  endpoint: https://api.github.com/repos/charmbracelet/crush/releases/latest
-  baseline: "v0.53.0" # Crush version. OpenCode final: v0.0.55
-  # Track the successor for active changes. OpenCode is frozen.
+  endpoint: https://api.github.com/repos/anomalyco/opencode/releases/latest
+  baseline: "v1.17.20" # released 2026-07-13
 
 changelog:
-  - url: https://github.com/charmbracelet/crush/releases
-    label: Crush GitHub Releases
+  - url: https://github.com/anomalyco/opencode/releases
+    label: GitHub releases
 
 config_schema:
-  url: https://raw.githubusercontent.com/charmbracelet/crush/main/schema.json
+  url: https://opencode.ai/config.json
   format: json-schema
   draft: "2020-12"
-  # Config file: crush.json (no leading dot). OpenCode used .opencode.json.
-  # Also available at: https://charm.land/crush.json
+  # Config file: opencode.json / opencode.jsonc (project root or ~/.config/opencode/).
 
 content_types:
   # ── Support summary ───────────────────────────────────────────────────
-  # OpenCode supports: rules (via contextPaths config), agents (4 built-in, not
-  #   user-definable), commands, mcp
-  # Not supported: hooks (no hook system), skills (no native format; coverable
-  #   via cross-provider convention)
-  # Note: OpenCode has no native skill format — the cross-provider SKILL.md
-  #   convention applies. 'agents' are 4 built-in types (coder/summarizer/task/title), not
-  #   user-definable. Crush fork adds slightly different MCP config format.
+  # opencode supports: rules (AGENTS.md + instructions array), agents
+  #   (markdown + frontmatter, user-definable), commands, mcp
+  # Not supported: hooks (no lifecycle hook system)
+  # skills: no native format — the cross-provider SKILL.md convention applies.
+  # Docs pages serve raw-markdown mirrors at <page>.md (no llms.txt index).
   # ─────────────────────────────────────────────────────────────────────
 
   rules:
     sources:
-      - url: https://raw.githubusercontent.com/opencode-ai/opencode/main/internal/llm/prompt/prompt.go
-        type: source-code
-        format: go
+      - url: https://opencode.ai/docs/rules.md
+        type: docs
+        format: markdown
         extracts: [file_locations, hierarchy, discovery_rules]
-
-      - url: https://raw.githubusercontent.com/charmbracelet/crush/main/internal/config/config.go
-        type: source-code
-        format: go
-        extracts: [file_locations, hierarchy]
-    # No dedicated rules system. Uses contextPaths config — list of files auto-loaded into prompt.
-    # OpenCode defaults: .github/copilot-instructions.md, .cursorrules, CLAUDE.md, opencode.md, etc.
-    # Crush expands to add: GEMINI.md, crush.md, AGENTS.md.
+    # AGENTS.md walked up from cwd (CLAUDE.md fallback at each level), global
+    # at ~/.config/opencode/AGENTS.md; the instructions array in opencode.json
+    # adds files, glob patterns, or remote URLs.
 
   hooks:
     supported: false
-    # No hook system in either OpenCode or Crush.
+    # No user-definable lifecycle hooks — no hook events, no hook config schema.
 
   mcp:
     sources:
-      - url: https://raw.githubusercontent.com/charmbracelet/crush/main/schema.json
-        type: schema
-        format: json-schema
-        json_path: "$.properties.mcp"
-        extracts: [server_config_fields, transport_types]
-
-      - url: https://raw.githubusercontent.com/opencode-ai/opencode/main/internal/llm/agent/mcp-tools.go
-        type: source-code
-        format: go
-        extracts: [server_config_fields]
-    # OpenCode: command, args[], env[] (string array), type (stdio/sse), url, headers.
-    # Crush adds: http type, disabled, disabled_tools[], timeout, env changed to map[string]string.
+      - url: https://opencode.ai/docs/mcp-servers.md
+        type: docs
+        format: markdown
+        extracts: [server_config_fields, transport_types, config_examples]
+    # local (stdio via command array) and remote (HTTP/SSE) under the mcp key
+    # in opencode.json; OAuth 2.0 with Dynamic Client Registration.
 
   skills:
     supported: true
     convention: cross-provider-skill-md
-    # OpenCode has no native skill documentation to monitor. Installers place
-    # skills using the cross-provider Agent Skills convention (SKILL.md with
-    # YAML frontmatter) at .opencode/skills/ (project) and ~/.config/opencode/skills/
-    # (user), plus the cross-provider .agents/skills/ location.
+    # No native skill implementation or docs to monitor. Installers use the
+    # cross-provider Agent Skills convention: .opencode/skill/<name>/SKILL.md
+    # (project) and ~/.config/opencode/skills/<name>/SKILL.md (user).
 
   agents:
     sources:
-      - url: https://raw.githubusercontent.com/opencode-ai/opencode/main/internal/llm/agent/agent.go
+      - url: https://opencode.ai/docs/agents.md
+        type: docs
+        format: markdown
+        extracts: [file_format, config_fields, features]
+
+      - url: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/opencode/src/config/agent.ts
         type: source-code
-        format: go
+        format: typescript
         extracts: [config_fields]
-    # 4 built-in agents (not user-definable): coder, summarizer, task, title.
-    # Configured via config.Agent struct (model, maxTokens, reasoningEffort).
+    # Markdown + YAML frontmatter in .opencode/agents/ (project) and
+    # ~/.config/opencode/agents/ (global). The schema is exported as
+    # ConfigAgentV1 from packages/core/src/v1/config/agent.ts; the monitored
+    # file above is the thin loader that imports it.
 
   commands:
     sources:
-      - url: https://raw.githubusercontent.com/opencode-ai/opencode/main/internal/tui/components/dialog/custom_commands.go
-        type: source-code
-        format: go
+      - url: https://opencode.ai/docs/commands.md
+        type: docs
+        format: markdown
         extracts: [file_format, file_locations, features]
-    # Markdown files in $XDG_CONFIG_HOME/opencode/commands/ (user:) or .opencode/commands/ (project:).
-    # Supports named arguments ($ISSUE_NUMBER, $AUTHOR_NAME).
+    # Markdown + frontmatter in .opencode/commands/ (project) and
+    # ~/.config/opencode/commands/ (user); $ARGUMENTS plus positional $1/$2/$3.
