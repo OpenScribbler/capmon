@@ -52,7 +52,8 @@ content_types:
         format: markdown
         extracts: [file_locations, hierarchy, discovery_rules]
     # AGENTS.md walked up from cwd (CLAUDE.md fallback at each level), global
-    # at ~/.config/opencode/AGENTS.md; the instructions array in opencode.json
+    # at ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md; the instructions
+    # array in opencode.json (or the global ~/.config/opencode/opencode.json)
     # adds files, glob patterns, or remote URLs.
 
   hooks:

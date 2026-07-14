@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:33:51Z
+# Generated at: 2026-07-14T18:45:36Z
 
 content_type: agents
 providers:
@@ -190,7 +190,7 @@ providers:
                 confidence: confirmed
             definition_format:
                 supported: true
-                mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key
+                mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key
                 confidence: confirmed
             invocation_patterns:
                 supported: true

@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:33:51Z
+# Generated at: 2026-07-14T18:45:36Z
 
 content_type: rules
 providers:
@@ -258,11 +258,11 @@ providers:
                         confidence: confirmed
             file_imports:
                 supported: true
-                mechanism: instructions array in opencode.json lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context
+                mechanism: instructions array in opencode.json (or the global ~/.config/opencode/opencode.json) lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context
                 confidence: confirmed
             hierarchical_loading:
                 supported: true
-                mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md appended; all matching files combined
+                mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md appended; all matching files combined
                 confidence: confirmed
     windsurf:
         supported: true

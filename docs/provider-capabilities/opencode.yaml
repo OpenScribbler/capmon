@@ -62,11 +62,11 @@ content_types:
             confidence: confirmed
       file_imports:
         supported: true
-        mechanism: instructions array in opencode.json lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context
+        mechanism: instructions array in opencode.json (or the global ~/.config/opencode/opencode.json) lists additional rule files by relative path, glob pattern, or remote URL — all combined with AGENTS.md into context
         confidence: confirmed
       hierarchical_loading:
         supported: true
-        mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md appended; all matching files combined
+        mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md appended; all matching files combined
         confidence: confirmed
   hooks:
     supported: false
@@ -102,7 +102,7 @@ content_types:
         confidence: confirmed
       definition_format:
         supported: true
-        mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key
+        mechanism: markdown with YAML frontmatter in .opencode/agents/*.md (project) and ~/.config/opencode/agents/*.md (global); the loader accepts both agent/ and agents/ directory names and recurses; frontmatter declares description/mode/model/temperature/top_p/steps/permission/color/hidden/disable/variant/prompt and the body becomes the system prompt; agents can also be defined inline in opencode.json under the agent key
         confidence: confirmed
       invocation_patterns:
         supported: true
