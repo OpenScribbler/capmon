@@ -233,6 +233,11 @@ func sourceManifestStatuses(sourcesDir string) (map[string]string, error) {
 		if prev, dup := seen[m.Slug]; dup {
 			return nil, fmt.Errorf("duplicate source manifest slug %q in %s and %s", m.Slug, prev, name)
 		}
+		// The manifest schema requires status; a manifest that omits it would
+		// otherwise silently publish a provider doc without provider_status.
+		if m.Status == "" {
+			return nil, fmt.Errorf("source manifest %s: missing required field 'status'", name)
+		}
 		seen[m.Slug] = name
 		statuses[m.Slug] = m.Status
 	}
