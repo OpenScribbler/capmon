@@ -5,7 +5,7 @@ category: cli
 # - required: true | false | null (null = source doesn't say)
 # - value_type: see allow-list in formatdoc_validate.go
 # - examples: [{title?, lang, code, note?}]
-last_fetched_at: "2026-07-13T18:22:14Z"
+last_fetched_at: "2026-07-14T00:38:38Z"
 last_changed_at: "2026-07-13T18:22:14Z"
 generation_method: subagent
 
@@ -66,7 +66,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:7193ac6a72ddac37f000ed5c5a7a4be667ed035d5637aacae9e7c472ae73e96d"
-        fetched_at: "2026-07-13T18:22:14Z"
+        fetched_at: "2026-07-14T00:38:38Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -123,12 +123,12 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:1da8aca036511883626f482fb40e74a2fcd236ab7369d8a9d28d383dcd8fb420"
-        fetched_at: "2026-07-13T18:22:14Z"
+        fetched_at: "2026-07-14T00:38:38Z"
       - uri: "https://raw.githubusercontent.com/sst/opencode/dev/packages/opencode/src/config/agent.ts"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:4844d4dfa48a516f5b134b0e310c3b0fc11292d0180b0b12ab8d96a43775efa7"
-        fetched_at: "2026-07-13T18:22:14Z"
+        fetched_at: "2026-07-14T00:38:38Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -253,7 +253,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:9d4900e5e744946f37ab6192cb887d152616055a3e3be20df435f29a3438cbc8"
-        fetched_at: "2026-07-13T18:22:14Z"
+        fetched_at: "2026-07-14T00:38:38Z"
     canonical_mappings:
       argument_substitution:
         supported: true
@@ -314,7 +314,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:3ce1f56ebbe2ffc03213188645126ab0f080461704d5351589b3e5c66819eb2a"
-        fetched_at: "2026-07-13T18:22:14Z"
+        fetched_at: "2026-07-14T00:38:38Z"
     canonical_mappings:
       transport_types:
         supported: true

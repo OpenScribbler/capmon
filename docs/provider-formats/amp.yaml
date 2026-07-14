@@ -1,7 +1,7 @@
 provider: amp
 docs_url: "https://ampcode.com/manual"
 category: cli
-last_fetched_at: "2026-07-13T18:17:33Z"
+last_fetched_at: "2026-07-14T00:37:57Z"
 last_changed_at: "2026-07-13T18:17:33Z"
 generation_method: subagent
 
@@ -13,7 +13,7 @@ content_types:
         type: documentation
         fetch_method: md_url
         content_hash: "sha256:f6c73b990982fd25b4cfe30cf090c63b830576f7a8e01ec8d0d7914d7982e48b"
-        fetched_at: "2026-07-13T18:17:33Z"
+        fetched_at: "2026-07-14T00:37:57Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -135,12 +135,12 @@ content_types:
         type: example
         fetch_method: http
         content_hash: "sha256:ede3c3c842adbd5fd0543d9a5bcedfb0e56edec05d41ba76519c7024570d533a"
-        fetched_at: "2026-04-11T21:46:10Z"
+        fetched_at: "2026-07-14T00:37:57Z"
       - uri: "https://raw.githubusercontent.com/sourcegraph/amp-examples-and-guides/main/guides/agent-file/AGENT.md"
         type: example
         fetch_method: http
         content_hash: "sha256:b5106eece797ac7545cb02da2144737aac76e04fda8fa88f7c1f1e3052cb1efb"
-        fetched_at: "2026-04-11T21:46:11Z"
+        fetched_at: "2026-07-14T00:37:57Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -197,7 +197,7 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:e7a21d87492bae8fb92774c1446e063bff0b5490dbd84f947a149192b6961c6c"
-        fetched_at: "2026-07-13T06:30:00Z"
+        fetched_at: "2026-07-14T00:37:57Z"
     canonical_mappings:
       handler_types:
         supported: true
@@ -354,17 +354,17 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:fa609068c31f12cf7bd25a11f8ae5467eb18dfaf4ef5fd06c6ecae24f7d805e4"
-        fetched_at: "2026-04-11T21:49:38Z"
+        fetched_at: "2026-07-14T00:37:57Z"
       - uri: "https://ampcode.com/manual/mcp.md"
         type: documentation
         fetch_method: http
         content_hash: "sha256:3a2e6eeb629a5d7ecfc46063d0eb7cbaadadd9bfed13bc1df17f34f38c0aab0d"
-        fetched_at: "2026-04-11T21:49:38Z"
+        fetched_at: "2026-07-14T00:37:57Z"
       - uri: "https://ampcode.com/manual/appendix/mcp-registry-allowlist.md"
         type: documentation
         fetch_method: http
         content_hash: "sha256:00f04e9f04fc1632ae80aabb07017474bb26c96fc3698f3ce158cdc52fb470e3"
-        fetched_at: "2026-04-11T21:49:38Z"
+        fetched_at: "2026-07-14T00:37:57Z"
     canonical_mappings:
       transport_types:
         supported: false

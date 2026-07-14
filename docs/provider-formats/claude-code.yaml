@@ -1,7 +1,7 @@
 provider: claude-code
 docs_url: "https://docs.claude.com/en/docs/claude-code"
 category: cli
-last_fetched_at: "2026-07-13T18:28:52Z"
+last_fetched_at: "2026-07-14T00:39:56Z"
 last_changed_at: "2026-07-13T18:28:52Z"
 generation_method: subagent
 
@@ -13,7 +13,7 @@ content_types:
         type: documentation
         fetch_method: md_url
         content_hash: "sha256:e9c3ecd52a640a4113821a0443a0cc2cbcb79751a57adfd57be7f53c594452a6"
-        fetched_at: "2026-07-13T18:28:52Z"
+        fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -277,8 +277,8 @@ content_types:
       - uri: "https://code.claude.com/docs/en/memory.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:633dbdccf64f123ebda1264c9209c4426c4a0ef206f3e628c6b5ccc838e286e6"
-        fetched_at: "2026-07-13T18:28:52Z"
+        content_hash: "sha256:05a2b9fa03260880e5b0140d3979342a0267d4cba46acc598f0c0b297503e781"
+        fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -286,7 +286,7 @@ content_types:
         confidence: confirmed
       file_imports:
         supported: true
-        mechanism: "@path/to/file syntax in CLAUDE.md files; relative and absolute paths; recursive up to 5 hops; requires per-project approval"
+        mechanism: "@path/to/file syntax in CLAUDE.md files; relative and absolute paths; recursive up to 4 hops; requires per-project approval"
         confidence: confirmed
       cross_provider_recognition:
         supported: false
@@ -317,7 +317,7 @@ content_types:
 
       - id: file_imports
         name: "@-Import Syntax for CLAUDE.md"
-        summary: "CLAUDE.md @path/to/file imports expand referenced files into context (up to 5 hops, requires per-project approval). Relative paths resolve relative to the containing file, not the working directory."
+        summary: "CLAUDE.md @path/to/file imports expand referenced files into context (up to 4 hops, requires per-project approval). Relative paths resolve relative to the containing file, not the working directory."
         conversion: preserved
         source_ref: "https://code.claude.com/docs/en/memory.md#import-additional-files"
         graduation_candidate: false
@@ -410,13 +410,13 @@ content_types:
       - uri: "https://code.claude.com/docs/en/hooks.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:8e781effb04ee36b17c1f959990418401430b5fb65946fdae99da097876b4674"
-        fetched_at: "2026-07-13T18:28:52Z"
+        content_hash: "sha256:7c2711e0f07fab25f72320423e9a7a914b0dbef6f0c7ec1dd4a37e28892a636c"
+        fetched_at: "2026-07-14T00:39:56Z"
       - uri: "https://code.claude.com/docs/en/hooks-guide.md"
         type: documentation
         fetch_method: md_url
         content_hash: "sha256:e59f347ea3511697437e70359e6b228d0af46775e0b828772dd94f6205a049c8"
-        fetched_at: "2026-07-13T18:28:52Z"
+        fetched_at: "2026-07-14T00:39:56Z"
       - uri: "hooks-example-hooks.json"
         type: example
         fetch_method: local_file
@@ -652,8 +652,8 @@ content_types:
       - uri: "https://code.claude.com/docs/en/mcp.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:f47d84c3fdb820b17402b0633ede1b3579a3c0d682e8e707bc32354229d6c3b7"
-        fetched_at: "2026-07-13T18:28:52Z"
+        content_hash: "sha256:94225384b3bea21342651055c21dbe92ddf3a2c95163da2daae5fdc532d1a641"
+        fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -850,8 +850,8 @@ content_types:
       - uri: "https://code.claude.com/docs/en/sub-agents.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:f3f95fd7ec9f2abf39f107f12fbf40326884180f342df009af9f44e3d57004e0"
-        fetched_at: "2026-07-13T18:28:52Z"
+        content_hash: "sha256:f71b00f6482bb66e26715abfcdf7d65d0a917d6c188186b474097de7bbf82fe5"
+        fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -1031,8 +1031,8 @@ content_types:
       - uri: "https://code.claude.com/docs/en/commands.md"
         type: documentation
         fetch_method: md_url
-        content_hash: "sha256:f0599f785be72683c9161085546e0b55802845c20e0ab2d42551746fc67886dc"
-        fetched_at: "2026-07-13T18:28:52Z"
+        content_hash: "sha256:7bd4e3cf8fc3838c0f6e216ca944b0461b9f65451bc67f9dc921b687bb5edba8"
+        fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       argument_substitution:
         supported: true

@@ -1,7 +1,7 @@
 provider: cline
 docs_url: "https://docs.cline.bot"
 category: ide-extension
-last_fetched_at: "2026-05-06T00:00:00Z"
+last_fetched_at: "2026-07-14T00:38:04Z"
 last_changed_at: "2026-05-06T00:00:00Z"
 generation_method: subagent
 
@@ -13,12 +13,12 @@ content_types:
         type: documentation
         fetch_method: md_url
         content_hash: "sha256:6f8562d51b02f3bdb9616d7efda38ea8b7799dfc06693720b6056307a21a3512"
-        fetched_at: "2026-07-13T18:30:00Z"
+        fetched_at: "2026-07-14T00:38:04Z"
       - uri: "https://docs.cline.bot/customization/skills"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:19ecc139d128f9617d8c5ed7e8c5f95d31c8151973628c4e68bc2cea4eeab09e"
-        fetched_at: "2026-07-13T18:30:00Z"
+        content_hash: "sha256:50da82a4295473e551fc7c5932e6f2e2ccc432629dca65c164d6e22d980ee690"
+        fetched_at: "2026-07-14T00:38:04Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -128,8 +128,8 @@ content_types:
       - uri: "https://docs.cline.bot/customization/cline-rules"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:b6074899464576127d8de21fe761adf8dfd2f60dccdb8c518037d2c28e07d15f"
-        fetched_at: "2026-07-13T18:30:00Z"
+        content_hash: "sha256:921e9732295adb9cd1485d396dd3afeee0b63aee1c053a260eabd682546de941"
+        fetched_at: "2026-07-14T00:38:04Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -194,8 +194,8 @@ content_types:
       - uri: "https://docs.cline.bot/customization/hooks"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:259407a07abc54281f6819965dc81f4f5c7ee17a28b311cc6458ec3d67ebae7c"
-        fetched_at: "2026-07-13T18:30:00Z"
+        content_hash: "sha256:34b4fde7a939bfb4dbad20965e19697acedbf1b1ac0901dd7fa1bf949bccc4ac"
+        fetched_at: "2026-07-14T00:38:04Z"
     canonical_mappings:
       handler_types:
         supported: false
@@ -318,8 +318,8 @@ content_types:
       - uri: "https://docs.cline.bot/mcp/mcp-overview"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:5b4032a7dc0b154784b318976d56b3b5e88e152b39a2209c246b0f945a08a5b0"
-        fetched_at: "2026-07-13T18:30:00Z"
+        content_hash: "sha256:e96de3f1379d982c44d0798c87b21b77c26d8ed828f1c3da5bce0461c4a662e3"
+        fetched_at: "2026-07-14T00:38:04Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -404,8 +404,8 @@ content_types:
       - uri: "https://docs.cline.bot/core-workflows/using-commands"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:fd58abc91f2db2f90b490bdad97718ea0b08c09e2900380ede7d3a9dc3a5ef4f"
-        fetched_at: "2026-07-13T18:30:00Z"
+        content_hash: "sha256:862aed093eaf078024c30cb21247f8e612865a3dbd3e387cea5ed53304fd9648"
+        fetched_at: "2026-07-14T00:38:04Z"
     canonical_mappings:
       argument_substitution:
         supported: false

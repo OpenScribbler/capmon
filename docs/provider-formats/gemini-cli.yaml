@@ -1,7 +1,7 @@
 provider: gemini-cli
 docs_url: "https://github.com/google-gemini/gemini-cli"
 category: cli
-last_fetched_at: "2026-05-06T13:00:00Z"
+last_fetched_at: "2026-07-14T00:38:36Z"
 last_changed_at: "2026-05-06T13:00:00Z"
 generation_method: subagent
 
@@ -13,7 +13,7 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:244e992d0a504bf54e92679291d30fdbe6a2e98f960a19bcb75ee928e3960385"
-        fetched_at: "2026-05-06T13:00:00Z"
+        fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -100,7 +100,7 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:d00eeaef22453de4756a9862d8467750f772e239c4ee9b6f755709429b47c2cf"
-        fetched_at: "2026-07-13T18:20:42Z"
+        fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -158,22 +158,22 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:3d0dce53a6f36e6ca90761d6769c3431e109e12aaa31e9e29ae169faf955bf70"
-        fetched_at: "2026-04-11T21:50:37Z"
+        fetched_at: "2026-07-14T00:38:36Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:8bc78d59eb87aa79893a0b5928720d571397505b94e2d983f988c5932afc0016"
-        fetched_at: "2026-07-13T18:20:42Z"
+        fetched_at: "2026-07-14T00:38:36Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/hooks/index.md"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:3d3eed03c5394c59e91d714f94015735a9697bef4d7c84796d8d6302b16a640c"
-        fetched_at: "2026-05-06T13:00:00Z"
+        fetched_at: "2026-07-14T00:38:36Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/hooks/reference.md"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:103bab9f0f8fd7251b97d06c6b7c4e52752427bf23cbacd1379f2aecaaf26e4c"
-        fetched_at: "2026-04-11T21:50:38Z"
+        fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       handler_types:
         supported: false
@@ -274,17 +274,17 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:8bc78d59eb87aa79893a0b5928720d571397505b94e2d983f988c5932afc0016"
-        fetched_at: "2026-07-13T18:20:42Z"
+        fetched_at: "2026-07-14T00:38:36Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/tools/mcp-server.md"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:c666e348477ac0f37ee3522a4d8fc0f133904f4082e8fbae54afdcc0f825ce8b"
-        fetched_at: "2026-07-13T18:20:42Z"
+        fetched_at: "2026-07-14T00:38:36Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/cli/tutorials/mcp-setup.md"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:9a4633c905689c79d06e1e3fe59236ccc76010bce5ef6da38b0ff41e5f14a4b0"
-        fetched_at: "2026-04-11T21:46:23Z"
+        fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -389,7 +389,7 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:d0a7dacc329cfb6055195b066e70e6c75cfce280e626101bad14f4d1907a7e83"
-        fetched_at: "2026-05-06T00:00:00Z"
+        fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       argument_substitution:
         supported: true
@@ -453,12 +453,12 @@ content_types:
         type: documentation
         fetch_method: http
         content_hash: "sha256:1a1b38993a2f5c6e16afda1914974a86274e73fac90e3ab62334d45e34bf7849"
-        fetched_at: "2026-07-13T18:20:42Z"
+        fetched_at: "2026-07-14T00:38:36Z"
       - uri: "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/docs/core/remote-agents.md"
         type: documentation
         fetch_method: http
         content_hash: "sha256:8dd736d4ad31ffdb3ef8736746da31935b00fffaa37de07408827bf36d6fc2aa"
-        fetched_at: "2026-04-28T22:02:38Z"
+        fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       definition_format:
         supported: true

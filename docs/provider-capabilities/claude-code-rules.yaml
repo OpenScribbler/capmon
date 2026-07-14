@@ -22,7 +22,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: file_imports
       supported: true
-      mechanism: '@path/to/file syntax in CLAUDE.md files; relative and absolute paths; recursive up to 5 hops; requires per-project approval'
+      mechanism: '@path/to/file syntax in CLAUDE.md files; relative and absolute paths; recursive up to 4 hops; requires per-project approval'
       source_field: ""
       source_value: ""
       confidence: confirmed

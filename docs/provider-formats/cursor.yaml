@@ -5,7 +5,7 @@ category: standalone-app
 # - required: true | false | null (null = source doesn't say)
 # - value_type: see allow-list in formatdoc_validate.go
 # - examples: [{title?, lang, code, note?}]
-last_fetched_at: "2026-07-13T18:21:27Z"
+last_fetched_at: "2026-07-14T00:38:11Z"
 last_changed_at: "2026-07-13T18:21:27Z"
 generation_method: subagent
 
@@ -17,7 +17,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:ba7541afdade9cd8b10a2c7fa73a768769d2595a6f5c5f5803bd8770f1a653b7"
-        fetched_at: "2026-07-13T18:21:27Z"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -125,7 +125,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:515553610bca313a942694e602f3b862d3ef1bf1bd295375bfc2da7e1252a9b6"
-        fetched_at: "2026-07-13T18:21:27Z"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -228,7 +228,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:cad2718037d7fcc057ce2900c2f22a77158e5381fb201a59844124956b07186d"
-        fetched_at: "2026-07-13T18:21:27Z"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       handler_types:
         supported: true
@@ -348,7 +348,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:21180b425e2816ac42aad4d84373cb3388d2f000423b91848de64d36c4f651d5"
-        fetched_at: "2026-07-13T18:21:27Z"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -450,7 +450,7 @@ content_types:
         type: documentation
         fetch_method: readability
         content_hash: "sha256:de86cfdea7b58ad55fb9cfab7acf6752c73d3ec89bb4b01473807b518624a1f0"
-        fetched_at: "2026-07-13T18:21:27Z"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       definition_format:
         supported: true

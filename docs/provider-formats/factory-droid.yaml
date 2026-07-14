@@ -1,7 +1,7 @@
 provider: factory-droid
 docs_url: "https://docs.factory.ai"
 category: cli
-last_fetched_at: "2026-07-13T18:25:13Z"
+last_fetched_at: "2026-07-14T00:38:11Z"
 last_changed_at: "2026-07-13T18:25:13Z"
 generation_method: subagent
 
@@ -12,8 +12,8 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/skills"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:3a949298a322594a378780266976873c9861b79bf27864a677cdcc723d892552"
-        fetched_at: "2026-07-13T18:25:13Z"
+        content_hash: "sha256:e919c0aa4d47004e85b835112e50f03ed488ac64657f71be6417cecf69a446a6"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -105,8 +105,8 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/agents-md"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:11eb03eefbe43e9b75a8815802c03992c43dbf1d948142924bd66a2f7e2580f2"
-        fetched_at: "2026-07-13T18:25:13Z"
+        content_hash: "sha256:924e7a3bb29a06353b01640276eda74418e76e5059ad188ac1ea59155b0cf9e5"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       activation_mode:
         supported: false
@@ -169,13 +169,13 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/hooks-guide"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:caa58f9b5b4c5425bb00539341b7d312c1c09b6f878ae1dafdaddb556f6c384c"
-        fetched_at: "2026-07-13T18:25:13Z"
+        content_hash: "sha256:353a57a5a53d56e61645375f1fa29faa69212830b6b032ba53cf0b047d83badd"
+        fetched_at: "2026-07-14T00:38:11Z"
       - uri: "https://docs.factory.ai/reference/hooks-reference"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:408ccf3cf0eb0c275a25d7a156fc9a49303cbec54897698769e2118f20f740f4"
-        fetched_at: "2026-07-13T18:25:13Z"
+        content_hash: "sha256:04f48da6fbd1bdae6d255ea059b821c8733588ba765e9785ed427c0319073817"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       handler_types:
         supported: false
@@ -273,8 +273,8 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/mcp"
         type: documentation
         fetch_method: readability
-        content_hash: "sha256:2ccad2e1e3ed285ea030bbf3678689d603a427e999dfa1466e01cda56316e8b3"
-        fetched_at: "2026-07-13T18:25:13Z"
+        content_hash: "sha256:ef76c7f1c69d0a76683c384757fe94271f59f25a442e71580ab02aa34022c9ad"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -367,8 +367,8 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/custom-droids"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:75a95f7bf4f470b84a7b873fce7afb9a65be9921f6de1ddd4cfae1e3839152eb"
-        fetched_at: "2026-07-13T18:25:13Z"
+        content_hash: "sha256:c32e99a3c9fa17818669bd47af46ce8375a4659963a8257b175f3bbefb55184f"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -463,8 +463,8 @@ content_types:
       - uri: "https://docs.factory.ai/cli/configuration/custom-slash-commands"
         type: documentation
         fetch_method: http
-        content_hash: "sha256:894652da0201f9288598ea877acb984707134b08532e909c29d06301bfcb50e9"
-        fetched_at: "2026-07-13T18:25:13Z"
+        content_hash: "sha256:b05e3bf744b6d2fb2987a61637c5d1535c484d20fedd5fab3b88ddb7f786dff0"
+        fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       argument_substitution:
         supported: true

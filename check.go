@@ -276,6 +276,26 @@ func runSourceCheck(ctx context.Context, contentType string, src SourceRef, batc
 	return nil
 }
 
+// HashURLResult carries what `capmon hash-url` reports for one fetch.
+type HashURLResult struct {
+	Hash        string
+	ContentType string
+	FinalURL    string
+	Size        int
+}
+
+// HashURL fetches rawURL exactly as the drift check does (fetchForCheck) and
+// returns the canonical content hash with fetch metadata. It exists so
+// curation can compute valid baselines without replicating the check path's
+// header behavior by hand — curl is NOT byte-equivalent on every host.
+func HashURL(ctx context.Context, rawURL string) (HashURLResult, error) {
+	body, ct, fu, err := fetchForCheck(ctx, rawURL)
+	if err != nil {
+		return HashURLResult{}, err
+	}
+	return HashURLResult{Hash: SHA256Hex(body), ContentType: ct, FinalURL: fu, Size: len(body)}, nil
+}
+
 // logOrCreateFetchErrorIssue records a fetch/validity failure into the provider
 // batch for deferred issue creation. DryRun is handled by flushProviderBatch.
 func logOrCreateFetchErrorIssue(contentType, sourceURI, reason string, batch *providerBatch) {
@@ -289,12 +309,34 @@ func logOrCreateFetchErrorIssue(contentType, sourceURI, reason string, batch *pr
 // fetchForCheck makes a direct HTTP GET and returns the body, Content-Type header,
 // final URL (after redirects), and any error. Uses the same httpDoer as FetchSource
 // so it is overridable in tests via SetHTTPClientForTest.
+//
+// Content negotiation is pinned so the bytes — and therefore every
+// content_hash baseline — are deterministic and reproducible outside Go:
+//   - Accept: text/markdown for *.md paths (code.claude.com intermittently
+//     serves rendered HTML without it), */* otherwise (curl's default;
+//     Mintlify hosts vary bytes on its absence).
+//   - Accept-Encoding: identity, so the transport's implicit gzip never
+//     shapes the hashed bytes.
+//
+// The canonical hash recipe is therefore:
+//
+//	curl -H 'User-Agent: capmon/1.0' -H 'Accept: <as above>' \
+//	     -H 'Accept-Encoding: identity' -L <url> | sha256sum
+//
+// or, without remembering any of that, `capmon hash-url <url>` — which calls
+// this function. `capmon backfill` writes baselines through this same path.
 func fetchForCheck(ctx context.Context, rawURL string) (body []byte, contentType, finalURL string, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, "", "", fmt.Errorf("create request: %w", err)
 	}
 	req.Header.Set("User-Agent", "capmon/1.0")
+	if strings.HasSuffix(req.URL.Path, ".md") {
+		req.Header.Set("Accept", "text/markdown")
+	} else {
+		req.Header.Set("Accept", "*/*")
+	}
+	req.Header.Set("Accept-Encoding", "identity")
 	resp, err := httpDoer.Do(req)
 	if err != nil {
 		return nil, "", "", err

@@ -6,7 +6,7 @@
 provider: roo-code
 docs_url: "https://docs.roocode.com"
 category: ide-extension
-last_fetched_at: "2026-07-13T18:22:26Z"
+last_fetched_at: "2026-07-14T00:38:40Z"
 last_changed_at: "2026-04-11T00:00:00Z"
 generation_method: human-edited
 
@@ -18,12 +18,12 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:56c6fbe03fc949f317cb713e666513c321d632be98e0ccc15f741de1c95c498e"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/.roo/rules-code/use-safeWriteJson.md"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:f001cb0acb40182d790f8ed4ffb03c0adfcd1c4e021274f4e0195b6d51b7712c"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       activation_mode:
         supported: true
@@ -93,7 +93,7 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:572905c8c70f26ff4aed5354ff9468127dbed96e91e4bbe3776d831fe7a817f1"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       display_name:
         supported: true
@@ -183,17 +183,17 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:322dfa749a97441f3f4cc92676355c130bfa38f6a0b1a7fef2c845e9fa89a951"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/packages/types/src/mcp.ts"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:7064b2b899eee528246e0fd2e123d2de6bc8712a540353245046cbd5e02ae6fe"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/src/shared/globalFileNames.ts"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:0899ab51711478743f970592fd542cbc164e6ba3ea70e6a1498e4740fa95f972"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       transport_types:
         supported: true
@@ -280,17 +280,17 @@ content_types:
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:2fd53138c0c2f2a75ddfe66e06abc14cc34862513385b47a79793d9680b3afc6"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/src/core/config/CustomModesManager.ts"
         type: source_code
         fetch_method: gh_raw
         content_hash: "sha256:38906a0b4f2f645ccf01727af23b43b12c912c58fb17e3ebb1c54e64d65e5219"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
       - uri: "https://raw.githubusercontent.com/RooVetGit/Roo-Code/main/.roomodes"
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:6f7638ce4f233a805bd0979d6a20badc765314c1b928aad74bc56536705bb53b"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       definition_format:
         supported: true
@@ -379,7 +379,7 @@ content_types:
         type: documentation
         fetch_method: gh_raw
         content_hash: "sha256:efc08126119069c83264d02b8762b53bae9fbdb35b6d80db9431ede45fd8e3fc"
-        fetched_at: "2026-07-13T18:22:26Z"
+        fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       argument_substitution:
         supported: true

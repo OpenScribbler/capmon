@@ -5,7 +5,7 @@ category: standalone-app
 # - required: true | false | null (null = source doesn't say)
 # - value_type: see allow-list in formatdoc_validate.go
 # - examples: [{title?, lang, code, note?}]
-last_fetched_at: "2026-07-13T06:30:00Z"
+last_fetched_at: "2026-07-14T00:38:50Z"
 last_changed_at: "2026-05-06T00:00:00Z"
 generation_method: subagent
 
@@ -16,12 +16,12 @@ content_types:
       - uri: "https://zed.dev/docs/ai/instructions"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-07-13T06:30:00Z"
+        fetched_at: "2026-07-14T00:38:50Z"
         content_hash: "sha256:2c984f0ae1887abde3391cd611f725edb7588a59ab1468a9b3db1a5f4333a315"
       - uri: "https://raw.githubusercontent.com/zed-industries/zed/main/.rules"
         type: example
         fetch_method: gh_raw
-        fetched_at: "2026-05-06T12:57:00Z"
+        fetched_at: "2026-07-14T00:38:50Z"
         content_hash: "sha256:079f88838e5b214428c6ebd5e4e68d038df538c2abfc12de8f7bb9b93fa440f5"
     canonical_mappings:
       activation_mode:
@@ -60,12 +60,12 @@ content_types:
       - uri: "https://zed.dev/docs/ai/mcp"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-07-13T18:19:52Z"
+        fetched_at: "2026-07-14T00:38:50Z"
         content_hash: "sha256:d529b69080eeb2d289d729f3846965db66394a6af4d319f659a652e95e792aff"
       - uri: "https://raw.githubusercontent.com/zed-industries/zed/main/crates/context_server/src/context_server.rs"
         type: source_code
         fetch_method: gh_raw
-        fetched_at: "2026-07-13T18:19:52Z"
+        fetched_at: "2026-07-14T00:38:50Z"
         content_hash: "sha256:ed3818ee4ec499f77cbbb01909d8fb819424e38a4c818e23730d0d1003607e4c"
     canonical_mappings:
       transport_types:
@@ -189,12 +189,12 @@ content_types:
       - uri: "https://zed.dev/docs/ai/agent-settings"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-07-13T18:19:52Z"
+        fetched_at: "2026-07-14T00:38:50Z"
         content_hash: "sha256:e22818a36925400174b41668eb9fddce9cb2a83c094bec9f5577676dec68c5df"
       - uri: "https://zed.dev/docs/ai/agent-profiles"
         type: documentation
         fetch_method: gh_raw
-        fetched_at: "2026-07-13T18:19:52Z"
+        fetched_at: "2026-07-14T00:38:50Z"
         content_hash: "sha256:e85fab668658fa81ea0c95acb2509dec0db5ccedc168bdd465de5b092ddde66d"
     canonical_mappings: {}
     provider_extensions: []
