@@ -64,6 +64,131 @@ provider_exclusive:
 	}
 }
 
+// TestSeedProviderCapabilities_RoutesNonCanonicalToExclusive: extracted keys
+// not in the canonical-key registry must land under provider_exclusive as
+// "<ct>.<key>" nodes — never leak into content_types capabilities (capmon-t8e).
+func TestSeedProviderCapabilities_RoutesNonCanonicalToExclusive(t *testing.T) {
+	capsDir := t.TempDir()
+	seedOpts := capmon.SeedOptions{
+		CapsDir:  capsDir,
+		Provider: "test-provider",
+		Extracted: map[string]string{
+			"skills.capabilities.display_name.supported":       "true",
+			"skills.capabilities.creation_workflow.supported":  "true",
+			"skills.capabilities.creation_workflow.mechanism":  "documented under 'Creating Skills'",
+			"skills.capabilities.creation_workflow.confidence": "inferred",
+		},
+	}
+	if err := capmon.SeedProviderCapabilities(seedOpts); err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+	caps, err := capyaml.LoadCapabilityYAML(filepath.Join(capsDir, "test-provider.yaml"))
+	if err != nil {
+		t.Fatalf("load output: %v", err)
+	}
+
+	// Canonical key stays in content_types capabilities.
+	if _, ok := caps.ContentTypes["skills"].Capabilities["display_name"]; !ok {
+		t.Error("canonical display_name missing from skills capabilities")
+	}
+	// Non-canonical key routed to provider_exclusive, absent from capabilities.
+	if _, leaked := caps.ContentTypes["skills"].Capabilities["creation_workflow"]; leaked {
+		t.Error("non-canonical creation_workflow leaked into skills capabilities")
+	}
+	pe, ok := caps.ProviderExclusive["skills.creation_workflow"]
+	if !ok {
+		t.Fatalf("provider_exclusive missing skills.creation_workflow; got %v", caps.ProviderExclusive)
+	}
+	if !pe.Supported || pe.Mechanism == "" || pe.Confidence != "inferred" {
+		t.Errorf("skills.creation_workflow fields not applied: %+v", pe)
+	}
+}
+
+// TestSeedProviderCapabilities_ForceOverwriteIsPerEntry: --force-overwrite-exclusive
+// must overwrite ONLY the exclusive entries the extraction collides with —
+// never clear the section (capmon-t8e repro: it nil'd the whole map).
+func TestSeedProviderCapabilities_ForceOverwriteIsPerEntry(t *testing.T) {
+	capsDir := t.TempDir()
+	initial := `schema_version: "1"
+slug: test-provider
+provider_exclusive:
+  skills.creation_workflow:
+    supported: true
+    mechanism: 'curated mechanism text'
+    confidence: confirmed
+  hooks.custom_event:
+    supported: true
+    mechanism: 'CustomEvent: a custom event'
+`
+	writeInitial := func(t *testing.T) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(capsDir, "test-provider.yaml"), []byte(initial), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	extracted := map[string]string{
+		"skills.capabilities.creation_workflow.mechanism": "freshly extracted text",
+	}
+
+	// Without force: the colliding extracted key is skipped, curation wins.
+	writeInitial(t)
+	if err := capmon.SeedProviderCapabilities(capmon.SeedOptions{
+		CapsDir: capsDir, Provider: "test-provider", Extracted: extracted,
+	}); err != nil {
+		t.Fatalf("seed without force: %v", err)
+	}
+	caps, err := capyaml.LoadCapabilityYAML(filepath.Join(capsDir, "test-provider.yaml"))
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+	if got := caps.ProviderExclusive["skills.creation_workflow"].Mechanism; got != "curated mechanism text" {
+		t.Errorf("without force: mechanism = %q, want curated text preserved", got)
+	}
+
+	// With force: only the colliding entry is overwritten; others survive.
+	writeInitial(t)
+	if err := capmon.SeedProviderCapabilities(capmon.SeedOptions{
+		CapsDir: capsDir, Provider: "test-provider", Extracted: extracted,
+		ForceOverwriteExclusive: true,
+	}); err != nil {
+		t.Fatalf("seed with force: %v", err)
+	}
+	caps, err = capyaml.LoadCapabilityYAML(filepath.Join(capsDir, "test-provider.yaml"))
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+	if got := caps.ProviderExclusive["skills.creation_workflow"].Mechanism; got != "freshly extracted text" {
+		t.Errorf("with force: mechanism = %q, want freshly extracted text", got)
+	}
+	// Overwrite means overwrite: the node is reset before extracted fields
+	// land, so the stale curated confidence must NOT survive as a merge.
+	if got := caps.ProviderExclusive["skills.creation_workflow"].Confidence; got != "" {
+		t.Errorf("with force: stale confidence %q survived — forced collision merged instead of overwriting", got)
+	}
+	if _, ok := caps.ProviderExclusive["hooks.custom_event"]; !ok {
+		t.Error("with force: untouched hooks.custom_event was removed — section cleared wholesale")
+	}
+}
+
+// TestSeedProviderCapabilities_BareSeedNeedsNoRegistry: stub creation and
+// events-only seeds never consult the canonical-key registry, so they must
+// work with an unresolvable CanonicalKeysPath (the registry loads lazily).
+func TestSeedProviderCapabilities_BareSeedNeedsNoRegistry(t *testing.T) {
+	capsDir := t.TempDir()
+	err := capmon.SeedProviderCapabilities(capmon.SeedOptions{
+		CapsDir:           capsDir,
+		Provider:          "test-provider",
+		CanonicalKeysPath: filepath.Join(t.TempDir(), "does-not-exist.yaml"),
+		Extracted: map[string]string{
+			"hooks.supported": "true",
+			"hooks.events.before_tool_execute.native_name": "PreToolUse",
+		},
+	})
+	if err != nil {
+		t.Fatalf("bare seed without registry: %v", err)
+	}
+}
+
 func TestSeedProviderCapabilities_WritesConfidence(t *testing.T) {
 	capsDir := t.TempDir()
 	seedOpts := capmon.SeedOptions{
