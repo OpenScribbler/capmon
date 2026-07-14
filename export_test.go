@@ -123,6 +123,38 @@ func TestRunExportFailClosedPreservesOut(t *testing.T) {
 		requireStructured(t, err, "EXPORT_003")
 		assertSentinelUntouched(t, outDir, before)
 	})
+
+	t.Run("slug-permanence failure after full staging", func(t *testing.T) {
+		// Both source manifests present (EXPORT_003 passes) but the lock omits
+		// synthetic: the slug-permanence gate must fire EXPORT_005 after full
+		// staging, and the pre-existing OutDir must survive untouched.
+		lockedSources := t.TempDir()
+		for _, name := range []string{"alpha.yaml", "synthetic.yaml"} {
+			src := readFileBytes(t, filepath.Join(base.SourcesDir, name))
+			if err := os.WriteFile(filepath.Join(lockedSources, name), src, 0644); err != nil {
+				t.Fatalf("copy source manifest %s: %v", name, err)
+			}
+		}
+		if err := os.WriteFile(filepath.Join(lockedSources, publishedSlugsLockName), []byte("alpha\n"), 0644); err != nil {
+			t.Fatalf("write partial published-slugs lock: %v", err)
+		}
+		outDir, before := sentinelOutDir(t)
+
+		opts := ExportOptions{
+			CapsDir:           base.CapsDir,
+			CanonicalKeysPath: base.CanonicalKeysPath,
+			SourcesDir:        lockedSources,
+			PublishAssetsDir:  base.PublishAssetsDir,
+			OutDir:            outDir,
+			GeneratedAt:       "2026-01-01T00:00:00Z",
+		}
+		err := RunExport(opts)
+		se := requireStructured(t, err, "EXPORT_005")
+		if !strings.Contains(se.Error(), "synthetic") {
+			t.Errorf("EXPORT_005 does not name the unlocked exported slug: %v", se)
+		}
+		assertSentinelUntouched(t, outDir, before)
+	})
 }
 
 // TestRunExportTrailingSeparatorOutDir pins the OutDir normalization: with a

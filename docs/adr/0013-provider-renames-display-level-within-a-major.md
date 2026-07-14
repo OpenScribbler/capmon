@@ -19,9 +19,11 @@ Accepted
 Providers rebrand while their capmon slug is already published. The driving case
 is Windsurf → "Devin Desktop" (Cognition, 2026-07): all six source URLs 301'd
 across domains and the product name changed, but `slug: windsurf` is live at
-`v1/capabilities/windsurf.json`. Prior art: Roo Code → Roomote (frozen), and the
-opencode name collision (the published `opencode` slug now means the active
-sst/opencode, not the archived opencode-ai/opencode it was onboarded from).
+`v1/capabilities/windsurf.json`. Prior art: the Roo Code sunset (slug frozen as
+archived and still published; the team's next product, Roomote, is explicitly
+*not* a successor and is out of capmon scope), and the opencode name collision
+(the published `opencode` slug now means the active sst/opencode, not the
+archived opencode-ai/opencode it was onboarded from).
 
 Constraints already in force:
 
