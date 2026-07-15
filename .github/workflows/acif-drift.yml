@@ -1,0 +1,43 @@
+name: acif-drift
+
+# Enforces the ACIF source-of-truth rule (ACIF CHANGE-PROCESS.md):
+# docs/spec/canonical-keys.yaml is a derived copy of ACIF's published
+# capability-vocabulary export; if they disagree, capmon has the bug and
+# THIS repository's CI fails (never ACIF's). The weekly run catches
+# upstream vocabulary changes that land without any capmon commit.
+# Fetches the public export anonymously — no ACIF-repo credentials.
+
+on:
+  pull_request:
+    paths:
+      - "docs/spec/canonical-keys.yaml"
+      - "cmd/acifdrift/**"
+      - ".github/workflows/acif-drift.yml"
+  schedule:
+    - cron: "0 10 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    name: canonical-keys vs ACIF vocabulary
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
+        with:
+          go-version-file: go.mod
+
+      - name: Fetch ACIF capability-vocabulary export
+        run: |
+          curl -fsSL --retry 3 \
+            -o /tmp/capability-vocabulary.yaml \
+            https://raw.githubusercontent.com/holdenhewett/agent-content-interchange-format/main/conformance/capability-vocabulary.yaml
+
+      - name: Diff canonical-keys.yaml against the export
+        run: go run ./cmd/acifdrift --vocabulary /tmp/capability-vocabulary.yaml

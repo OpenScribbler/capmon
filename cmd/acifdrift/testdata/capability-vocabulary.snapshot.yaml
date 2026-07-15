@@ -1,0 +1,97 @@
+# ACIF capability vocabulary export (machine-readable).
+#
+# The published, machine-readable projection of each L1 spec's Capability
+# Dispositions section: every capability key of every content type's
+# vocabulary, classified DERIVABLE or OUT-OF-SCOPE-AT-L1. The normative
+# source is the owning spec's section (cited per type below); this file
+# is a derived artifact whose currency is selftest-enforced (the
+# capability-vocabulary sync check fails if it drifts from the spec
+# sections). Downstream conforming copies — capmon's
+# docs/spec/canonical-keys.yaml, any registry's vocabulary projection —
+# diff against THIS file, never against spec prose (CHANGE-PROCESS.md,
+# "Vocabulary source of truth").
+#
+# The recognized `requires` vocabulary is empty for all six types in
+# ACIF 0.1: DERIVABLE keys are never `requires` keys, and OUT-OF-SCOPE
+# keys are not `requires`-eligible ([ACIF-CORE] §9.2–§9.4).
+#
+# Changing this file's content is a Class C vocabulary change
+# (CHANGE-PROCESS.md) — it moves only when the owning spec section moves.
+
+vocabulary:
+  skill:
+    spec: ACIF-SKILL
+    section: "§10"
+    derivable:
+      - auto_invocable
+      - disable_model_invocation
+      - user_invocable
+      - skill_bundled_resources
+    out_of_scope_at_l1:
+      - display_name
+      - description
+      - license
+      - compatibility
+      - metadata_map
+      - version
+      - project_scope
+      - global_scope
+      - shared_scope
+      - canonical_filename
+      - custom_filename
+  rule:
+    spec: ACIF-RULE
+    section: "§9"
+    derivable:
+      - activation_mode
+    out_of_scope_at_l1:
+      - file_imports
+      - cross_provider_recognition
+      - auto_memory
+      - hierarchical_loading
+  command:
+    spec: ACIF-COMMAND
+    section: "§9"
+    derivable: []
+    out_of_scope_at_l1:
+      - argument_substitution
+      - builtin_commands
+  agent:
+    spec: ACIF-AGENT
+    section: "§9"
+    derivable:
+      - tool_restrictions
+      - model_selection
+      - per_agent_mcp
+      - subagent_spawning
+    out_of_scope_at_l1:
+      - definition_format
+      - invocation_patterns
+      - agent_scopes
+  hook:
+    spec: ACIF-HOOK
+    section: "§10"
+    derivable:
+      - handler_types
+      - matcher_patterns
+      - async_execution
+    out_of_scope_at_l1:
+      - hook_scopes
+      - decision_control
+      - input_modification
+      - json_io_protocol
+      - context_injection
+      - permission_control
+  mcp_config:
+    spec: ACIF-MCP
+    section: "§9"
+    derivable:
+      - transport_types
+      - oauth_support
+      - env_var_expansion
+      - tool_filtering
+      - auto_approve
+    out_of_scope_at_l1:
+      - marketplace
+      - enterprise_management
+      - resource_referencing
