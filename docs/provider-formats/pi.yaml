@@ -21,70 +21,70 @@ content_types:
         fetched_at: "2026-07-14T00:38:39Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required, max 64 chars, lowercase a-z/0-9/hyphens). Unlike the Agent Skills standard, Pi does NOT require name to match the parent directory name: skills.ts validateName() dropped the parent-dir equality check (commit 5d31e70), an intentional deviation for shared cross-harness skill directories."
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (required, max 1024 chars)"
         confidence: confirmed
       license:
-        supported: true
+        status: mapped
         provider_field: "license"
         mechanism: "yaml frontmatter key: license (optional)"
         confidence: confirmed
       compatibility:
-        supported: true
+        status: mapped
         provider_field: "compatibility"
         mechanism: "yaml frontmatter key: compatibility (optional, max 500 chars)"
         confidence: confirmed
       metadata_map:
-        supported: true
+        status: mapped
         provider_field: "metadata"
         mechanism: "yaml frontmatter key: metadata (optional, arbitrary key-value mapping)"
         confidence: confirmed
       disable_model_invocation:
-        supported: true
+        status: mapped
         provider_field: "disable-model-invocation"
         mechanism: "yaml frontmatter key: disable-model-invocation (optional bool); confirmed in SkillFrontmatter TypeScript interface as disable-model-invocation?: boolean"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: ".pi/skills/<name>/SKILL.md or .agents/skills/<name>/SKILL.md (checked in cwd and ancestor directories up to git repo root, or filesystem root)"
         paths:
           - ".pi/skills/<name>/SKILL.md"
           - ".agents/skills/<name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "~/.pi/agent/skills/<name>/SKILL.md or ~/.agents/skills/<name>/SKILL.md"
         paths:
           - "~/.pi/agent/skills/<name>/SKILL.md"
           - "~/.agents/skills/<name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: false
+        status: absent
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "SKILL.md (required, fixed filename for directory-form skills)"
         confidence: confirmed
       custom_filename:
-        supported: true
+        status: mapped
         mechanism: "Any .md filename at root of ~/.pi/agent/skills/ or .pi/skills/ (shorthand single-file form)"
         confidence: confirmed
       user_invocable:
-        supported: false
+        status: absent
         confidence: confirmed
       auto_invocable:
-        supported: true
+        status: mapped
         extension_id: auto_invocation
         mechanism: "Skill name and description are injected into the system prompt as XML; the agent loads matching SKILL.md bodies on demand. Skills with disable-model-invocation: true are excluded from system prompt injection."
         confidence: confirmed
       skill_bundled_resources:
-        supported: true
+        status: mapped
         mechanism: "Skill directories may include scripts/, references/, and assets/ subdirectories that SKILL.md references via relative paths."
         source_ref: "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/docs/skills.md"
         confidence: confirmed
@@ -160,23 +160,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:39Z"
     canonical_mappings:
       activation_mode:
-        supported: false
+        status: absent
         mechanism: "Pi rule files load unconditionally; no conditional or model-decision activation documented"
         confidence: inferred
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No file import syntax documented for Pi rule files"
         confidence: inferred
       cross_provider_recognition:
-        supported: false
+        status: absent
         mechanism: "Pi reads its own rule format; no cross-provider rule file recognition documented"
         confidence: inferred
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "Pi does not have an AI-generated auto-memory system"
         confidence: confirmed
       hierarchical_loading:
-        supported: false
+        status: absent
         mechanism: "Pi rule files are not documented as supporting multi-level directory loading"
         confidence: inferred
     provider_extensions:
@@ -216,39 +216,39 @@ content_types:
         fetched_at: "2026-07-14T00:38:39Z"
     canonical_mappings:
       handler_types:
-        supported: true
+        status: mapped
         mechanism: "pi_extension_typescript_native: Pi hooks support TypeScript/native extension handler type beyond shell commands"
         confidence: confirmed
       matcher_patterns:
-        supported: false
+        status: absent
         mechanism: "Pi hooks fire on configured lifecycle events; no per-tool name filtering at the subscription level — tool discrimination is done in handler code"
         confidence: inferred
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "tool_call handlers return { block: true, reason? } to prevent tool execution; tool_call errors also block the tool (fail-safe behavior)"
         confidence: confirmed
       input_modification:
-        supported: true
+        status: mapped
         mechanism: "tool_call handlers mutate event.input in place to modify tool arguments before execution; later handlers see prior mutations"
         confidence: confirmed
       async_execution:
-        supported: false
+        status: absent
         mechanism: "Pi extension handlers are awaited synchronously in registration order; no fire-and-forget async execution documented"
         confidence: inferred
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "Extensions load from global scope (~/.pi/agent/extensions/) and project-local scope (.pi/extensions/); both scopes are auto-discovered and can be combined"
         confidence: confirmed
       json_io_protocol:
-        supported: false
+        status: absent
         mechanism: "Pi hooks communicate via TypeScript extension API; no JSON stdin/stdout protocol for shell hooks"
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         mechanism: "before_agent_start handlers return { message: { customType, content, display } } to inject a persistent message stored in session and sent to LLM; context handlers return { messages } to modify the message array before each LLM call"
         confidence: confirmed
       permission_control:
-        supported: false
+        status: absent
         mechanism: "Pi extensions cannot make availability decisions for tools; tool_call block controls invocation flow but does not remove a tool from the available set; setActiveTools() is available but is not a hook return mechanism"
         confidence: inferred
     provider_extensions:
@@ -349,11 +349,11 @@ content_types:
         fetched_at: "2026-07-14T00:38:39Z"
     canonical_mappings:
       argument_substitution:
-        supported: true
+        status: mapped
         mechanism: "positional expansion: $1, $2 (specific positions), $@ or $ARGUMENTS (all args joined), ${1:-default} (default value used when the arg is absent/empty), ${@:N} (args from position N), ${@:N:L} (L args starting at N); richer syntax than most providers"
         confidence: confirmed
       builtin_commands:
-        supported: false
+        status: absent
         mechanism: "pi prompt templates are entirely user-defined; no built-in slash commands documented"
         confidence: inferred
     provider_extensions:

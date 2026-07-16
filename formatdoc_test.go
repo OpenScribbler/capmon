@@ -23,11 +23,11 @@ content_types:
         fetched_at: "2026-04-10T14:00:00Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         mechanism: "yaml frontmatter key: name (required)"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: ".agents/skills/<name>/SKILL.md"
         paths:
           - ".agents/skills/<name>/SKILL.md"
@@ -94,8 +94,8 @@ func TestLoadFormatDoc_RoundTrip(t *testing.T) {
 	if !ok {
 		t.Fatal("canonical_mappings.display_name missing")
 	}
-	if !dm.Supported {
-		t.Error("display_name.supported should be true")
+	if dm.Status != MappingStatusMapped {
+		t.Errorf("display_name.status = %q, want %q", dm.Status, MappingStatusMapped)
 	}
 	if dm.Confidence != "confirmed" {
 		t.Errorf("display_name.confidence = %q, want %q", dm.Confidence, "confirmed")

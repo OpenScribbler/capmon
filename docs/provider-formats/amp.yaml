@@ -16,24 +16,24 @@ content_types:
         fetched_at: "2026-07-14T00:37:57Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required)"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (required)"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: "skill directory placed under .agents/skills/<name>/ or .claude/skills/<name>/ within the project root"
         paths:
           - ".agents/skills/<name>/SKILL.md"
           - ".claude/skills/<name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "skill directory placed under ~/.config/agents/skills/<name>/, ~/.agents/skills/<name>/, ~/.config/amp/skills/<name>/, or ~/.claude/skills/<name>/ (the ~/.agents/skills/ path was added in the 2026-07 rewrite of the 'Agent Skills' doc — see intro paragraph and the 'Skill precedence (first wins)' list)"
         paths:
           - "~/.config/agents/skills/<name>/SKILL.md"
@@ -42,31 +42,31 @@ content_types:
           - "~/.claude/skills/<name>/SKILL.md"
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "SKILL.md (required, fixed name)"
         confidence: confirmed
       custom_filename:
-        supported: false
+        status: absent
         mechanism: "not observed — amp requires SKILL.md as the fixed canonical filename"
         confidence: confirmed
       user_invocable:
-        supported: false
+        status: absent
         mechanism: "not documented — no mechanism to hide skills from user-facing menus is described; skills are managed via 'amp skill' CLI and command palette, not a slash-command invocation menu"
         confidence: confirmed
       disable_model_invocation:
-        supported: false
+        status: absent
         mechanism: "not documented — no mechanism to prevent the model from auto-invoking a skill; the model always selects based on name and description match"
         confidence: confirmed
       auto_invocable:
-        supported: true
+        status: mapped
         mechanism: "Model auto-selects skill by matching user request against frontmatter name and description fields; no explicit opt-out mechanism is documented."
         confidence: confirmed
       shared_scope:
-        supported: false
+        status: absent
         mechanism: "not documented — only project-scope (.agents/skills/) and user-wide (~/.config/agents/skills/) are described; no enterprise or shared scope exists"
         confidence: confirmed
       skill_bundled_resources:
-        supported: true
+        status: mapped
         mechanism: "Arbitrary files (scripts, templates, configs) co-located alongside SKILL.md in the skill directory; agent reads them by relative path when the skill is invoked."
         source_ref: "https://ampcode.com/manual/agent-skills.md"
         confidence: confirmed
@@ -143,23 +143,23 @@ content_types:
         fetched_at: "2026-07-14T00:37:57Z"
     canonical_mappings:
       activation_mode:
-        supported: false
+        status: absent
         mechanism: "Amp rule files load unconditionally; no conditional or model-decision activation documented"
         confidence: inferred
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No file import syntax documented for Amp rule files"
         confidence: inferred
       cross_provider_recognition:
-        supported: false
+        status: absent
         mechanism: "Amp reads its own rule format; no cross-provider rule file recognition documented"
         confidence: inferred
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "Amp does not have an AI-generated auto-memory system"
         confidence: confirmed
       hierarchical_loading:
-        supported: false
+        status: absent
         mechanism: "Amp rule files are project-scoped; no subdirectory hierarchy documented"
         confidence: inferred
     provider_extensions:
@@ -221,45 +221,45 @@ content_types:
         fetched_at: "2026-07-14T00:37:57Z"
     canonical_mappings:
       handler_types:
-        supported: true
+        status: mapped
         provider_field: "amp.on"
         mechanism: "TypeScript handlers, not shell-command-only: amp.on(event, async (event, ctx) => {...}) handlers are TypeScript functions run in Amp's Bun runtime. A handler can shell out via ctx.$ (Bun shell), classify via amp.ai.ask(), and spawn subagents via amp.getBuiltinAgent()/createAgent(); custom agent-callable tools are added with amp.registerTool({name, description, inputSchema, execute})."
         confidence: inferred
       matcher_patterns:
-        supported: true
+        status: mapped
         provider_field: "amp.permissions.matches"
         mechanism: "amp.on() event subscriptions carry NO declarative matcher — a handler fires for every event of its type and discriminates in code (e.g. checking event.tool, or regex on the shell command). Declarative pattern matching survives only in the legacy amp.permissions rules (glob '*' and regex '/.../' match conditions), now applied by the internal compatibility plugin."
         confidence: inferred
       decision_control:
-        supported: true
+        status: mapped
         provider_field: "amp.on('tool.call')"
         mechanism: "A tool.call handler returns a ToolCallResult union: {action: 'allow'}, {action: 'reject-and-continue', message}, {action: 'modify', input}, {action: 'synthesize', result: {output, exitCode?}}, or {action: 'error', message} — richer than the retired send-user-message / exit-code model."
         confidence: inferred
       input_modification:
-        supported: true
+        status: mapped
         provider_field: "amp.on('tool.call')"
         mechanism: "A tool.call handler returns {action: 'modify', input: Record<string, unknown>} to replace the tool's input arguments before it executes."
         confidence: inferred
       async_execution:
-        supported: false
+        status: absent
         mechanism: "Plugin event handlers are async TypeScript functions awaited inline in the request/response flow (a tool.call blocks until the handler resolves); no fire-and-forget or background hook execution is documented, and there is no session.end event."
         confidence: inferred
       hook_scopes:
-        supported: true
+        status: mapped
         provider_field: ".amp/plugins/"
         mechanism: "Three plugin load locations: project (.amp/plugins/*.ts), system / per-machine user (~/.config/amp/plugins/*.ts; %USERPROFILE%\\.config\\amp\\plugins\\*.ts on Windows), and global (configured in workspace settings and applied to every workspace member — a limited experimental release)."
         confidence: inferred
       json_io_protocol:
-        supported: false
+        status: absent
         mechanism: "Plugins are in-process TypeScript modules; handlers exchange typed event objects and typed return values through the @ampcode/plugin PluginAPI, not a serialized JSON stdin/stdout protocol."
         confidence: inferred
       context_injection:
-        supported: true
+        status: mapped
         provider_field: "amp.on('agent.start')"
         mechanism: "Several injection points: agent.start returns {message: {content, display?}} to append a message after the user's content (docs: 'Allows adding context messages or modifying the system prompt'); tool.result returns a replacement {status, output} to rewrite a tool result before it reaches the model; agent.end returns {action: 'continue', userMessage} to start a follow-up turn; and ctx.thread.append(...) appends to the active thread."
         confidence: inferred
       permission_control:
-        supported: true
+        status: mapped
         provider_field: "amp.on('tool.call')"
         mechanism: "Amp no longer prompts before running tools; a tool.call handler makes the decision ({action: 'allow' | 'reject-and-continue' | 'synthesize'}). Legacy amp.permissions / amp.guardedFiles.allowlist / amp.dangerouslyAllowAll(=false) settings are enforced by an internal compatibility plugin that Amp auto-activates when it detects them."
         confidence: inferred
@@ -441,35 +441,35 @@ content_types:
         fetched_at: "2026-07-14T00:37:57Z"
     canonical_mappings:
       transport_types:
-        supported: false
+        status: absent
         mechanism: "Amp MCP transport types not documented beyond basic MCP support"
         confidence: inferred
       oauth_support:
-        supported: true
+        status: mapped
         mechanism: "oauth_support: Amp supports OAuth 2.0 authentication for remote MCP servers"
         confidence: confirmed
       env_var_expansion:
-        supported: false
+        status: absent
         mechanism: "Amp MCP configuration does not document environment variable expansion"
         confidence: inferred
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "per_tool_enable_disable: Amp supports per-tool enable/disable configuration to control which MCP tools are exposed to the agent"
         confidence: confirmed
       auto_approve:
-        supported: false
+        status: absent
         mechanism: "Amp does not document pre-configured auto-approval for specific MCP tools separate from tool filtering"
         confidence: inferred
       marketplace:
-        supported: false
+        status: absent
         mechanism: "Amp does not have an in-IDE MCP marketplace"
         confidence: inferred
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "Amp does not document MCP resource referencing"
         confidence: inferred
       enterprise_management:
-        supported: true
+        status: mapped
         mechanism: "enterprise_registry_allowlist: Amp supports organization-level MCP configuration with an enterprise registry and allowlist"
         confidence: confirmed
     provider_extensions:

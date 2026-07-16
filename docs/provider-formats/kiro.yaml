@@ -16,60 +16,60 @@ content_types:
         fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required, slug-style identifier)"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (required)"
         confidence: confirmed
       license:
-        supported: true
+        status: mapped
         provider_field: "license"
         mechanism: "yaml frontmatter key: license (optional)"
         confidence: confirmed
       compatibility:
-        supported: true
+        status: mapped
         provider_field: "compatibility"
         mechanism: "yaml frontmatter key: compatibility (optional)"
         confidence: confirmed
       metadata_map:
-        supported: true
+        status: mapped
         provider_field: "metadata"
         mechanism: "yaml frontmatter key: metadata (optional map)"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: "Self-contained directory installed via Kiro Powers panel (UI installation, no fixed filesystem path)"
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "Fixed filename POWER.md (required, all caps)"
         confidence: confirmed
       custom_filename:
-        supported: false
+        status: absent
         mechanism: "Not observed — POWER.md is fixed"
         confidence: confirmed
       global_scope:
-        supported: false
+        status: absent
         mechanism: ""
         confidence: confirmed
       shared_scope:
-        supported: false
+        status: absent
         mechanism: ""
         confidence: confirmed
       disable_model_invocation:
-        supported: false
+        status: absent
         mechanism: ""
         confidence: confirmed
       user_invocable:
-        supported: false
+        status: absent
         mechanism: ""
         confidence: confirmed
       auto_invocable:
-        supported: true
+        status: mapped
         extension_id: kiro_keywords
         mechanism: "Keywords array in POWER.md frontmatter (key: keywords); Kiro activates the power when any listed keyword is mentioned in conversation."
         confidence: confirmed
@@ -128,23 +128,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       activation_mode:
-        supported: true
+        status: mapped
         mechanism: "kiro_steering_inclusion_mode: Kiro steering files support always, conditional, auto, and manual inclusion modes"
         confidence: confirmed
       file_imports:
-        supported: true
+        status: mapped
         mechanism: "kiro_steering_file_references: Kiro steering files can reference other files using @file syntax"
         confidence: confirmed
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "kiro_agents_md_recognition: Kiro reads AGENTS.md files from other providers in addition to its own steering files"
         confidence: confirmed
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "Kiro does not have an AI-generated auto-memory system separate from user-authored steering files"
         confidence: confirmed
       hierarchical_loading:
-        supported: false
+        status: absent
         mechanism: "Kiro steering files are project-scoped; no multi-level subdirectory hierarchy documented"
         confidence: inferred
     provider_extensions:
@@ -197,39 +197,39 @@ content_types:
         fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       handler_types:
-        supported: true
+        status: mapped
         mechanism: "Hook action.type supports 'command' (shell) and 'agent' (predefined agent prompt) per the JSON file format — the agent type is a non-shell executor, which satisfies the canonical definition (executors beyond shell commands). No HTTP, mcp_tool, or TypeScript extension handler types documented"
         confidence: confirmed
       matcher_patterns:
-        supported: true
+        status: mapped
         mechanism: "Per-hook 'matcher' regex field (JSON file format) filters by tool name or file path; the 'Trigger reference' table 'Matcher matches' column documents Tool name (regex) for PreToolUse/PostToolUse and File path (regex) for PostFileCreate/PostFileSave/PostFileDelete"
         confidence: confirmed
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "Block-only: exit code 2 blocks execution for PreToolUse, UserPromptSubmit, and PreTaskExec (STDERR returned to the agent); documented via the 'Can block?' column in the 'Trigger reference' table and the 'Exit code behavior' section. No allow or input-modify decisions documented"
         confidence: confirmed
       input_modification:
-        supported: false
+        status: absent
         mechanism: "Kiro hooks cannot modify tool input before execution"
         confidence: inferred
       async_execution:
-        supported: false
+        status: absent
         mechanism: "Kiro hooks run synchronously; no async execution documented"
         confidence: inferred
       hook_scopes:
-        supported: false
+        status: absent
         mechanism: "Kiro hook JSON files live in .kiro/hooks/ at the workspace level only; no user/global/managed/plugin scope documented"
         confidence: confirmed
       json_io_protocol:
-        supported: false
+        status: absent
         mechanism: "Hook config is JSON, but the command I/O protocol is exit-code + STDOUT/STDERR text (documented under 'Exit code behavior'), not a JSON stdin/stdout message protocol"
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         mechanism: "Command hooks with exit code 0 add their STDOUT to the agent context for SessionStart and UserPromptSubmit events (ignored for other triggers); documented under 'Exit code behavior'"
         confidence: confirmed
       permission_control:
-        supported: false
+        status: absent
         mechanism: "Kiro hooks do not participate in permission decisions"
         confidence: inferred
     provider_extensions:
@@ -281,35 +281,35 @@ content_types:
         fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "Kiro supports stdio (local process via command + args) and remote (HTTPS endpoint or localhost HTTP via url + optional headers) server types"
         confidence: confirmed
       oauth_support:
-        supported: true
+        status: mapped
         mechanism: "Kiro handles browser-based OAuth flows automatically for remote MCP servers, using Dynamic Client Registration (DCR) by default; documented under 'OAuth authentication' heading (added 2026-06-10). For providers without DCR, oauth.clientId + oauthScopes (and optional oauth.redirectUri) are supplied per server. Only public PKCE clients (no client secret) are supported; expired tokens trigger automatic browser re-authentication."
         confidence: confirmed
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "kiro_mcp_env_var_expansion: Environment variables referenced dynamically using ${VARIABLE_NAME} syntax within MCP config values; recommended pattern for secrets instead of hardcoded values"
         confidence: confirmed
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "kiro_mcp_disabled_tools: Kiro supports per-server tool disable configuration to control which MCP tools are available to the agent"
         confidence: confirmed
       auto_approve:
-        supported: true
+        status: mapped
         mechanism: "kiro_mcp_auto_approve: Kiro supports per-server or per-tool auto-approval configuration to suppress confirmation prompts"
         confidence: confirmed
       marketplace:
-        supported: false
+        status: absent
         mechanism: "Kiro does not have an in-IDE MCP marketplace"
         confidence: inferred
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "Kiro does not document MCP resource referencing"
         confidence: inferred
       enterprise_management:
-        supported: false
+        status: absent
         mechanism: "Kiro does not document organization-level MCP management"
         confidence: inferred
     provider_extensions:
@@ -365,31 +365,31 @@ content_types:
         fetched_at: "2026-07-14T00:38:37Z"
     canonical_mappings:
       definition_format:
-        supported: true
+        status: mapped
         mechanism: "JSON config files in .kiro/agents/ (project) or ~/.kiro/agents/ (global); prompt field accepts inline string or file:// URI to external .md file"
         confidence: confirmed
       tool_restrictions:
-        supported: true
+        status: mapped
         mechanism: "tools array with exact names, wildcards (computer_*), or MCP-namespaced refs (@server_name); allowedTools list for tools requiring no user approval; toolsSettings map for per-tool behavioral config"
         confidence: confirmed
       invocation_patterns:
-        supported: true
+        status: mapped
         mechanism: "keyboard shortcut binding for IDE invocation; welcomeMessage shown on agent start; manual selection via agent picker"
         confidence: inferred
       agent_scopes:
-        supported: true
+        status: mapped
         mechanism: "project (.kiro/agents/) + global (~/.kiro/agents/); global overrides local on name collision — reverse of most Kiro content types"
         confidence: confirmed
       model_selection:
-        supported: true
+        status: mapped
         mechanism: "model field in agent JSON config overrides workspace default for that agent; falls back to default if specified model is unavailable"
         confidence: confirmed
       per_agent_mcp:
-        supported: true
+        status: mapped
         mechanism: "inline mcpServers map per agent config; includeMcpJson boolean controls whether workspace .kiro/settings/mcp.json is merged into agent's server set"
         confidence: confirmed
       subagent_spawning:
-        supported: false
+        status: absent
         mechanism: "no subagent spawning mechanism documented for Kiro custom agents"
         confidence: inferred
     provider_extensions:

@@ -17,12 +17,12 @@ func makeTestFormatDoc(provider string) *FormatDoc {
 				Status: "supported",
 				CanonicalMappings: map[string]CanonicalMapping{
 					"display_name": {
-						Supported:  true,
+						Status:     "mapped",
 						Mechanism:  "yaml key: name",
 						Confidence: "confirmed",
 					},
 					"project_scope": {
-						Supported:  true,
+						Status:     "mapped",
 						Mechanism:  ".agents/skills/<name>/SKILL.md",
 						Confidence: "confirmed",
 					},
@@ -42,7 +42,7 @@ func makeMultiCTFormatDoc(provider string) *FormatDoc {
 				Status: "supported",
 				CanonicalMappings: map[string]CanonicalMapping{
 					"display_name": {
-						Supported:  true,
+						Status:     "mapped",
 						Mechanism:  "yaml key: name",
 						Confidence: "confirmed",
 					},
@@ -52,7 +52,7 @@ func makeMultiCTFormatDoc(provider string) *FormatDoc {
 				Status: "supported",
 				CanonicalMappings: map[string]CanonicalMapping{
 					"description": {
-						Supported:  true,
+						Status:     "mapped",
 						Mechanism:  "frontmatter description",
 						Confidence: "confirmed",
 					},
@@ -136,7 +136,7 @@ func TestDeriveSeederSpecs_UnknownKey(t *testing.T) {
 				Status: "supported",
 				CanonicalMappings: map[string]CanonicalMapping{
 					"not_a_real_key": {
-						Supported:  true,
+						Status:     "mapped",
 						Mechanism:  "something",
 						Confidence: "confirmed",
 					},
@@ -162,7 +162,7 @@ func TestDeriveSeederSpecs_UnsupportedSkipped(t *testing.T) {
 			"skills": {
 				Status: "unsupported",
 				CanonicalMappings: map[string]CanonicalMapping{
-					"display_name": {Supported: true, Mechanism: "x", Confidence: "confirmed"},
+					"display_name": {Status: "mapped", Mechanism: "x", Confidence: "confirmed"},
 				},
 			},
 		},
@@ -228,9 +228,9 @@ func TestDeriveSeederSpecs_SortedByContentType(t *testing.T) {
 		LastFetchedAt:    "2026-04-11T00:00:00Z",
 		GenerationMethod: "human-edited",
 		ContentTypes: map[string]ContentTypeFormatDoc{
-			"skills": {Status: "supported", CanonicalMappings: map[string]CanonicalMapping{"display_name": {Supported: true, Mechanism: "x", Confidence: "confirmed"}}},
-			"rules":  {Status: "supported", CanonicalMappings: map[string]CanonicalMapping{"description": {Supported: true, Mechanism: "x", Confidence: "confirmed"}}},
-			"agents": {Status: "supported", CanonicalMappings: map[string]CanonicalMapping{"display_name": {Supported: true, Mechanism: "x", Confidence: "confirmed"}}},
+			"skills": {Status: "supported", CanonicalMappings: map[string]CanonicalMapping{"display_name": {Status: "mapped", Mechanism: "x", Confidence: "confirmed"}}},
+			"rules":  {Status: "supported", CanonicalMappings: map[string]CanonicalMapping{"description": {Status: "mapped", Mechanism: "x", Confidence: "confirmed"}}},
+			"agents": {Status: "supported", CanonicalMappings: map[string]CanonicalMapping{"display_name": {Status: "mapped", Mechanism: "x", Confidence: "confirmed"}}},
 		},
 	}
 	dir := t.TempDir()

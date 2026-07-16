@@ -58,9 +58,12 @@ func DeriveSeederSpecs(doc *FormatDoc, canonicalKeysPath string) ([]*SeederSpec,
 
 			spec.ProposedMappings = append(spec.ProposedMappings, ProposedMapping{
 				CanonicalKey: key,
-				Supported:    mapping.Supported,
-				Mechanism:    mapping.Mechanism,
-				Confidence:   mapping.Confidence,
+				// The seeder spec's bool tracks only "does this map"; absent and
+				// unmapped both derive to false. The absent-vs-unmapped
+				// distinction lives in the format doc (the authority).
+				Supported:  mapping.Status == MappingStatusMapped,
+				Mechanism:  mapping.Mechanism,
+				Confidence: mapping.Confidence,
 			})
 		}
 

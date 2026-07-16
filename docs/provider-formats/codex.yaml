@@ -26,43 +26,43 @@ content_types:
         fetched_at: "2026-07-14T00:38:05Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "YAML frontmatter key: name (optional — falls back to parent directory name if absent or empty; max 64 chars enforced after whitespace normalization)"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "YAML frontmatter key: description (required — empty string triggers MissingField error; max 1024 chars enforced after whitespace normalization)"
         confidence: confirmed
       disable_model_invocation:
-        supported: true
+        status: mapped
         mechanism: "openai.yaml companion file key: policy.allow_implicit_invocation (optional bool; false disables implicit/auto invocation; defaults to true when absent)"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: "Skills directory at <project_config_folder>/skills/ (SkillScope::Repo) or any .agents/skills/ directory between project root and cwd (monorepo traversal)"
         paths:
           - ".agents/skills/<name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "Skills directory at $HOME/.agents/skills/ or the user config layer's skills/ subdir ($CODEX_HOME/skills, deprecated but kept for backward compatibility) (SkillScope::User)"
         paths:
           - "~/.agents/skills/<name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: true
+        status: mapped
         mechanism: "Admin scope at /etc/codex/skills on Unix (SkillScope::Admin) — machine-level shared skills readable by all local users; injected via System config layer"
         paths:
           - "/etc/codex/skills/<name>/SKILL.md"
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "Fixed filename SKILL.md required within each named skill directory (SKILLS_FILENAME constant)"
         confidence: confirmed
       user_invocable:
-        supported: false
+        status: absent
         confidence: confirmed
     provider_extensions:
       - id: short_description
@@ -158,7 +158,7 @@ content_types:
       canonical mapping covers the Admin scope (/etc/codex/skills) — machine-level shared
       scope (all local users), not org/cloud shared scope. The user_invocable key has no
       evidence in the source (no concept of hiding skills from user-facing menus in the Rust
-      implementation) — set to supported: false, confidence: confirmed. The openai_yaml_companion_file
+      implementation) — set to status: absent, confidence: confirmed. The openai_yaml_companion_file
       is flagged graduation_candidate: true because other providers (windsurf, amp, cline,
       claude-code) support additional supporting files in the skill directory beyond the
       primary content file.
@@ -190,23 +190,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:05Z"
     canonical_mappings:
       activation_mode:
-        supported: false
+        status: absent
         mechanism: "Codex AGENTS.md files load unconditionally; no conditional or model-decision activation documented"
         confidence: inferred
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No file import syntax documented for Codex AGENTS.md files"
         confidence: inferred
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "agents_md_filename: Codex reads AGENTS.md files using the standard filename used by multiple providers"
         confidence: confirmed
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "Codex does not have an AI-generated auto-memory system"
         confidence: confirmed
       hierarchical_loading:
-        supported: true
+        status: mapped
         mechanism: "Codex unconditionally collects every AGENTS.md from the project root down to the cwd and combines them; project root is found by walking up to the nearest ancestor with project markers, and traversal never passes the project root (codex-rs/core/src/agents_md.rs module doc + find_nearest_ancestor_with_markers). Previously described as gated by the child_agents_md feature flag; that experiment was removed upstream (openai/codex #28993) and base hierarchical loading is now always-on."
         confidence: confirmed
     provider_extensions:
@@ -244,7 +244,7 @@ content_types:
       features.child_agents_md flag (verified absent from config.schema.json), its prompt template,
       and its test suite, so the former hierarchical_agents_md provider extension (which documented
       that feature flag) was removed. Base hierarchical loading is unaffected and remains
-      supported: true / confirmed — Codex still unconditionally collects and combines AGENTS.md
+      status: mapped / confirmed — Codex still unconditionally collects and combines AGENTS.md
       across the project-root-to-cwd hierarchy in codex-rs/core/src/agents_md.rs (verified live on
       main). The AGENTS.md repo-root instance also drifted (new Rust/TUI guideline content) but is
       example content, not capability evidence.
@@ -374,39 +374,39 @@ content_types:
         fetched_at: "2026-07-14T00:38:05Z"
     canonical_mappings:
       handler_types:
-        supported: true
+        status: mapped
         mechanism: "hook_handler_types: Codex supports shell command and LLM prompt handler types; TypeScript extension type also documented"
         confidence: confirmed
       matcher_patterns:
-        supported: true
+        status: mapped
         mechanism: "hook_matcher: Codex hooks support pattern matching to filter which tools or events trigger the hook"
         confidence: confirmed
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "hook_result_abort: Codex hooks can abort (block) the triggering action; allow and modify sub-capabilities documented via hook result schema"
         confidence: confirmed
       input_modification:
-        supported: true
+        status: mapped
         mechanism: "hook_updated_input: Codex PreToolUse hooks return modified input arguments that replace the original tool input"
         confidence: confirmed
       async_execution:
-        supported: true
+        status: mapped
         mechanism: "hook_execution_mode: Codex supports async hook execution mode for fire-and-forget background hook runs"
         confidence: confirmed
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "hook_scope: Codex hooks can be scoped to global/user or project configuration"
         confidence: confirmed
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "Codex hooks communicate via structured JSON on stdin (typed per-event payload conforming to the event input schema) and stdout (typed response conforming to the event output schema); exit codes alone are not the protocol"
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         mechanism: "hook_system_message: Codex hooks can inject a system message into the agent's active session context"
         confidence: confirmed
       permission_control:
-        supported: true
+        status: mapped
         mechanism: "hook_permission_decision: Codex hooks can return permission decisions that grant or deny tool availability"
         confidence: confirmed
     provider_extensions:
@@ -550,35 +550,35 @@ content_types:
         fetched_at: "2026-07-14T00:38:05Z"
     canonical_mappings:
       transport_types:
-        supported: false
+        status: absent
         mechanism: "Codex MCP transport types not documented beyond basic MCP support; likely stdio only"
         confidence: inferred
       oauth_support:
-        supported: true
+        status: mapped
         mechanism: "mcp_oauth_support: Codex supports OAuth 2.0 authentication for remote MCP servers"
         confidence: confirmed
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "mcp_env_vars: Codex RawMcpServerConfig supports an env_vars array of McpServerEnvVar entries; each entry is either a plain string or a structured object with name and optional source fields enabling named environment variable sourcing"
         confidence: confirmed
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "mcp_enabled_disabled_tools: Codex supports per-server tool enable/disable configuration controlling which tools are exposed to the agent"
         confidence: confirmed
       auto_approve:
-        supported: true
+        status: mapped
         mechanism: "mcp_per_tool_approval: Codex supports per-tool approval configuration to suppress confirmation prompts for trusted tools"
         confidence: confirmed
       marketplace:
-        supported: false
+        status: absent
         mechanism: "Codex does not have an in-IDE MCP marketplace"
         confidence: confirmed
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "Codex does not document MCP resource referencing"
         confidence: inferred
       enterprise_management:
-        supported: false
+        status: absent
         mechanism: "Codex does not document organization-level MCP management"
         confidence: inferred
     provider_extensions:
@@ -672,31 +672,31 @@ content_types:
         fetched_at: "2026-07-14T00:38:05Z"
     canonical_mappings:
       definition_format:
-        supported: true
+        status: mapped
         mechanism: "TOML role config files referenced from config.toml [agents] section; built-in roles (default/explorer/worker) always available without user config"
         confidence: confirmed
       tool_restrictions:
-        supported: false
+        status: absent
         mechanism: "role config layers override model/settings but no explicit tool allowlist or denylist in role definitions"
         confidence: inferred
       invocation_patterns:
-        supported: true
+        status: mapped
         mechanism: "spawn-agent tool at LLM discretion; LLM selects role from dynamically-built role descriptions combining built-in and user-defined roles"
         confidence: confirmed
       agent_scopes:
-        supported: true
+        status: mapped
         mechanism: "built-in roles always available; user-defined roles in config.toml [agents] section; user-defined roles override built-in roles of same name"
         confidence: confirmed
       model_selection:
-        supported: true
+        status: mapped
         mechanism: "role config_file can override model and model_reasoning_effort; caller's current profile and model_provider preserved unless explicitly overridden"
         confidence: confirmed
       per_agent_mcp:
-        supported: false
+        status: absent
         mechanism: "MCP configuration is workspace-wide; no per-role MCP scoping mechanism"
         confidence: inferred
       subagent_spawning:
-        supported: true
+        status: mapped
         mechanism: "multi-agent V2 feature flag; max_threads and max_concurrent_threads_per_session control concurrent agent count, max_depth controls nesting depth; spawn-agent tool initiates delegation"
         confidence: confirmed
     provider_extensions:
@@ -777,11 +777,11 @@ content_types:
         fetched_at: "2026-07-14T00:38:05Z"
     canonical_mappings:
       argument_substitution:
-        supported: false
+        status: absent
         mechanism: "no implementation details captured; only source is a redirect stub to external docs — cannot confirm argument substitution support"
         confidence: unknown
       builtin_commands:
-        supported: false
+        status: absent
         mechanism: "no implementation details captured; slash commands feature exists but format and capabilities are undocumented in cached sources"
         confidence: unknown
     provider_extensions: []

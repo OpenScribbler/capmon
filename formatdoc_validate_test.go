@@ -55,7 +55,7 @@ content_types:
         fetched_at: "2026-04-11T00:00:00Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         mechanism: "yaml key: name"
         confidence: confirmed
     provider_extensions:
@@ -107,7 +107,7 @@ content_types:
         fetched_at: "2026-04-11T00:00:00Z"
     canonical_mappings:
       unknown_key:
-        supported: true
+        status: mapped
         mechanism: "some mechanism"
         confidence: confirmed
 `
@@ -225,7 +225,7 @@ content_types:
         fetched_at: "2026-04-11T00:00:00Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         mechanism: "yaml key: name"
         confidence: maybe
 `
@@ -374,7 +374,7 @@ content_types:
 	}
 }
 
-func TestValidateFormatDoc_SupportedUnknown(t *testing.T) {
+func TestValidateFormatDoc_LegacySupportedField(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
 	canonicalKeysPath := writeTestCanonicalKeys(t, dir)
@@ -382,8 +382,9 @@ func TestValidateFormatDoc_SupportedUnknown(t *testing.T) {
 	if err := os.MkdirAll(formatsDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	// supported: unknown is invalid YAML for a bool field — validate should
-	// catch it before the YAML parser produces an opaque type error.
+	// The pre-status-enum `supported:` field is silently ignored by the YAML
+	// parser (leaving status empty); the pre-scan catches it with a migration
+	// message pointing at `status:` rather than a bare empty-status error.
 	content := `provider: test-provider
 docs_url: "https://example.com/docs"
 category: cli
@@ -399,7 +400,7 @@ content_types:
         fetched_at: "2026-04-11T00:00:00Z"
     canonical_mappings:
       display_name:
-        supported: unknown
+        supported: true
         mechanism: "yaml key: name"
         confidence: unknown
 `
@@ -407,13 +408,13 @@ content_types:
 
 	err := ValidateFormatDoc(formatsDir, canonicalKeysPath, "test-provider")
 	if err == nil {
-		t.Fatal("expected error for supported: unknown")
+		t.Fatal("expected error for legacy supported: field")
 	}
-	if !strings.Contains(err.Error(), "supported: unknown") {
-		t.Errorf("error should mention the bad pattern, got: %v", err)
+	if !strings.Contains(err.Error(), "legacy `supported:` field") {
+		t.Errorf("error should name the legacy field, got: %v", err)
 	}
-	if !strings.Contains(err.Error(), "supported: false") {
-		t.Errorf("error should suggest the fix (supported: false), got: %v", err)
+	if !strings.Contains(err.Error(), "status:") {
+		t.Errorf("error should point at the status: migration, got: %v", err)
 	}
 }
 

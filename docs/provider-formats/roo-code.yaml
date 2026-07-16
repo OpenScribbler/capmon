@@ -26,23 +26,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       activation_mode:
-        supported: true
+        status: mapped
         mechanism: "mode_partitioned_activation: rule files in mode-specific directories (.roo/rules-<mode-slug>/) activate only when that mode is active; files in .roo/rules/ activate for all modes"
         confidence: confirmed
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No import directive syntax documented — rule files are loaded as plain markdown bodies"
         confidence: inferred
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "legacy_clinerules_fallback: Roo Code reads .clinerules/ as a backward-compatibility fallback when native .roo/rules/ is absent"
         confidence: confirmed
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "No auto-append or persistent memory command documented for rule content"
         confidence: inferred
       hierarchical_loading:
-        supported: true
+        status: mapped
         mechanism: "mode_scoped_loading: files under .roo/rules/ load universally; files under .roo/rules-<mode>/ load conditionally based on the active mode"
         paths:
           - ".roo/rules/"
@@ -96,60 +96,60 @@ content_types:
         fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required); identifies the skill and typically matches the directory name"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (required); documents what the skill does and when Roo should load it"
         confidence: confirmed
       license:
-        supported: false
+        status: absent
         mechanism: "No license frontmatter field observed in Roo Code skill examples"
         confidence: inferred
       compatibility:
-        supported: false
+        status: absent
         mechanism: "No compatibility frontmatter field observed in Roo Code skill examples"
         confidence: inferred
       metadata_map:
-        supported: false
+        status: absent
         mechanism: "No metadata frontmatter key observed in Roo Code skill examples"
         confidence: inferred
       project_scope:
-        supported: true
+        status: mapped
         mechanism: ".roo/skills/<slug>/SKILL.md"
         paths:
           - ".roo/skills/<slug>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "~/.roo/skills/<slug>/SKILL.md"
         paths:
           - "~/.roo/skills/<slug>/SKILL.md"
         confidence: inferred
       shared_scope:
-        supported: true
+        status: mapped
         mechanism: ".agents/skills/<slug>/SKILL.md cross-provider convention directory read alongside .roo/skills/"
         paths:
           - ".agents/skills/<slug>/SKILL.md"
           - "~/.agents/skills/<slug>/SKILL.md"
         confidence: inferred
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "SKILL.md (required, fixed name per Agent Skills standard)"
         confidence: confirmed
       custom_filename:
-        supported: false
+        status: absent
         mechanism: "Filename is fixed as SKILL.md — no alternate filenames observed"
         confidence: confirmed
       disable_model_invocation:
-        supported: false
+        status: absent
         mechanism: "No disable-model-invocation frontmatter field observed"
         confidence: inferred
       user_invocable:
-        supported: false
+        status: absent
         mechanism: "No user-invocation flag observed — skills are auto-loaded based on description matching"
         confidence: inferred
     provider_extensions:
@@ -196,35 +196,35 @@ content_types:
         fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "transport_types: stdio, sse, and streamable-http are supported and selected via the type field on each server entry"
         confidence: confirmed
       oauth_support:
-        supported: false
+        status: absent
         mechanism: "No OAuth 2.0 authentication flow documented for Roo Code MCP servers"
         confidence: inferred
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "env_variable_expansion: server env blocks accept environment variables so secrets can be referenced from the shell environment"
         confidence: inferred
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "per_server_tool_filtering: alwaysAllow and disabledTools arrays on each server entry filter which MCP tools are exposed and which bypass confirmation"
         confidence: confirmed
       auto_approve:
-        supported: true
+        status: mapped
         mechanism: "always_allow_list: alwaysAllow tool names bypass confirmation prompts for that server"
         confidence: confirmed
       marketplace:
-        supported: false
+        status: absent
         mechanism: "No in-app MCP marketplace documented"
         confidence: inferred
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "MCP resource referencing is not documented as a first-class feature in Roo Code"
         confidence: inferred
       enterprise_management:
-        supported: false
+        status: absent
         mechanism: "No organization-level MCP management documented"
         confidence: inferred
     provider_extensions:
@@ -293,31 +293,31 @@ content_types:
         fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       definition_format:
-        supported: true
+        status: mapped
         mechanism: "YAML file (.roomodes for project scope, custom_modes.yaml for global scope) containing an array of custom mode entries with slug, name, roleDefinition, groups, and optional whenToUse, description, customInstructions fields"
         confidence: confirmed
       tool_restrictions:
-        supported: true
+        status: mapped
         mechanism: "groups array declares which tool groups (read, edit, command, mcp) the mode may use; entries may be strings or [group, {fileRegex, description}] tuples for path-scoped edit access. The legacy 'browser' group is deprecated and stripped on load per mode.ts deprecatedToolGroups"
         confidence: confirmed
       invocation_patterns:
-        supported: true
+        status: mapped
         mechanism: "Users switch modes via the mode selector or /mode command; each mode is a distinct operating persona with its own roleDefinition and tool groups"
         confidence: confirmed
       agent_scopes:
-        supported: true
+        status: mapped
         mechanism: "Two scopes: project (.roomodes at the project root) and global (custom_modes.yaml in Roo Code's settings dir); project entries override global entries with the same slug"
         confidence: confirmed
       model_selection:
-        supported: false
+        status: absent
         mechanism: "No per-mode model selection field documented in the mode schema"
         confidence: inferred
       per_agent_mcp:
-        supported: false
+        status: absent
         mechanism: "Custom modes do not declare their own MCP server lists — MCP configuration is global per the .roo/mcp.json and global MCP settings"
         confidence: inferred
       subagent_spawning:
-        supported: false
+        status: absent
         mechanism: "Custom modes are switched-to by the user rather than spawned as subagents; Roo Code's orchestrator mode delegates to other modes at runtime but mode files themselves do not spawn peers"
         confidence: inferred
     provider_extensions:
@@ -382,11 +382,11 @@ content_types:
         fetched_at: "2026-07-14T00:38:40Z"
     canonical_mappings:
       argument_substitution:
-        supported: true
+        status: mapped
         mechanism: "argument-hint frontmatter field documents expected arguments; user-supplied arguments are appended to the command body at invocation time"
         confidence: inferred
       builtin_commands:
-        supported: false
+        status: absent
         mechanism: "Roo Code commands are user-defined Markdown files in .roo/commands/ — no user-overridable built-in slash-command layer documented"
         confidence: inferred
     provider_extensions:

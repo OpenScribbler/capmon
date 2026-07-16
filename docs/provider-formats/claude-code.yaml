@@ -16,48 +16,48 @@ content_types:
         fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (optional, falls back to directory name; lowercase letters, numbers, hyphens only, max 64 characters)"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (recommended, not required; if omitted uses first paragraph of markdown content)"
         confidence: confirmed
       disable_model_invocation:
-        supported: true
+        status: mapped
         provider_field: "disable-model-invocation"
         extension_id: "auto_invocation"
         mechanism: "yaml frontmatter key: disable-model-invocation (optional bool, default false); also prevents the skill from being preloaded into subagents via the skills frontmatter field"
         confidence: confirmed
       user_invocable:
-        supported: true
+        status: mapped
         provider_field: "user-invocable"
         mechanism: "yaml frontmatter key: user-invocable (optional bool, default true); controls /menu visibility only, not Skill tool access"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: ".claude/skills/<skill-name>/SKILL.md committed to version control"
         paths:
           - ".claude/skills/<skill-name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "~/.claude/skills/<skill-name>/SKILL.md in user home directory"
         paths:
           - "~/.claude/skills/<skill-name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: true
+        status: mapped
         mechanism: "Managed settings deployment for organization-wide distribution"
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "Fixed filename SKILL.md required inside skill directory"
         confidence: confirmed
       custom_filename:
-        supported: true
+        status: mapped
         mechanism: "Variable directory name: .claude/skills/<name>/SKILL.md — directory name is the skill identifier"
         confidence: confirmed
     # Optional extension depth fields (populated by capmon subagent):
@@ -281,23 +281,23 @@ content_types:
         fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       activation_mode:
-        supported: true
+        status: mapped
         mechanism: "Always-on (CLAUDE.md loads at every session start); conditional via paths frontmatter in .claude/rules/*.md files (glob-based, triggers on file access)"
         confidence: confirmed
       file_imports:
-        supported: true
+        status: mapped
         mechanism: "@path/to/file syntax in CLAUDE.md files; relative and absolute paths; recursive up to 4 hops; requires per-project approval"
         confidence: confirmed
       cross_provider_recognition:
-        supported: false
+        status: absent
         mechanism: "Claude Code does not natively read rule files defined by other providers"
         confidence: confirmed
       auto_memory:
-        supported: true
+        status: mapped
         mechanism: "Auto memory saves Claude's accumulated notes to ~/.claude/projects/<project>/memory/MEMORY.md; first 200 lines or 25KB loaded at session start; requires CC v2.1.59+; enabled by default; disable via CLAUDE_CODE_DISABLE_AUTO_MEMORY=1; override storage location via autoMemoryDirectory setting (read from any settings scope: user, project, local, managed policy, or --settings flag); subagents can also maintain their own auto memory"
         confidence: confirmed
       hierarchical_loading:
-        supported: true
+        status: mapped
         mechanism: "CLAUDE.md files load from all ancestor directories up to repo root (ancestor files load in full at launch; subdirectory CLAUDE.md files beyond 200 lines threshold load on demand when Claude reads files in those subdirectories); .claude/rules/ files discovered recursively; user-level rules (~/.claude/rules/) load before project rules; rules without paths frontmatter load unconditionally"
         confidence: confirmed
     provider_extensions:
@@ -434,39 +434,39 @@ content_types:
         fetched_at: "2026-04-11T21:48:17Z"
     canonical_mappings:
       handler_types:
-        supported: true
+        status: mapped
         mechanism: "Five types: command (shell), http (POST to URL), mcp_tool (MCP tool call), prompt (LLM evaluation), agent (subagent with tools, experimental); prompt/agent restricted to subset of events"
         confidence: confirmed
       matcher_patterns:
-        supported: true
+        status: mapped
         mechanism: "hook_matcher_patterns: exact string, pipe-separated list, or JavaScript regex; matches on tool_name or event-specific fields; if field uses permission-rule syntax for per-subcommand filtering"
         confidence: confirmed
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "block: exit code 2 or decision=block; allow: permissionDecision=allow in hookSpecificOutput; modify: updatedInput replaces tool input before execution; PermissionDenied event supports {retry: true} to allow model retry"
         confidence: confirmed
       input_modification:
-        supported: true
+        status: mapped
         mechanism: "hook_input_modification: PreToolUse returns updatedInput in hookSpecificOutput; entire input object replaced; compatible with all permissionDecision values except defer"
         confidence: confirmed
       async_execution:
-        supported: true
+        status: mapped
         mechanism: "hook_async_execution: async: true on command handlers runs hook in background without blocking; decisions ignored; systemMessage delivered on next turn; asyncRewake: true also wakes Claude on exit code 2"
         confidence: confirmed
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "Six scopes: user (~/.claude/settings.json), project (.claude/settings.json), local (.claude/settings.local.json), managed policy, plugin (hooks/hooks.json), component frontmatter (skill/agent)"
         confidence: confirmed
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "Command hooks receive event JSON on stdin; respond with JSON on stdout (exit 0); structured fields: continue, stopReason, suppressOutput, systemMessage, hookSpecificOutput"
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         mechanism: "Hooks return systemMessage field in JSON output to inject context into agent's active session"
         confidence: confirmed
       permission_control:
-        supported: true
+        status: mapped
         mechanism: "hook_permission_update_entries: PermissionRequest hooks return updatedPermissions with addRules/replaceRules/removeRules/setMode entries"
         confidence: confirmed
     provider_extensions:
@@ -656,35 +656,35 @@ content_types:
         fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "mcp_transport_types: stdio (local process), SSE (deprecated, still supported), HTTP/streamable-HTTP (recommended for remote), WebSocket (type: ws; persistent bidirectional connection for servers that push events; header-only auth, no OAuth or --transport flag support)"
         confidence: confirmed
       oauth_support:
-        supported: true
+        status: mapped
         mechanism: "mcp_oauth_authentication: OAuth 2.0 for HTTP MCP servers; dynamic client registration or CIMD auto-discovery; token storage in macOS keychain or credentials file; auto-refresh; oauth.scopes pins requested scope set; authServerMetadataUrl overrides discovery chain"
         confidence: confirmed
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "mcp_env_var_expansion: ${VAR} and ${VAR:-default} syntax in command, args, env, url, and headers fields of .mcp.json"
         confidence: confirmed
       tool_filtering:
-        supported: false
+        status: absent
         mechanism: "Claude Code exposes all tools from connected MCP servers; no per-server tool allowlist or blocklist for individual tool visibility"
         confidence: confirmed
       auto_approve:
-        supported: false
+        status: absent
         mechanism: "Claude Code does not support pre-configured auto-approval for specific MCP tools; all tool calls require user confirmation unless covered by session permission rules"
         confidence: confirmed
       marketplace:
-        supported: false
+        status: absent
         mechanism: "Claude Code does not have an in-IDE MCP marketplace for discovery and installation"
         confidence: confirmed
       resource_referencing:
-        supported: true
+        status: mapped
         mechanism: "mcp_resources: MCP resources accessible via @server:protocol://path syntax; appear in @ autocomplete; auto-fetched when referenced"
         confidence: confirmed
       enterprise_management:
-        supported: true
+        status: mapped
         mechanism: "mcp_managed_config: managed-mcp.json for exclusive control, or allowedMcpServers/deniedMcpServers in managed settings for policy-based control"
         confidence: confirmed
     provider_extensions:
@@ -854,31 +854,31 @@ content_types:
         fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       definition_format:
-        supported: true
+        status: mapped
         mechanism: "Markdown files with YAML frontmatter in .claude/agents/ (project) or ~/.claude/agents/ (user); file body becomes system prompt; only name and description are required"
         confidence: confirmed
       tool_restrictions:
-        supported: true
+        status: mapped
         mechanism: "tools allowlist and disallowedTools denylist in frontmatter; if both set, disallowedTools applied first then tools resolved against remaining pool; Agent(type) syntax in tools allowlist restricts which subagent types a main-thread agent can spawn"
         confidence: confirmed
       invocation_patterns:
-        supported: true
+        status: mapped
         mechanism: "natural language (Claude auto-delegates), @agent-<name> @-mention from typeahead, or --agent flag at startup for session-wide agent; plugin subagents appear as <plugin>:<name> in typeahead"
         confidence: confirmed
       agent_scopes:
-        supported: true
+        status: mapped
         mechanism: "5 scopes (highest-first): managed settings (org-wide, priority 1), CLI --agents flag (current session, priority 2), project (.claude/agents/, priority 3), user (~/.claude/agents/, priority 4), plugin agents/ directory (priority 5); highest-priority wins on name collision"
         confidence: confirmed
       model_selection:
-        supported: true
+        status: mapped
         mechanism: "model frontmatter field accepts sonnet/opus/haiku/fable alias, full model ID (e.g. claude-opus-4-8, claude-sonnet-5), or inherit (default); resolution order: CLAUDE_CODE_SUBAGENT_MODEL env var > per-invocation model param > frontmatter model > main conversation model (CC v2.1.196+: CLAUDE_CODE_SUBAGENT_MODEL=inherit behaves as unset rather than forcing the main model)"
         confidence: confirmed
       per_agent_mcp:
-        supported: true
+        status: mapped
         mechanism: "mcpServers frontmatter field: list of server names referencing already-configured workspace servers or inline server definitions; ignored for plugin subagents"
         confidence: confirmed
       subagent_spawning:
-        supported: true
+        status: mapped
         mechanism: "main-thread agents spawn subagents via Agent tool; subagents cannot spawn further subagents; Agent(type) in tools allowlist restricts which subagent types are allowed; Agent without parentheses allows spawning any subagent; omitting Agent from tools list blocks all spawning"
         confidence: confirmed
     provider_extensions:
@@ -1035,11 +1035,11 @@ content_types:
         fetched_at: "2026-07-14T00:39:56Z"
     canonical_mappings:
       argument_substitution:
-        supported: true
+        status: mapped
         mechanism: "$ARGUMENTS (all args), $ARGUMENTS[N] (Nth arg), $N (positional), ${CLAUDE_SESSION_ID} and other env vars; shared with skills argument substitution"
         confidence: confirmed
       builtin_commands:
-        supported: true
+        status: mapped
         mechanism: "100+ built-in slash commands including /add-dir, /advisor, /agents, /autofix-pr, /background, /batch [Skill], /branch, /btw, /cd, /chrome, /claude-api [Skill], /clear, /code-review [Skill], /color, /compact, /config, /context, /copy, /cost, /dataviz [Skill], /debug [Skill], /deep-research, /design-login, /design-sync [Skill], /desktop, /diff, /doctor [Skill], /effort, /exit, /export, /fast, /feedback, /fewer-permission-prompts [Skill], /focus, /fork, /goal, /heapdump, /help, /hooks, /ide, /init, /insights, /install-github-app, /install-slack-app, /keybindings, /login, /logout, /loop [Skill], /mcp, /memory, /mobile, /model, /passes, /permissions, /plan, /plugin, /powerup, /pr-comments, /privacy-settings, /radio, /recap, /release-notes, /reload-plugins, /reload-skills, /remote-control, /remote-env, /rename, /resume, /review, /rewind, /run [Skill], /run-skill-generator [Skill], /sandbox, /schedule, /scroll-speed, /security-review, /setup-bedrock, /setup-vertex, /simplify [Skill], /skills, /stats, /status, /statusline, /stickers, /stop, /tasks, /team-onboarding, /teleport, /terminal-setup, /theme, /tui, /ultraplan, /ultrareview, /upgrade, /usage, /usage-credits, /verify [Skill], /vim, /voice, /web-setup, /workflows; not user-modifiable; availability varies by platform and plan"
         confidence: confirmed
     provider_extensions:

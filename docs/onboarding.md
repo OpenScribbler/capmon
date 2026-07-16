@@ -28,12 +28,31 @@ exactly one of two places:
 
 - **`canonical_mappings.<canonical_key>`** — when the field corresponds to an
   existing canonical key. The `<canonical_key>` **must already exist in
-  `docs/spec/canonical-keys.yaml`**. Record `supported`, `mechanism`,
+  `docs/spec/canonical-keys.yaml`**. Record `status` (see below), `mechanism`,
   `confidence` (`confirmed` | `inferred` | `unknown`), and `provider_field`
   where applicable.
 - **`provider_extensions[]`** — when the field has no canonical key yet. Each
   entry needs `id`, `name`, `summary`, `source_ref`, `conversion`, and
   `graduation_candidate`.
+
+#### `status` — absent vs mapped vs unmapped (do not conflate)
+
+Every `canonical_mappings` entry carries a required `status`:
+
+- **`mapped`** — the provider mechanism maps to this canonical key.
+- **`absent`** — the provider genuinely has **no** such mechanism. Nothing to
+  map, ever.
+- **`unmapped`** — the provider **has** a mechanism, but it does not map to the
+  canonical key (a Class B mapping-row candidate). Requires a `source_form`: the
+  **verbatim minimal native snippet** exhibiting the mechanism (canonicalizer-
+  feedable input, *not* a prose description — prose goes in `mechanism`).
+
+The distinction between `absent` and `unmapped` is load-bearing and easy to get
+wrong. "The provider has no conditional-activation *syntax*" is often `unmapped`
+(it loads rules some other way — that *is* a mechanism), not `absent`. When in
+doubt between the two, prefer `unmapped` with a `source_form` and let the
+downstream confirmation decide. Do **not** reach for `absent` just because the
+provider lacks the canonical key's most obvious form.
 
 **Never invent a canonical key.** Canonical keys live in
 `docs/spec/canonical-keys.yaml`, which is capmon's conforming copy of ACIF's
