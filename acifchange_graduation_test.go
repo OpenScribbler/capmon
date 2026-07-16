@@ -31,7 +31,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 			creates++
 			createCall = copyArgs(args)
 			createBody = argValue(args, "--body")
-			return []byte("https://github.com/holdenhewett/agent-content-interchange-format/issues/321\n"), nil
+			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/321\n"), nil
 		}
 		if isGH(args, "issue", "comment") {
 			comments++
@@ -144,7 +144,7 @@ func TestScanGraduationCandidates_CommentsWhenQualifyingSetChanges(t *testing.T)
 		}
 		if isGH(args, "issue", "create") {
 			creates++
-			return []byte("https://github.com/holdenhewett/agent-content-interchange-format/issues/321\n"), nil
+			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/321\n"), nil
 		}
 		if isGH(args, "issue", "comment") {
 			comments++

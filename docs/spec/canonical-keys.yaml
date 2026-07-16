@@ -4,7 +4,7 @@
 # Authority
 #   ACIF (Agent Content Interchange Format) owns the capability dispositions,
 #   derivation predicates, and canonical vocabularies for every key in this file:
-#   https://github.com/holdenhewett/agent-content-interchange-format (v0.1, 2026-07-11).
+#   https://github.com/OpenScribbler/agent-content-interchange-format (v0.1, 2026-07-11).
 #   This file is capmon's conforming reference copy. Authority direction: capmon
 #   conforms to ACIF's copy, never the reverse. When an ACIF spec section and this
 #   file disagree, the ACIF spec governs and this file has a bug.
