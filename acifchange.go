@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	acifChangeRepo   = "holdenhewett/agent-content-interchange-format"
+	acifChangeRepo   = "OpenScribbler/agent-content-interchange-format"
 	acifChangeLabel  = "acif-change"
 	acifClassBLabel  = "class-b"
 	acifClassCLabel  = "class-c"
@@ -201,7 +201,7 @@ func buildACIFUnmappedIssueBody(state unmappedObservationState, keyHash string) 
 	b.WriteString("**Source form:**\n\n")
 	b.WriteString(fencedACIFBlock(state.SourceForm))
 	b.WriteString("\n\n**What to do:** Review the ACIF `CHANGE-PROCESS.md` Class B section and decide whether to add a mapping row for this source form.\n")
-	b.WriteString("Reference: https://github.com/holdenhewett/agent-content-interchange-format/blob/main/CHANGE-PROCESS.md\n")
+	b.WriteString("Reference: https://github.com/OpenScribbler/agent-content-interchange-format/blob/main/CHANGE-PROCESS.md\n")
 	return b.String()
 }
 

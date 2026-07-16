@@ -6,7 +6,7 @@ name: acif-change-scan
 # spec repo.
 #
 # Cross-repo: the scan files issues in
-# holdenhewett/agent-content-interchange-format, NOT in capmon. The default
+# OpenScribbler/agent-content-interchange-format, NOT in capmon. The default
 # GITHUB_TOKEN cannot write to another repository, so gh authenticates with
 # the ACIF_ISSUES_TOKEN secret — a PAT (or GitHub App token) holding
 # issues:write on the ACIF repo. Until that secret is populated, scheduled

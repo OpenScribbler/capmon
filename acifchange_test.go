@@ -26,7 +26,7 @@ func TestRecordUnmappedForm_ThresholdCreatesIssue(t *testing.T) {
 		}
 		if isGH(args, "issue", "create") {
 			createBody = argValue(args, "--body")
-			return []byte("https://github.com/holdenhewett/agent-content-interchange-format/issues/123\n"), nil
+			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/123\n"), nil
 		}
 		t.Fatalf("unexpected gh call: %v", args)
 		return nil, nil
@@ -107,7 +107,7 @@ func TestRecordUnmappedForm_DedupCommentsExistingIssue(t *testing.T) {
 		}
 		if isGH(args, "issue", "create") {
 			creates++
-			return []byte("https://github.com/holdenhewett/agent-content-interchange-format/issues/77\n"), nil
+			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/77\n"), nil
 		}
 		if isGH(args, "issue", "comment") {
 			comments++
@@ -167,7 +167,7 @@ func TestRecordUnmappedForm_StateLostAnchorFoundComments(t *testing.T) {
 		}
 		if isGH(args, "issue", "create") {
 			creates++
-			return []byte("https://github.com/holdenhewett/agent-content-interchange-format/issues/99\n"), nil
+			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/99\n"), nil
 		}
 		t.Fatalf("unexpected gh call: %v", args)
 		return nil, nil
@@ -292,7 +292,7 @@ func TestRecordUnmappedForm_StateRoundTripThroughJSON(t *testing.T) {
 			return []byte(`[]`), nil
 		}
 		if isGH(args, "issue", "create") {
-			return []byte("https://github.com/holdenhewett/agent-content-interchange-format/issues/66\n"), nil
+			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/66\n"), nil
 		}
 		t.Fatalf("unexpected gh call: %v", args)
 		return nil, nil

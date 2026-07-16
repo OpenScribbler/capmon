@@ -7,7 +7,7 @@ Capmon tracks which content types (rules, skills, agents, commands, MCP,
 hooks) each AI coding tool provider supports natively, watches the providers'
 upstream documentation for drift, and heals its own data when sources move.
 Capability dispositions and vocabularies conform to
-[ACIF v0.1](https://github.com/holdenhewett/agent-content-interchange-format);
+[ACIF v0.1](https://github.com/OpenScribbler/agent-content-interchange-format);
 capmon conforms to ACIF, never the reverse.
 
 ## The data

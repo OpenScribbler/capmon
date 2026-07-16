@@ -303,7 +303,7 @@ func buildACIFGraduationIssueBody(state graduationState, qualifyingProviders []s
 		fmt.Fprintf(&b, "- `%s`: **%s** - %s\n", provider, name, summary)
 	}
 	b.WriteString("\n**What to do:** Review the ACIF `CHANGE-PROCESS.md` Class C section and decide whether this extension should graduate into canonical vocabulary.\n")
-	b.WriteString("Reference: https://github.com/holdenhewett/agent-content-interchange-format/blob/main/CHANGE-PROCESS.md\n")
+	b.WriteString("Reference: https://github.com/OpenScribbler/agent-content-interchange-format/blob/main/CHANGE-PROCESS.md\n")
 	return b.String()
 }
 
