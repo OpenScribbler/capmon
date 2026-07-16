@@ -1,0 +1,68 @@
+name: acif-change-scan
+
+# Runs `capmon acif-change scan` on a daily cron to detect ACIF Class C
+# graduation candidates — provider extensions observed in 2+ providers across
+# 2+ distinct scan dates — and file or refresh tracking issues in the ACIF
+# spec repo.
+#
+# Cross-repo: the scan files issues in
+# holdenhewett/agent-content-interchange-format, NOT in capmon. The default
+# GITHUB_TOKEN cannot write to another repository, so gh authenticates with
+# the ACIF_ISSUES_TOKEN secret — a PAT (or GitHub App token) holding
+# issues:write on the ACIF repo. Until that secret is populated, scheduled
+# runs fail at the first gh call; that is expected, not a regression.
+#
+# State: the >=2-distinct-dates debounce needs state to survive between runs,
+# and runners are ephemeral. We persist .capmon-cache/acif-change/ with
+# actions/cache using a rolling key (unique per run) plus a restore-keys
+# prefix, so each run restores the most recent prior state and saves an
+# updated copy. This needs no contents:write, honoring ADR 0005 (no scheduled
+# job holds write access to the publish branch). If the cache evicts, the
+# debounce resets and graduation is merely delayed — never wrong — and the
+# per-issue anchor still prevents duplicate filings.
+#
+# Cadence is daily (not weekly): it graduates the debounce in ~2 days instead
+# of ~2 weeks and keeps the cache warm well inside its 7-day eviction window.
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: acif-change graduation scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout capmon
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v5
+        with:
+          go-version-file: go.mod
+
+      - name: Restore and persist acif-change debounce state
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .capmon-cache/acif-change
+          key: acif-change-state-${{ github.run_id }}
+          restore-keys: |
+            acif-change-state-
+
+      - name: Run acif-change scan
+        # mkdir keeps the state path present so actions/cache does not warn on
+        # the cold-start run before the scan has written anything.
+        run: |
+          mkdir -p .capmon-cache/acif-change
+          go run ./cmd/capmon acif-change scan
+        env:
+          # The scan writes issues in the ACIF repo (cross-repo); gh reads
+          # GH_TOKEN, and the default GITHUB_TOKEN cannot write there. Set
+          # both names to the cross-repo PAT for parity with the other capmon
+          # workflows and any library that reads GITHUB_TOKEN.
+          GH_TOKEN: ${{ secrets.ACIF_ISSUES_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACIF_ISSUES_TOKEN }}
