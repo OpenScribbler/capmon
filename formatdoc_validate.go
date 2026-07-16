@@ -102,19 +102,23 @@ func loadCanonicalKeys(path string) (map[string]map[string]bool, error) {
 	return result, nil
 }
 
-// supportedUnknownRE matches lines where the supported field is set to the
-// string "unknown" instead of a boolean. YAML unmarshal rejects this with an
-// unhelpful type error; we catch it here before parsing to give a clear fix.
-var supportedUnknownRE = regexp.MustCompile(`(?m)^\s+supported:\s+unknown\s*$`)
+// legacySupportedFieldRE matches the pre-status-enum `supported:` field.
+// canonical_mappings replaced the overloaded `supported:` bool with
+// `status: absent|mapped|unmapped`. A lingering `supported:` line (e.g. from a
+// stale generator or a hand-copied older doc) is silently ignored by the YAML
+// parser, leaving status empty; catch it here with an actionable migration
+// message instead of a bare "status: invalid value" error. The content-type
+// level uses `status: supported`, which this pattern does not match.
+var legacySupportedFieldRE = regexp.MustCompile(`(?m)^\s+supported:\s`)
 
 // preScanFormatDoc checks raw YAML bytes for known-bad patterns that would
-// cause confusing parse errors. Returns a descriptive, actionable error.
+// otherwise cause confusing errors. Returns a descriptive, actionable error.
 func preScanFormatDoc(data []byte) error {
-	if supportedUnknownRE.Match(data) {
-		return fmt.Errorf("✗ supported: unknown — the supported field must be a boolean (true or false)\n" +
-			"  For capabilities absent from source material use:\n" +
-			"    supported: false\n" +
-			"    confidence: unknown")
+	if legacySupportedFieldRE.Match(data) {
+		return fmt.Errorf("✗ legacy `supported:` field — canonical_mappings now uses `status:`\n" +
+			"  Replace `supported: true` with `status: mapped`, `supported: false` with\n" +
+			"  `status: absent`, or use `status: unmapped` (plus a source_form) for a\n" +
+			"  mechanism the provider has but that has no canonical mapping yet.")
 	}
 	return nil
 }
@@ -124,6 +128,13 @@ var validConfidenceValues = map[string]bool{
 	"confirmed": true,
 	"inferred":  true,
 	"unknown":   true,
+}
+
+// validMappingStatuses is the controlled vocabulary for canonical_mappings status.
+var validMappingStatuses = map[string]bool{
+	MappingStatusAbsent:   true,
+	MappingStatusMapped:   true,
+	MappingStatusUnmapped: true,
 }
 
 // validConversionValues is the controlled vocabulary for the provider extension
@@ -217,6 +228,18 @@ func ValidateFormatDoc(formatsDir, canonicalKeysPath, provider string) error {
 			// Rule 4: confidence vocabulary
 			if mapping.Confidence != "" && !validConfidenceValues[mapping.Confidence] {
 				errs = append(errs, fmt.Sprintf("✗ content_types.%s.canonical_mappings.%s.confidence: invalid value %q (must be confirmed|inferred|unknown)", ct, key, mapping.Confidence))
+			}
+
+			// Rule 5: status is required and drawn from the closed set;
+			// source_form is required exactly when status is "unmapped".
+			if !validMappingStatuses[mapping.Status] {
+				errs = append(errs, fmt.Sprintf("✗ content_types.%s.canonical_mappings.%s.status: invalid value %q (must be absent|mapped|unmapped)", ct, key, mapping.Status))
+			}
+			if mapping.Status == MappingStatusUnmapped && strings.TrimSpace(mapping.SourceForm) == "" {
+				errs = append(errs, fmt.Sprintf("✗ content_types.%s.canonical_mappings.%s.source_form: required when status is \"unmapped\" (verbatim native snippet)", ct, key))
+			}
+			if mapping.Status != MappingStatusUnmapped && mapping.SourceForm != "" {
+				errs = append(errs, fmt.Sprintf("✗ content_types.%s.canonical_mappings.%s.source_form: only allowed when status is \"unmapped\" (got status %q)", ct, key, mapping.Status))
 			}
 		}
 

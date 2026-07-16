@@ -75,7 +75,7 @@ content_types:
         fetched_at: "2026-04-11T00:00:00Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         mechanism: "yaml key: name"
         confidence: confirmed
 `

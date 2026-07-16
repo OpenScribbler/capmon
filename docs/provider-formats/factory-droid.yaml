@@ -16,47 +16,47 @@ content_types:
         fetched_at: "2026-07-14T18:58:19Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (optional, defaults to directory name)"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (recommended, not required)"
         confidence: confirmed
       user_invocable:
-        supported: true
+        status: mapped
         provider_field: "user-invocable"
         mechanism: "yaml frontmatter key: user-invocable (optional bool, default: true)"
         confidence: confirmed
       disable_model_invocation:
-        supported: true
+        status: mapped
         provider_field: "disable-model-invocation"
         mechanism: "yaml frontmatter key: disable-model-invocation (optional bool, default: false)"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: "<repo>/.factory/skills/<skill-name>/SKILL.md"
         paths:
           - ".factory/skills/<skill-name>/SKILL.md"
           - ".agent/skills/<skill-name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "~/.factory/skills/<skill-name>/SKILL.md"
         paths:
           - "~/.factory/skills/<skill-name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: false
+        status: absent
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "SKILL.md (fixed, required filename within the skill directory)"
         confidence: confirmed
       custom_filename:
-        supported: true
+        status: mapped
         mechanism: "skill.mdx is accepted as an alternative to SKILL.md within the skill directory"
         confidence: confirmed
     provider_extensions:
@@ -109,23 +109,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       activation_mode:
-        supported: false
+        status: absent
         mechanism: "Factory Droid rule files load unconditionally; no conditional or model-decision activation documented"
         confidence: inferred
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No file import syntax documented for Factory Droid rule files"
         confidence: inferred
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "agents_md_format: Factory Droid reads AGENTS.md files in the shared multi-provider format"
         confidence: confirmed
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "Factory Droid does not have an AI-generated auto-memory system"
         confidence: confirmed
       hierarchical_loading:
-        supported: true
+        status: mapped
         mechanism: "Factory Droid loads global and project rule layers; innermost (most specific) layer takes precedence"
         confidence: confirmed
     provider_extensions:
@@ -178,39 +178,39 @@ content_types:
         fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       handler_types:
-        supported: false
+        status: absent
         mechanism: "Factory Droid hooks execute shell commands only (type: command); no other handler types documented"
         confidence: confirmed
       matcher_patterns:
-        supported: true
+        status: mapped
         mechanism: "PreToolUse and PostToolUse hooks use matcher strings supporting exact tool names, regex patterns (Edit|Create, Notebook.*), MCP tool patterns (mcp__<server>__<tool>), and wildcard (*) to match all tools"
         confidence: confirmed
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "PreToolUse hooks return JSON with allow/deny/ask decision field; exit code 2 blocks with stderr fed back to Droid; non-zero non-2 shows stderr to user as non-blocking error"
         confidence: confirmed
       input_modification:
-        supported: true
+        status: mapped
         mechanism: "PreToolUse hooks return updatedInput in JSON output to modify tool parameters before execution"
         confidence: confirmed
       async_execution:
-        supported: true
+        status: mapped
         mechanism: "Matching hooks for the same event execute concurrently (in parallel); deduplication consolidates identical commands automatically"
         confidence: confirmed
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "Four scopes documented: user-level (~/.factory/settings.json), project-level (.factory/settings.json), local-uncommitted (.factory/settings.local.json), and enterprise managed policies"
         confidence: confirmed
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "Hooks receive JSON via stdin containing session_id, transcript_path, cwd, permission_mode, hook_event_name, and event-specific fields; hooks return JSON output with continue, stopReason, suppressOutput, systemMessage, and event-specific fields"
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         mechanism: "additionalContext field in PostToolUse, UserPromptSubmit, and SessionStart hook output injects information into the agent session; systemMessage field in JSON output provides session-level injection"
         confidence: confirmed
       permission_control:
-        supported: true
+        status: mapped
         mechanism: "PreToolUse hooks return allow, deny, or ask in the JSON decision field to bypass, block, or escalate tool permission decisions"
         confidence: confirmed
     provider_extensions:
@@ -277,35 +277,35 @@ content_types:
         fetched_at: "2026-07-14T18:58:19Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "three transports documented under 'Adding Servers via CLI': http (Streamable HTTP, current standard, droid mcp add <name> <url> --type http), sse (legacy standalone HTTP+SSE, --type sse), and stdio (local processes, droid mcp add <name> '<command>' [--env KEY=VALUE...])"
         confidence: confirmed
       oauth_support:
-        supported: true
+        status: mapped
         mechanism: "OAuth authentication supported for HTTP servers; tokens stored globally in system keyring rather than per-project; managed via /mcp interactive manager"
         confidence: confirmed
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "${VAR} and ${VAR:-default} expansion in mcp.json documented under 'Variable expansion' heading (supported in stdio command/args/env and http url/headers; expanded in memory at load time, file never rewritten); stdio server add also accepts --env KEY=VALUE flags"
         confidence: confirmed
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "per-server tool filtering via disabledTools (blocklist) and enabledTools (allowlist; takes precedence when both set) fields in Configuration Schema, documented under 'Per-tool filtering' heading; mirrors --enabled-tools / --disabled-tools flags on droid exec"
         confidence: confirmed
       auto_approve:
-        supported: false
+        status: absent
         mechanism: "no auto-approve / always-allow field documented in Configuration Schema"
         confidence: inferred
       marketplace:
-        supported: true
+        status: mapped
         mechanism: "Quick Start: Add from Registry via /mcp command — 40+ pre-configured servers (Figma, Linear, Sentry, Notion, Supabase, Stripe, Vercel, Playwright, HubSpot, MongoDB) organized into categories"
         confidence: confirmed
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "no @-mention or resource referencing syntax for MCP resources documented"
         confidence: inferred
       enterprise_management:
-        supported: true
+        status: mapped
         mechanism: "org-managed 'Enterprise MCP policy' (mcpPolicy with enabled + allowlist of hostname/command matchers) restricts which servers may connect; 'MCP autonomy URL overrides' (mcpAutonomyUrlOverrides) assign per-URL autonomy risk levels; both delivered via org-managed settings and cannot be weakened downstream. A folder-level scope (.factory/mcp.json in any ancestor dir) also exists alongside user and project scopes"
         confidence: confirmed
     provider_extensions:
@@ -371,31 +371,31 @@ content_types:
         fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       definition_format:
-        supported: true
+        status: mapped
         mechanism: ".md files in .factory/droids/ (project) or ~/.factory/droids/ (personal); single-file with YAML frontmatter (name, description, model, reasoningEffort, tools) and system prompt body"
         confidence: confirmed
       tool_restrictions:
-        supported: true
+        status: mapped
         mechanism: "tools field accepts a category string (read-only, edit, execute, web, mcp), an explicit array of tool IDs ([\"Read\", \"Edit\", \"Execute\"], case-sensitive), or omission for all tools; TodoWrite is automatically included for all droids"
         confidence: confirmed
       invocation_patterns:
-        supported: true
+        status: mapped
         mechanism: "exposed as subagent_type targets for the Task tool; primary assistant delegates mid-session; droids enabled by default with live progress streaming in UI"
         confidence: inferred
       agent_scopes:
-        supported: true
+        status: mapped
         mechanism: "project (.factory/droids/) overrides personal (~/.factory/droids/) on name collision — reverse of skills precedence; top-level files only, no recursion"
         confidence: confirmed
       model_selection:
-        supported: true
+        status: mapped
         mechanism: "model field accepts inherit (use parent session model) or a specific model identifier; custom BYOK models use custom: prefix; reasoningEffort (low/medium/high) is an additional per-droid field ignored when model is inherit"
         confidence: confirmed
       per_agent_mcp:
-        supported: true
+        status: mapped
         mechanism: "mcpServers frontmatter field (array of configured server names, e.g. [\"linear\", \"github\"]) scopes a droid to specific MCP servers, documented under 'Selecting MCP servers' heading; omit to inherit session-wide MCP tools, set [] to exclude all, or list exact registered MCP tool IDs in tools for per-tool control"
         confidence: confirmed
       subagent_spawning:
-        supported: true
+        status: mapped
         mechanism: "droids exposed as subagent_type targets for Task tool delegation; /droids menu (I key) imports Claude Code .claude/agents/*.md to droid format with field mapping and model family translation"
         confidence: inferred
     provider_extensions:
@@ -467,12 +467,12 @@ content_types:
         fetched_at: "2026-07-14T00:38:11Z"
     canonical_mappings:
       argument_substitution:
-        supported: true
+        status: mapped
         provider_field: "$ARGUMENTS"
         mechanism: "$ARGUMENTS substitution in Markdown-type commands expands to text typed after the command name; argument-hint frontmatter field provides autocomplete usage hint; executable commands receive arguments as positional shell parameters"
         confidence: confirmed
       builtin_commands:
-        supported: false
+        status: absent
         mechanism: "no built-in slash commands documented; Factory commands are user-defined Markdown templates or executable scripts"
         confidence: inferred
     provider_extensions:

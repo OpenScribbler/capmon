@@ -16,18 +16,18 @@ content_types:
         fetched_at: "2026-07-14T18:58:16Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required) — must exactly match the directory name"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         extension_id: description_based_auto_invocation
         mechanism: "yaml frontmatter key: description (required) — tells Cline when to use this skill, max 1024 characters"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: "Skills stored in .cline/skills/<name>/SKILL.md (recommended path)"
         paths:
           - ".cline/skills/<name>/SKILL.md"
@@ -35,36 +35,36 @@ content_types:
           - ".claude/skills/<name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "Skills stored in ~/.cline/skills/<name>/SKILL.md (macOS/Linux)"
         paths:
           - "~/.cline/skills/<name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: false
+        status: absent
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "Fixed filename SKILL.md required inside a named skill directory"
         confidence: confirmed
       custom_filename:
-        supported: false
+        status: absent
         mechanism: "Not applicable — Cline uses fixed SKILL.md canonical filename only"
         confidence: confirmed
       disable_model_invocation:
-        supported: false
+        status: absent
         confidence: confirmed
       user_invocable:
-        supported: true
+        status: mapped
         mechanism: "Enabled skills can be invoked explicitly from the chat input via slash command (/<skill-name>, e.g. /aws-deploy), which forces Cline to load that skill's SKILL.md — documented under 'Triggering Skills with Slash Commands'"
         confidence: confirmed
       auto_invocable:
-        supported: true
+        status: mapped
         extension_id: description_based_auto_invocation
         mechanism: "Cline auto-invokes skills by matching the user message against the description frontmatter field via the use_skill tool; enabled skills can additionally be triggered explicitly by slash command (see user_invocable) — documented under 'How Skills Work' / 'Triggering Skills with Slash Commands'"
         confidence: confirmed
       skill_bundled_resources:
-        supported: true
+        status: mapped
         mechanism: "Optional docs/, templates/, scripts/ subdirectories under SKILL.md are loaded on demand when the skill is invoked."
         source_ref: "https://docs.cline.bot/customization/skills.md#bundling-supporting-files"
         confidence: confirmed
@@ -127,23 +127,23 @@ content_types:
         fetched_at: "2026-07-14T18:58:16Z"
     canonical_mappings:
       activation_mode:
-        supported: true
+        status: mapped
         mechanism: "conditional_rules_paths: Cline supports path-conditional rules alongside always-on rules; conditions use glob patterns"
         confidence: confirmed
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No file import/include syntax documented for Cline rule files"
         confidence: inferred
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "multi_source_rule_detection: Cline auto-detects rules from .clinerules/, .cursorrules, .windsurfrules, and AGENTS.md (including ~/.agents/AGENTS.md) — documented under 'Supported Rule Types'. CLAUDE.md is no longer listed in the supported rule-type table (dropped in favor of the AGENTS.md standard)."
         confidence: confirmed
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "Cline does not have an AI-generated auto-memory system distinct from user-authored rules"
         confidence: confirmed
       hierarchical_loading:
-        supported: false
+        status: absent
         mechanism: "Cline rules are project-scoped or global; no per-subdirectory loading hierarchy documented"
         confidence: inferred
     provider_extensions:
@@ -219,39 +219,39 @@ content_types:
         fetched_at: "2026-07-14T01:27:39Z"
     canonical_mappings:
       handler_types:
-        supported: false
+        status: absent
         mechanism: "Neither surface documents the canonical shell/HTTP/LLM-prompt/agent handler-type selection: filesystem hooks (VS Code/JetBrains) execute shell or PowerShell scripts only; plugin hooks (SDK/CLI/Kanban) are in-process TypeScript AgentPlugin handlers"
         confidence: inferred
       matcher_patterns:
-        supported: false
+        status: absent
         mechanism: "Neither surface documents per-tool pattern matching: filesystem PreToolUse and plugin tool_call_before both fire for every tool call regardless of tool identity"
         confidence: inferred
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "Filesystem PreToolUse hooks cancel (block) a tool invocation by returning cancel:true on VS Code/JetBrains (hook-factory.ts); the plugin tool_call_before hook stage blocks tool calls on SDK/CLI/Kanban (sdk/plugins). No allow or modify sub-capabilities on either surface"
         confidence: confirmed
       input_modification:
-        supported: true
+        status: mapped
         mechanism: "Filesystem PreToolUse hooks return modified context/input before tool execution via contextModification on VS Code/JetBrains (hook-factory.ts); the plugin before_agent_start / tool_call_before stages inject or modify prompt and messages on SDK/CLI/Kanban (sdk/plugins)"
         confidence: confirmed
       async_execution:
-        supported: true
+        status: mapped
         mechanism: "Plugin hook policies (mode: async) run hooks off the critical path on SDK/CLI/Kanban (sdk/plugins hook policies table); filesystem-script hooks on VS Code/JetBrains remain synchronous with a 30s HOOK_EXECUTION_TIMEOUT_MS (hook-factory.ts)"
         confidence: inferred
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "Both surfaces support global + project scope: filesystem hooks in .clinerules/hooks (project) and ~/Documents/Cline/Hooks (global) per disk.ts; plugins in .cline/plugins (project) and ~/.cline/plugins (global) per customization/plugins"
         confidence: confirmed
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "The filesystem-script model (VS Code/JetBrains) receives a JSON object via stdin and returns JSON to stdout with cancel (bool), contextModification (string), and errorMessage (string), debug to stderr — verified in hook-factory.ts. This is NOT the mechanism on the plugin model (SDK/CLI/Kanban), which uses in-process TypeScript AgentPlugin handlers rather than stdin/stdout JSON"
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         mechanism: "Filesystem hooks inject context via the contextModification stdout field on VS Code/JetBrains (hook-factory.ts); the plugin before_agent_start hook stage injects context or modifies the prompt on SDK/CLI/Kanban (sdk/plugins)"
         confidence: confirmed
       permission_control:
-        supported: false
+        status: absent
         mechanism: "Neither surface grants/denies tool availability: hooks can only block/cancel a specific tool call (decision_control). The plugin approval-policy concept governs blocking a call, not tool-availability permissioning"
         confidence: inferred
     provider_extensions:
@@ -332,7 +332,7 @@ content_types:
       .cline/plugins (project) or ~/.cline/plugins (global).
     notes: >
       Dual-model note (2026-07-14, issue #5 resolved): Cline supports two hook models split by
-      surface, and capability claims above are provider-level (supported: true when ANY surface
+      surface, and capability claims above are provider-level (status: mapped when ANY surface
       supports the capability; the mechanism prose names the surface split). The dedicated hooks
       doc (docs.cline.bot/customization/hooks) is a 2-line stub redirecting to SDK Plugins; the
       filesystem-script model it used to document is no longer on that page but remains LIVE on
@@ -361,35 +361,35 @@ content_types:
         fetched_at: "2026-07-14T01:27:39Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "Cline supports STDIO (local process) plus remote transports selected by the config `type` field: `streamableHttp` (recommended) and `sse` (legacy; the default when `type` is omitted) — documented under 'Transport types' and the 'Remote server (Streamable HTTP)' configuration example"
         confidence: confirmed
       oauth_support:
-        supported: false
+        status: absent
         mechanism: "Cline MCP does not document OAuth 2.0 authentication for remote servers"
         confidence: inferred
       env_var_expansion:
-        supported: false
+        status: absent
         mechanism: "Cline MCP configuration does not document environment variable expansion syntax"
         confidence: inferred
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "autoApprove (per-server tool list): the `autoApprove` array in a server's config entry names the MCP tools allowed to run without per-invocation confirmation — documented in the 'Configuration examples' JSON and 'Security basics' (Limit autoApprove to safe tools). NOTE: this field was renamed from `alwaysAllow` to `autoApprove` in the 2026-07 MCP docs consolidation."
         confidence: confirmed
       auto_approve:
-        supported: true
+        status: mapped
         mechanism: "autoApprove (execution gating): the per-server `autoApprove` array suppresses per-invocation approval prompts for the listed MCP tools — documented under 'Configuration examples' / 'Security basics'"
         confidence: confirmed
       marketplace:
-        supported: false
+        status: absent
         mechanism: "The 2026-07 MCP docs consolidation into mcp-overview removed the in-IDE MCP Marketplace section; no marketplace / 'Finding MCP Servers' discovery experience is documented in the current MCP docs or the docs.cline.bot/llms.txt sitemap (verified 2026-07-13). Server addition is now manual config, the `cline mcp` CLI wizard, or the Remote Servers tab."
         confidence: inferred
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "Cline does not document @-mention or equivalent access to MCP resources"
         confidence: inferred
       enterprise_management:
-        supported: true
+        status: mapped
         mechanism: "Cline Enterprise now documents org-level MCP management: 'MCP Server Controls' covers MCP server allowlisting and remote-MCP-server management (docs.cline.bot/enterprise-solutions/.../control-other-cline-features/mcp-server-controls) — verified 2026-07-13. NOTE: this evidence lives on the enterprise docs tree, not the tracked mcp-overview source."
         confidence: inferred
     # 2026-07-13 (issue #5): the mcp_marketplace, ai_assisted_server_setup, and
@@ -455,11 +455,11 @@ content_types:
         fetched_at: "2026-07-14T01:27:39Z"
     canonical_mappings:
       argument_substitution:
-        supported: false
+        status: absent
         mechanism: "Workflow markdown files are plain prompt templates with no documented argument-substitution placeholder (no {{args}} or equivalent)"
         confidence: inferred
       builtin_commands:
-        supported: true
+        status: mapped
         mechanism: "Built-in slash commands (/newtask, /smol alias /compact, /newrule, /deep-planning, /reportbug) are hardcoded and not user-modifiable — documented under 'Slash Commands'. As of 2026-07 /explain-changes is no longer listed; enabled skills are additive, invoked via slash command ('Skills via Slash Commands')"
         confidence: confirmed
     provider_extensions:

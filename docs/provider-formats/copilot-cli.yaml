@@ -29,21 +29,21 @@ content_types:
         fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required per Agent Skills open standard)"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (required per Agent Skills open standard)"
         confidence: confirmed
       user_invocable:
-        supported: true
+        status: mapped
         mechanism: "slash-prefixed skill name in user prompt (e.g. /frontend-design)"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: "skill directory under .github/skills/<name>/, .claude/skills/<name>/, or .agents/skills/<name>/ in project repository"
         paths:
           - ".github/skills/<name>/SKILL.md"
@@ -51,26 +51,26 @@ content_types:
           - ".agents/skills/<name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "skill directory under ~/.copilot/skills/<name>/ or ~/.agents/skills/<name>/ in the user home directory"
         paths:
           - "~/.copilot/skills/<name>/SKILL.md"
           - "~/.agents/skills/<name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: true
+        status: mapped
         mechanism: "organization/enterprise-hosted skills documented as a loadable 'Remote' scope in the CLI command reference 'Skill locations' table — projected via the AHP relay and fetched on demand when invoked. (The prior 'coming soon' statement for org/enterprise skills was removed from about-agent-skills.md in the 2026-07 docs update, commit 425f5b15.) NOTE: evidence is in cli-command-reference.md, not the cited skills how-to/concept sources, which have not yet caught up."
         confidence: inferred
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "SKILL.md (fixed filename per Agent Skills open standard)"
         confidence: confirmed
       custom_filename:
-        supported: false
+        status: absent
         mechanism: "not observed — Agent Skills standard uses fixed SKILL.md filename"
         confidence: confirmed
       disable_model_invocation:
-        supported: false
+        status: absent
         mechanism: ""
         confidence: confirmed
     # Optional extension depth fields (populated by capmon subagent):
@@ -129,7 +129,7 @@ content_types:
       directory can contain additional supporting files. Organization-level and enterprise-level
       skills (shared_scope) are no longer marked "coming soon" — the removal landed in commit
       425f5b15, and the CLI command reference now documents an org/enterprise "Remote" skill
-      scope projected via the AHP relay and fetched on demand. This is flipped to supported: true
+      scope projected via the AHP relay and fetched on demand. This is flipped to status: mapped
       (inferred) but flagged: the cited skills how-to/concept sources (about-agent-skills.md,
       add-skills.md) do not yet document the remote scope; the evidence is in
       cli-command-reference.md. Skills can be sourced from public collections such as
@@ -162,23 +162,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       activation_mode:
-        supported: false
+        status: absent
         mechanism: "Copilot CLI rules load unconditionally at session start; no conditional or manual activation modes documented"
         confidence: inferred
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No @-import or file inclusion syntax documented for Copilot CLI rule files"
         confidence: inferred
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "agents_md_instructions: Copilot CLI reads AGENTS.md files following the multi-provider shared format"
         confidence: confirmed
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "Copilot CLI does not have an AI-generated persistent memory system for rules"
         confidence: confirmed
       hierarchical_loading:
-        supported: true
+        status: mapped
         mechanism: "Copilot CLI supports repo-wide instructions plus path-specific and personal instruction layers with defined precedence"
         confidence: confirmed
     provider_extensions:
@@ -263,39 +263,39 @@ content_types:
         fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       handler_types:
-        supported: true
+        status: mapped
         mechanism: "three handler types: command hooks (bash/powershell scripts), HTTP hooks (POST requests), and prompt hooks (auto-submitted text, sessionStart only) — documented under 'Hook configuration format'"
         confidence: confirmed
       matcher_patterns:
-        supported: true
+        status: mapped
         mechanism: "optional 'matcher' regex per hook entry, compiled as ^(?:PATTERN)$ full-match against toolName (preToolUse/postToolUse/permissionRequest), notification_type, preCompact trigger, or subagent agentName — documented under 'Matcher filtering' / 'Tool names for hook matching'"
         confidence: confirmed
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "preToolUse returns permissionDecision allow/deny/ask (+ modifiedArgs); agentStop/subagentStop return decision block/allow to force another agent turn; permissionRequest returns behavior allow/deny ahead of the permission service — documented under the per-event 'decision control' headings"
         confidence: confirmed
       input_modification:
-        supported: true
+        status: mapped
         mechanism: "preToolUse output field modifiedArgs substitutes tool arguments before execution — documented under 'preToolUse decision control'"
         confidence: confirmed
       async_execution:
-        supported: false
+        status: absent
         mechanism: "Copilot CLI hooks run synchronously; no async execution documented (only the notification event itself fires asynchronously)"
         confidence: inferred
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "hooks load and combine from four scopes in order: policy-level files, user-level (~/.copilot), project (.github/hooks/*.json plus settings.json inline blocks), and plugin-contributed — documented under 'Hooks locations'"
         confidence: confirmed
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "hooks receive event-specific JSON payloads on stdin (inline schema per event under 'Hook event input payloads') and return JSON decision/output objects on stdout (preToolUse, postToolUse, agentStop, permissionRequest)"
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         mechanism: "postToolUse and sessionStart output field additionalContext injects text into the agent session — documented under 'postToolUse output' and the sessionStart row of 'Hook events'"
         confidence: confirmed
       permission_control:
-        supported: true
+        status: mapped
         mechanism: "permissionRequest hook fires before the permission service (rule checks, session approvals, auto-allow/deny, user prompting) and its behavior allow/deny decision preempts it — documented under 'permissionRequest decision control' (CLI only; cloud agent pre-approves tools)"
         confidence: confirmed
     provider_extensions:
@@ -358,35 +358,35 @@ content_types:
         fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "Copilot CLI supports both local (stdio) and remote (HTTP/SSE) MCP server types, confirmed in concepts/context/mcp.md"
         confidence: confirmed
       oauth_support:
-        supported: false
+        status: absent
         mechanism: "Copilot CLI MCP does not document OAuth 2.0 authentication"
         confidence: inferred
       env_var_expansion:
-        supported: false
+        status: absent
         mechanism: "Copilot CLI MCP configuration does not document environment variable expansion"
         confidence: inferred
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "mcp_tool_allow_deny_flags: Copilot CLI supports per-tool allow and deny flags to control which MCP tools are exposed"
         confidence: confirmed
       auto_approve:
-        supported: false
+        status: absent
         mechanism: "Copilot CLI does not document pre-configured auto-approval for MCP tools"
         confidence: inferred
       marketplace:
-        supported: true
+        status: mapped
         mechanism: "the `/mcp search` command browses the GitHub MCP Registry from inside the CLI, pre-populates a server's config form, and installs it into mcp-config.json — documented under 'Searching and installing from the registry' in add-mcp-servers.md. FLAGGED: experimental (requires the --experimental flag or /experimental on)."
         confidence: inferred
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "Copilot CLI does not document MCP resource referencing"
         confidence: inferred
       enterprise_management:
-        supported: true
+        status: mapped
         mechanism: "org/enterprise-configured MCP registry URL + allowlist policy now apply to Copilot CLI (the configured registry appears as a discovery source and only allowlisted servers can run) — documented in the 'Adding an MCP server' note of add-mcp-servers.md (commit a93dc7a) and corroborated by the 'Enterprise MCP allowlist' section of cli-command-reference.md. FLAGGED: about-copilot-cli.md's 'Known MCP server policy limitations' still lists the org 'MCP Registry URL' and 'MCP servers in Copilot' policies as NOT currently supported — the two docs conflict on the registry-URL policy specifically."
         confidence: inferred
     provider_extensions:
@@ -476,35 +476,35 @@ content_types:
         fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       definition_format:
-        supported: true
+        status: mapped
         mechanism: ".agent.md files with YAML frontmatter (description required; optional name, target, tools, model, disable-model-invocation, user-invocable, mcp-servers, metadata) documented under 'YAML frontmatter properties'; up to 30,000 chars of Markdown instructions as agent system prompt. The legacy `infer` property is now marked retired (superseded by disable-model-invocation/user-invocable)."
         confidence: confirmed
       tool_restrictions:
-        supported: true
+        status: mapped
         provider_field: "tools"
         extension_id: tool_aliases
         mechanism: "tools field with cross-provider alias system (execute/shell/Bash, read/Read, edit/Edit, etc.); [\"*\"] grants all tools; unrecognized names silently ignored"
         confidence: confirmed
       invocation_patterns:
-        supported: true
+        status: mapped
         mechanism: "/agent slash command, natural language instruction, auto-inference (suppressible with disable-model-invocation), or --agent flag; 4 patterns"
         confidence: confirmed
       agent_scopes:
-        supported: true
+        status: mapped
         mechanism: "project scope (.github/agents/ or .claude/agents/), personal (~/.copilot/agents/), plugin (agents/); personal takes precedence over project"
         confidence: confirmed
       model_selection:
-        supported: true
+        status: mapped
         provider_field: "model"
         mechanism: "model field in frontmatter overrides default model for that agent"
         confidence: confirmed
       per_agent_mcp:
-        supported: true
+        status: mapped
         provider_field: "mcp-servers"
         mechanism: "mcp-servers object in agent frontmatter adds MCP servers/tools for the agent (documented under 'MCP server configuration details'); the config spec marks mcp-servers as used by the github.com cloud agent and Copilot CLI but NOT by VS Code / IDE agents. Env-var/secret expansion in these configs supports $VAR, ${VAR}, ${VAR:-default} (Claude Code syntax) plus ${{ secrets.X }} / ${{ vars.X }} (Actions syntax)."
         confidence: inferred
       subagent_spawning:
-        supported: true
+        status: mapped
         mechanism: "agents run as subagents with isolated context windows; Git-SHA-based versioning ensures consistency across PR interactions"
         confidence: confirmed
     provider_extensions:
@@ -573,11 +573,11 @@ content_types:
         fetched_at: "2026-07-14T00:38:09Z"
     canonical_mappings:
       argument_substitution:
-        supported: false
+        status: absent
         mechanism: "Copilot CLI now documents a user-authored custom command format (.claude/commands/*.md with argument-hint / description / allowed-tools / disable-model-invocation fields — 'Commands (alternative skill format)' in cli-command-reference.md), but `argument-hint` is only a freeform display hint shown in the picker; no template-substitution syntax ($ARGUMENTS, $1/$2, {{args}}) is documented, so positional args are not interpolated into the command body"
         confidence: inferred
       builtin_commands:
-        supported: true
+        status: mapped
         mechanism: >
           60+ built-in slash commands documented in the 'Slash commands in the interactive interface'
           table of the CLI command reference, including: /add-dir, /agent, /ask, /allow-all,

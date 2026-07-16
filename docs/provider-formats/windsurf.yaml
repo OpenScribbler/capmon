@@ -19,27 +19,27 @@ content_types:
         fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         extension_id: name_format_constraint
         mechanism: "yaml frontmatter key: name (required). Must be lowercase letters, numbers, and hyphens only (e.g., deploy-to-staging, code-review). Used in UI listings and for @-mentions."
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         extension_id: auto_invocation
         mechanism: "yaml frontmatter key: description (required). Brief explanation shown to the model to help it decide when to auto-invoke the skill. Key field for automatic invocation matching."
         confidence: confirmed
       user_invocable:
-        supported: true
+        status: mapped
         mechanism: "Explicit @mention by skill name in Cascade input (e.g., @deploy-to-production). Always available regardless of auto-invocation eligibility."
         confidence: confirmed
       auto_invocable:
-        supported: true
+        status: mapped
         mechanism: "Cascade auto-invokes a skill when the user's request semantically matches its description frontmatter field."
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: "Skill directory at .windsurf/skills/<skill-name>/. Committed with the repo; current workspace only. For cross-agent compatibility, also discovered at .agents/skills/<skill-name>/ and (if Claude Code config reading is enabled) .claude/skills/<skill-name>/."
         paths:
           - ".windsurf/skills/<skill-name>/SKILL.md"
@@ -47,7 +47,7 @@ content_types:
           - ".claude/skills/<skill-name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "Skill directory at ~/.codeium/windsurf/skills/<skill-name>/. Available in all workspaces on the user's machine; not committed to version control. Also discovered at ~/.agents/skills/<skill-name>/ and (if Claude Code config reading is enabled) ~/.claude/skills/<skill-name>/."
         paths:
           - "~/.codeium/windsurf/skills/<skill-name>/SKILL.md"
@@ -55,15 +55,15 @@ content_types:
           - "~/.claude/skills/<skill-name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: true
+        status: mapped
         mechanism: "OS-specific system path deployed by enterprise IT; read-only for end users. macOS: /Library/Application Support/Windsurf/skills/<skill-name>/; Linux/WSL: /etc/windsurf/skills/<skill-name>/; Windows: C:\\ProgramData\\Windsurf\\skills\\<skill-name>\\."
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "Fixed filename SKILL.md required in each skill directory. All scopes (workspace, global, system) use this same convention."
         confidence: confirmed
       skill_bundled_resources:
-        supported: true
+        status: mapped
         mechanism: "Arbitrary additional files alongside SKILL.md (scripts, checklists, templates) in the skill directory; all are loaded when the skill is invoked."
         source_ref: "https://docs.devin.ai/desktop/cascade/skills.md#adding-supporting-resources"
         confidence: confirmed
@@ -133,23 +133,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       activation_mode:
-        supported: true
+        status: mapped
         mechanism: "activation_modes extension: always (unconditional), conditional (glob patterns), model (AI decides), manual (explicit toggle)"
         confidence: confirmed
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No @-import or file inclusion syntax documented for Windsurf rule files"
         confidence: confirmed
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "agents_md_auto_scoping: Windsurf reads both AGENTS.md and agents.md (case-insensitive) files from other providers and applies them with workspace-aware scoping"
         confidence: confirmed
       auto_memory:
-        supported: true
+        status: mapped
         mechanism: "auto_generated_memories: Windsurf AI generates persistent memories stored in ~/.codeium/windsurf/memories/ as rule-like files"
         confidence: confirmed
       hierarchical_loading:
-        supported: true
+        status: mapped
         mechanism: "rules_hierarchical_discovery: rules directories are discovered in the current workspace, all sub-directories, and parent directories up to the git root; rules from all levels are merged and deduplicated. Per 'Rules Discovery' / 'Rules Storage Locations', .devin/rules/ is the preferred location and takes precedence, with .windsurf/rules/ kept as a legacy fallback for backward compatibility"
         confidence: confirmed
     provider_extensions:
@@ -224,39 +224,39 @@ content_types:
         fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       handler_types:
-        supported: false
+        status: absent
         mechanism: "Windsurf hooks execute shell commands only; no HTTP, LLM prompt, or agent handler types documented"
         confidence: inferred
       matcher_patterns:
-        supported: false
+        status: absent
         mechanism: "Windsurf hooks fire on all events of their configured type; no per-tool or regex matching documented"
         confidence: inferred
       decision_control:
-        supported: false
+        status: absent
         mechanism: "Windsurf hooks are observational by default; pre-hooks can block via exit code 2 but cannot allow or modify the triggering action"
         confidence: inferred
       input_modification:
-        supported: false
+        status: absent
         mechanism: "Windsurf hooks cannot modify tool input arguments before execution"
         confidence: inferred
       async_execution:
-        supported: false
+        status: absent
         mechanism: "Windsurf hooks run synchronously; post_cascade_response and post_cascade_response_with_transcript fire asynchronously after the response but hooks themselves do not execute fire-and-forget"
         confidence: inferred
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "three_config_scopes: global (user-wide), workspace, and managed/enterprise hook configuration scopes"
         confidence: confirmed
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "json_stdin_context: Windsurf hooks receive event context as JSON on stdin"
         confidence: confirmed
       context_injection:
-        supported: false
+        status: absent
         mechanism: "Windsurf hooks cannot inject context into the agent's active session"
         confidence: inferred
       permission_control:
-        supported: false
+        status: absent
         mechanism: "Windsurf hooks do not participate in permission decisions"
         confidence: inferred
     provider_extensions:
@@ -328,35 +328,35 @@ content_types:
         fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "three_transport_types: Windsurf supports stdio, SSE, and HTTP/streamable-HTTP transports"
         confidence: confirmed
       oauth_support:
-        supported: true
+        status: mapped
         mechanism: "Windsurf supports OAuth for each transport type (stdio, Streamable HTTP, and SSE) for remote MCP server authentication"
         confidence: confirmed
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "config_interpolation: Windsurf MCP configuration supports ${env:VAR_NAME} and ${file:/path} interpolation for environment variables and file contents"
         confidence: confirmed
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "tool_limit_100: individual MCP tools can be toggled on or off per server via the Cascade panel UI; disabled tools are tracked in a disabledTools array separate from whitelist matching"
         confidence: confirmed
       auto_approve:
-        supported: false
+        status: absent
         mechanism: "Windsurf does not support pre-configured auto-approval for specific MCP tools"
         confidence: inferred
       marketplace:
-        supported: true
+        status: mapped
         mechanism: "mcp_marketplace: Windsurf has an in-IDE MCP server discovery and one-click installation experience"
         confidence: confirmed
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "Windsurf does not document @-mention or equivalent access to MCP resources"
         confidence: inferred
       enterprise_management:
-        supported: true
+        status: mapped
         mechanism: "enterprise_whitelist_and_registry: Windsurf supports organization-level MCP server allowlists and enterprise registries"
         confidence: confirmed
     provider_extensions:
@@ -441,11 +441,11 @@ content_types:
         fetched_at: "2026-07-14T00:38:47Z"
     canonical_mappings:
       argument_substitution:
-        supported: false
+        status: absent
         mechanism: "Cascade Workflows are plain Markdown prompt templates; no `{{args}}` or equivalent placeholder syntax is documented for user-provided arguments"
         confidence: inferred
       builtin_commands:
-        supported: true
+        status: mapped
         mechanism: "Cascade exposes its own built-in chat slash commands (e.g. for conversation control) independently of user-authored Workflows; the `/<workflow-name>` namespace is reserved for user files"
         confidence: inferred
     provider_extensions:

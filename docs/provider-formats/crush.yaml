@@ -33,23 +33,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:10Z"
     canonical_mappings:
       activation_mode:
-        supported: false
+        status: absent
         mechanism: "Crush rule files load unconditionally as project context; no conditional activation syntax documented"
         confidence: inferred
       file_imports:
-        supported: false
+        status: absent
         mechanism: "No file import directive documented for context files in Crush"
         confidence: inferred
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "Crush reads AGENTS.md, CRUSH.md, CLAUDE.md, GEMINI.md (and .local variants) as context files. The active filename is controlled by the initialize_as option (default: AGENTS.md); context_paths allows configuring an arbitrary list of additional file paths."
         confidence: confirmed
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "No runtime memory/append command documented for Crush rule files"
         confidence: inferred
       hierarchical_loading:
-        supported: false
+        status: absent
         mechanism: "Crush documents context files at the project root only; no hierarchical/subdirectory loading documented"
         confidence: inferred
     provider_extensions:
@@ -95,47 +95,47 @@ content_types:
         fetched_at: "2026-07-14T00:38:10Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required); follows the Anthropic Agent Skills standard. Validated: must be alphanumeric with hyphens, max 64 chars."
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (required); documents what the skill does and when Crush should invoke it"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: ".crush/skills/<name>/SKILL.md (native) and .agents/skills/<name>/SKILL.md (cross-provider convention)"
         paths:
           - ".crush/skills/<name>/SKILL.md"
           - ".agents/skills/<name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "~/.config/crush/skills/<name>/SKILL.md (XDG-compliant native path) and ~/.agents/skills/<name>/SKILL.md (cross-provider convention)"
         paths:
           - "~/.config/crush/skills/<name>/SKILL.md"
           - "~/.agents/skills/<name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: false
+        status: absent
         confidence: inferred
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "SKILL.md (required, fixed name per the Agent Skills standard)"
         confidence: confirmed
       custom_filename:
-        supported: false
+        status: absent
         mechanism: "filename is fixed as SKILL.md per the Agent Skills standard"
         confidence: confirmed
       disable_model_invocation:
-        supported: true
+        status: mapped
         provider_field: "disable-model-invocation"
         mechanism: "Go Skill struct field DisableModelInvocation (yaml:\"disable-model-invocation\", optional boolean) in skills.go. ToPromptXML skips skills with this flag set, excluding them from the model's <available_skills> list per the Agent Skills standard."
         confidence: confirmed
       user_invocable:
-        supported: true
+        status: mapped
         provider_field: "user-invocable"
         mechanism: "Go Skill struct field UserInvocable (yaml:\"user-invocable\", optional boolean) in skills.go. When true, the skill is invocable as a command from the commands palette (Ctrl+P); Skill.FormatInvocation() loads its instructions into the conversation context. Global-dir skills appear as user:<name>, project-dir skills as project:<name>."
         confidence: confirmed
@@ -176,36 +176,36 @@ content_types:
         fetched_at: "2026-07-14T00:38:10Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "Crush documents stdio, http, and sse transports in its JSON schema for MCP server configuration; default transport is stdio"
         confidence: confirmed
       oauth_support:
-        supported: false
+        status: absent
         mechanism: "Crush MCP does not document OAuth 2.0 authentication for remote servers"
         confidence: inferred
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "Crush MCP configuration supports environment variable references in server env blocks"
         confidence: inferred
       tool_filtering:
-        supported: true
+        status: mapped
         provider_field: "disabled_tools"
         mechanism: "MCPConfig has a disabled_tools array (block list of tool names to exclude from a specific server) and an enabled_tools array (allow list of tool names to permit from that server). Both enable per-server tool filtering at the configuration level."
         confidence: confirmed
       auto_approve:
-        supported: false
+        status: absent
         mechanism: "Crush does not document pre-configured auto-approval for specific MCP tools"
         confidence: inferred
       marketplace:
-        supported: false
+        status: absent
         mechanism: "Crush does not have an in-app MCP marketplace"
         confidence: confirmed
       resource_referencing:
-        supported: false
+        status: absent
         mechanism: "MCP resource referencing (as distinct from tool calls) not documented in Crush"
         confidence: inferred
       enterprise_management:
-        supported: false
+        status: absent
         mechanism: "Crush does not document organization-level MCP management"
         confidence: inferred
     provider_extensions:
@@ -271,43 +271,43 @@ content_types:
         fetched_at: "2026-07-15T03:36:49Z"
     canonical_mappings:
       handler_types:
-        supported: false
+        status: absent
         mechanism: "Crush hooks are shell commands only (command field in HookConfig) — no HTTP, LLM prompt, or agent handler types. Commands run through Crush's embedded POSIX shell (mvdan.cc/sh): inline commands and shebang-less scripts execute in-process; scripts with a #! shebang dispatch to the named interpreter via os/exec, so hook scripts can be written in any language. The contract is identical on macOS, Linux, and Windows."
         confidence: confirmed
       matcher_patterns:
-        supported: true
+        status: mapped
         provider_field: "matcher"
         mechanism: "HookConfig has an optional matcher field: a regex tested against the tool name (e.g. bash, edit, mcp_github_create_pull_request). Omitted or empty matcher matches all tools."
         confidence: confirmed
       decision_control:
-        supported: true
+        status: mapped
         provider_field: "decision"
         mechanism: "Exit code 2 blocks the tool call (stderr becomes the deny reason); exit 49 halts the whole turn; other non-zero exit codes are non-blocking errors and the tool call proceeds. On exit 0, stdout is parsed as a JSON envelope whose decision field may be allow, deny, or null. allow is affirmative pre-approval (skips the permission prompt); null/omitted means no opinion. Across multiple hooks, deny > allow > null, composed in config order."
         confidence: confirmed
       input_modification:
-        supported: true
+        status: mapped
         provider_field: "updated_input"
         mechanism: "The exit-0 JSON envelope may include updated_input: a shallow-merge patch against tool_input. Included keys overwrite matching keys; omitted keys are preserved; nested objects are replaced wholesale. Patches from multiple hooks shallow-merge sequentially in config order (later hooks win on colliding keys) and are ignored if the final decision is deny or halt. Implemented as UpdatedInput in internal/hooks/hooks.go."
         confidence: confirmed
       async_execution:
-        supported: false
+        status: absent
         mechanism: "Matching hooks run in parallel with each other, but the tool call waits for all of them to finish (or time out) before proceeding — there is no fire-and-forget mode. A hook that exceeds its timeout is treated as a non-blocking error (\"no opinion\") and the tool call proceeds."
         confidence: confirmed
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "Hooks can be configured in crush.json (or .crush.json) at both the user-global (~/.config/crush/crush.json) and project level, with project-level hooks taking precedence. Global-config commands must use absolute paths or inline commands; relative paths resolve against the working directory."
         confidence: confirmed
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "Stdin provides a JSON payload: event, session_id, cwd, plus tool_name and tool_input (the raw JSON the model sent) for PreToolUse. On exit 0 stdout is parsed as a JSON output envelope: version (defaults to 1), decision, halt, reason, context, updated_input. Simple hooks can skip JSON entirely and use CRUSH_* environment variables plus exit codes."
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         provider_field: "context"
         mechanism: "The output envelope's context field accepts a string or an array of strings, appended to what the model sees for the current turn. Across multiple hooks, context values concatenate in config order; empty entries are dropped."
         confidence: confirmed
       permission_control:
-        supported: true
+        status: mapped
         mechanism: "Hook results apply before permission checks. An aggregated deny blocks the tool call before any permission prompt; an aggregated allow is affirmative pre-approval that skips the prompt entirely; silence (no decision) falls through to the normal permission flow."
         confidence: confirmed
     provider_extensions:

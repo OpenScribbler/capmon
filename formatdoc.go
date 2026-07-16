@@ -57,8 +57,40 @@ type SourceRef struct {
 	Section     string `yaml:"section,omitempty"`
 }
 
+// MappingStatus values classify how a provider relates to a canonical key.
+// The bool `supported` field this replaces was overloaded: `false` conflated
+// "the provider genuinely lacks this concept" with "the provider has a
+// mechanism I could not map" — two cases with opposite downstream meaning.
+//
+//	absent   — the provider has no such mechanism; nothing to map, ever.
+//	           Never a Class B candidate.
+//	mapped   — the mechanism maps to the canonical key (the former supported: true).
+//	unmapped — the provider HAS a mechanism but it does not map to the canonical
+//	           key yet; a Class B (mapping-row) candidate. Requires SourceForm.
+const (
+	MappingStatusAbsent   = "absent"
+	MappingStatusMapped   = "mapped"
+	MappingStatusUnmapped = "unmapped"
+)
+
+// ValidMappingStatuses enumerates the allowed values for CanonicalMapping.Status.
+var ValidMappingStatuses = []string{
+	MappingStatusAbsent,
+	MappingStatusMapped,
+	MappingStatusUnmapped,
+}
+
 // CanonicalMapping records how a provider implements a canonical capability key.
 // The canonical key itself is the map key in ContentTypeFormatDoc.CanonicalMappings.
+//
+// Status classifies the relationship (absent | mapped | unmapped); see the
+// MappingStatus constants.
+//
+// SourceForm is required when Status is "unmapped": it is the verbatim minimal
+// provider content snippet exhibiting the unmapped mechanism — canonicalizer-
+// feedable input, NOT a prose description (prose belongs in Mechanism). The
+// deferred Class B confirmation step runs a conforming canonicalizer over this
+// snippet to confirm the totality-net diagnostic before any filing.
 //
 // ProviderField names the actual native field (frontmatter key, config key, TOML
 // field, dot-notation path) when the mapping corresponds to a specific named
@@ -69,7 +101,8 @@ type SourceRef struct {
 // The canonical mapping is the authority; the extension is the detail — so the
 // authority points to the detail, not the other way around.
 type CanonicalMapping struct {
-	Supported     bool     `yaml:"supported"`
+	Status        string   `yaml:"status"`
+	SourceForm    string   `yaml:"source_form,omitempty"`
 	Mechanism     string   `yaml:"mechanism"`
 	Paths         []string `yaml:"paths,omitempty"`
 	Confidence    string   `yaml:"confidence"`

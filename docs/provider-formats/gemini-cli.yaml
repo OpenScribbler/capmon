@@ -16,43 +16,43 @@ content_types:
         fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required); value should match the skill's directory name"
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (required); documents what the skill does and when Gemini should use it — drives auto-invocation decisions"
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: ".gemini/skills/<name>/SKILL.md"
         paths:
           - ".gemini/skills/<name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "~/.gemini/skills/<name>/SKILL.md"
         paths:
           - "~/.gemini/skills/<name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: false
+        status: absent
         confidence: confirmed
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "SKILL.md (required, fixed name)"
         confidence: confirmed
       custom_filename:
-        supported: false
+        status: absent
         mechanism: "not observed — filename is fixed as SKILL.md"
         confidence: confirmed
       disable_model_invocation:
-        supported: false
+        status: absent
         confidence: confirmed
       user_invocable:
-        supported: false
+        status: absent
         confidence: confirmed
     # Optional extension depth fields (populated by capmon subagent):
     # - required: true | false | null (null = source doesn't say)
@@ -108,23 +108,23 @@ content_types:
         fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       activation_mode:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI rule files load unconditionally; no conditional activation syntax documented"
         confidence: inferred
       file_imports:
-        supported: true
+        status: mapped
         mechanism: "file_imports extension: Gemini CLI supports including external file content into rule files via import directives"
         confidence: confirmed
       cross_provider_recognition:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI reads its own GEMINI.md format; no cross-provider rule file recognition documented"
         confidence: inferred
       auto_memory:
-        supported: true
+        status: mapped
         mechanism: "memory_command: under the 'Manage context with the /memory command' heading the /memory command now only shows (/memory show) and reloads (/memory reload) the concatenated GEMINI.md hierarchy — the /memory add append subcommand was removed upstream (commit 7504259d, 'clean up launched memory features'). Persistent cross-session memories are now saved via the separate Memory tool (this source's 'Next steps' see-also links docs/tools/memory.md 'to save persistent memories')"
         confidence: confirmed
       hierarchical_loading:
-        supported: true
+        status: mapped
         mechanism: "hierarchical_context_loading: Gemini CLI loads GEMINI.md files from multiple directory levels with defined precedence"
         confidence: confirmed
     provider_extensions:
@@ -181,39 +181,39 @@ content_types:
         fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       handler_types:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI hooks execute shell commands only; no HTTP, LLM prompt, or agent handler types documented"
         confidence: inferred
       matcher_patterns:
-        supported: true
+        status: mapped
         mechanism: "hook_matchers: Gemini CLI hooks support event and tool name matching to filter when hooks fire"
         confidence: confirmed
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "exit_code_semantics: Gemini CLI uses exit codes to signal block (non-zero) or allow (zero) decisions; no modify sub-capability documented"
         confidence: confirmed
       input_modification:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI hooks cannot modify tool input before execution"
         confidence: inferred
       async_execution:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI hooks run synchronously; no async execution documented"
         confidence: inferred
       hook_scopes:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI hooks are project-scoped; no multi-scope configuration documented"
         confidence: inferred
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "hook_io_protocol: Gemini CLI hooks receive event data as JSON on stdin and return structured JSON responses on stdout"
         confidence: confirmed
       context_injection:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI hooks cannot inject context into the agent session"
         confidence: inferred
       permission_control:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI hooks control invocation flow via exit codes but do not govern tool availability"
         confidence: inferred
     provider_extensions:
@@ -292,35 +292,35 @@ content_types:
         fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "transport_types: Gemini CLI documents supported MCP transport protocols including stdio and HTTP"
         confidence: confirmed
       oauth_support:
-        supported: true
+        status: mapped
         mechanism: "oauth_authentication: Gemini CLI supports OAuth 2.0 for remote MCP servers via SSE or HTTP transports; authProviderType selects dynamic_discovery, google_credentials, or service_account_impersonation; tokens stored in ~/.gemini/mcp-oauth-tokens.json and auto-refreshed"
         confidence: confirmed
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "env_variable_expansion: Gemini CLI MCP configuration supports environment variable expansion for secrets and paths"
         confidence: confirmed
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "tool_filtering: Gemini CLI supports per-server tool filtering to control which MCP tools are exposed to the agent"
         confidence: confirmed
       auto_approve:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI does not document pre-configured auto-approval for specific MCP tools"
         confidence: inferred
       marketplace:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI does not have an in-IDE MCP marketplace"
         confidence: confirmed
       resource_referencing:
-        supported: true
+        status: mapped
         mechanism: "resource_referencing: Gemini CLI supports accessing MCP resources in addition to tools"
         confidence: confirmed
       enterprise_management:
-        supported: false
+        status: absent
         mechanism: "Gemini CLI does not document organization-level MCP management"
         confidence: inferred
     provider_extensions:
@@ -397,11 +397,11 @@ content_types:
         fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       argument_substitution:
-        supported: true
+        status: mapped
         mechanism: "{{args}} placeholder injects all user-provided arguments; processed before shell injection (!{...}) and other substitutions; default argument handling collapses newlines"
         confidence: confirmed
       builtin_commands:
-        supported: true
+        status: mapped
         mechanism: "built-in slash commands include /commands reload (reload command files without restart) and /help; user-defined commands supplement but do not replace built-ins"
         confidence: confirmed
     provider_extensions:
@@ -466,31 +466,31 @@ content_types:
         fetched_at: "2026-07-14T00:38:36Z"
     canonical_mappings:
       definition_format:
-        supported: true
+        status: mapped
         mechanism: "Markdown files with YAML frontmatter (delimited by ---) in .gemini/agents/*.md (project) or ~/.gemini/agents/*.md (user/global); the file body becomes the subagent's system prompt."
         confidence: confirmed
       tool_restrictions:
-        supported: true
+        status: mapped
         mechanism: "tools array in frontmatter; supports wildcards: '*' for all built-in and MCP tools, 'mcp_*' for all MCP tools, 'mcp_<server-name>_*' for tools from a single MCP server. If omitted, the subagent inherits the full tool set from the parent session."
         confidence: confirmed
       invocation_patterns:
-        supported: true
+        status: mapped
         mechanism: "Two patterns: (1) automatic delegation by the main agent based on task relevance and the subagent's description, (2) explicit @-mention at the start of a prompt (e.g., '@codebase_investigator review this'); /agents list/enable/disable/configure manages the registry."
         confidence: confirmed
       agent_scopes:
-        supported: true
+        status: mapped
         mechanism: "Two scopes: project (.gemini/agents/*.md) and user/global (~/.gemini/agents/*.md). Both directories are scanned at session start and merged into a single registry; explicit collision-precedence behavior is not documented upstream."
         confidence: confirmed
       model_selection:
-        supported: true
+        status: mapped
         mechanism: "model frontmatter field (string); accepts a specific model id (e.g., 'gemini-3-preview') or 'inherit' (default) which uses the parent session's model. Optional 'temperature' field (0.0-2.0, default 1) sets per-subagent sampling temperature."
         confidence: confirmed
       per_agent_mcp:
-        supported: true
+        status: mapped
         mechanism: "mcpServers object in frontmatter; declares inline MCP server configurations scoped to this subagent. Each entry follows the same shape as the global mcpServers config and is isolated to the subagent's invocation."
         confidence: confirmed
       subagent_spawning:
-        supported: false
+        status: absent
         mechanism: "Recursion is explicitly prevented — subagents cannot invoke other subagents even when granted the '*' tool wildcard. The documentation states this is to avoid infinite loops and excessive token usage."
         confidence: confirmed
     provider_extensions:

@@ -83,7 +83,7 @@ content_types:
         fetched_at: ""
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         mechanism: "yaml key: name"
         confidence: confirmed
     provider_extensions: []

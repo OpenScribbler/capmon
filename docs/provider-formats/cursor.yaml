@@ -20,23 +20,23 @@ content_types:
         fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       activation_mode:
-        supported: true
+        status: mapped
         mechanism: "Four activation modes documented: Always (alwaysApply: true injects rule into every prompt), Apply to Specific Files (globs frontmatter matches edited files via glob syntax), Apply Intelligently (description frontmatter lets the Agent determine relevance), and Apply Manually (no frontmatter triggers, referenced explicitly with @ruleName)."
         confidence: confirmed
       file_imports:
-        supported: true
+        status: mapped
         mechanism: "MDC rule bodies may reference other files via @path syntax that inlines the referenced file into the rule context."
         confidence: confirmed
       cross_provider_recognition:
-        supported: true
+        status: mapped
         mechanism: "Cursor documents AGENTS.md as an officially supported alternative to .cursor/rules/*.mdc — a plain markdown file without frontmatter metadata that is recognized and loaded alongside project rules."
         confidence: confirmed
       auto_memory:
-        supported: false
+        status: absent
         mechanism: "Cursor does not document an AI-generated auto-memory system distinct from user-authored rules."
         confidence: inferred
       hierarchical_loading:
-        supported: true
+        status: mapped
         mechanism: "Rules can live in nested .cursor/rules/ directories within a project; rules in a subtree apply when working with files under that subtree, enabling monorepo-style scoping. AGENTS.md also supports nested files in subdirectories for granular context-specific guidance."
         confidence: confirmed
     provider_extensions:
@@ -128,62 +128,62 @@ content_types:
         fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       display_name:
-        supported: true
+        status: mapped
         provider_field: "name"
         mechanism: "yaml frontmatter key: name (required); matches the skill directory name per the Agent Skills convention."
         confidence: confirmed
       description:
-        supported: true
+        status: mapped
         provider_field: "description"
         mechanism: "yaml frontmatter key: description (required); documents what the skill does and when to use it."
         confidence: confirmed
       license:
-        supported: true
+        status: mapped
         provider_field: "license"
         mechanism: "yaml frontmatter key: license (optional)."
         confidence: confirmed
       compatibility:
-        supported: true
+        status: mapped
         provider_field: "compatibility"
         mechanism: "yaml frontmatter key: compatibility (optional)."
         confidence: confirmed
       metadata_map:
-        supported: true
+        status: mapped
         provider_field: "metadata"
         mechanism: "yaml frontmatter key: metadata (optional map of arbitrary key/value pairs)."
         confidence: confirmed
       disable_model_invocation:
-        supported: true
+        status: mapped
         provider_field: "disable-model-invocation"
         mechanism: "yaml frontmatter key: disable-model-invocation (optional bool, default false); when true, the skill is converted into an explicit slash command rather than a context-aware tool the model can auto-invoke."
         confidence: confirmed
       project_scope:
-        supported: true
+        status: mapped
         mechanism: ".cursor/skills/<name>/SKILL.md for Cursor-native project scope; .agents/skills/<name>/SKILL.md is also recognized via the cross-provider Agent Skills convention."
         paths:
           - ".cursor/skills/<name>/SKILL.md"
           - ".agents/skills/<name>/SKILL.md"
         confidence: confirmed
       global_scope:
-        supported: true
+        status: mapped
         mechanism: "~/.agents/skills/<name>/SKILL.md and ~/.cursor/skills/<name>/SKILL.md for user-level scope; both paths are documented."
         paths:
           - "~/.agents/skills/<name>/SKILL.md"
           - "~/.cursor/skills/<name>/SKILL.md"
         confidence: confirmed
       shared_scope:
-        supported: false
+        status: absent
         confidence: inferred
       canonical_filename:
-        supported: true
+        status: mapped
         mechanism: "SKILL.md (required, fixed name per Agent Skills convention)."
         confidence: confirmed
       custom_filename:
-        supported: false
+        status: absent
         mechanism: "Not observed — the skill filename is fixed as SKILL.md."
         confidence: confirmed
       user_invocable:
-        supported: true
+        status: mapped
         mechanism: "When disable-model-invocation is true, the skill becomes an explicit slash command invocable by the user rather than auto-invoked by the model."
         confidence: confirmed
     provider_extensions:
@@ -231,39 +231,39 @@ content_types:
         fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       handler_types:
-        supported: true
+        status: mapped
         mechanism: "Two handler types documented: command (shell scripts communicating over stdio via JSON) and prompt (LLM-evaluated natural language conditions for policy enforcement without custom scripting)."
         confidence: confirmed
       matcher_patterns:
-        supported: true
+        status: mapped
         mechanism: "Hook entries accept a matcher string that filters which tool or event fires the hook (for example a specific shell command or tool name)."
         confidence: confirmed
       decision_control:
-        supported: true
+        status: mapped
         mechanism: "Exit codes drive decisions: exit code 2 blocks the action, exit code 0 allows it to proceed; JSON on stdout can also return structured decision fields."
         confidence: confirmed
       input_modification:
-        supported: false
+        status: absent
         mechanism: "Cursor hooks are not documented to rewrite tool input before execution."
         confidence: inferred
       async_execution:
-        supported: false
+        status: absent
         mechanism: "Hooks run synchronously; no async/background flag documented."
         confidence: inferred
       hook_scopes:
-        supported: true
+        status: mapped
         mechanism: "Four scopes documented in priority order: Enterprise (system-wide MDM-managed), Team (cloud-distributed for Enterprise plans), Project (.cursor/hooks/ in the repository), and User (global personal configuration at ~/.cursor/hooks/)."
         confidence: confirmed
       json_io_protocol:
-        supported: true
+        status: mapped
         mechanism: "Command hooks receive event data as JSON on stdin and may return structured JSON on stdout to signal decisions and supply output fields."
         confidence: confirmed
       context_injection:
-        supported: true
+        status: mapped
         mechanism: "Hooks can inject context at session initialization via the sessionStart event, enabling custom context to be added to the agent's active session at startup."
         confidence: confirmed
       permission_control:
-        supported: false
+        status: absent
         mechanism: "Cursor hooks control allow/block via exit codes but do not govern tool availability through permission rule updates."
         confidence: inferred
     provider_extensions:
@@ -351,35 +351,35 @@ content_types:
         fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       transport_types:
-        supported: true
+        status: mapped
         mechanism: "Cursor documents three MCP transports: stdio for local processes managed by Cursor, sse for Server-Sent Events (local or remote, multi-user), and streamable-http for HTTP-based servers (local or remote, multi-user) with OAuth authentication support."
         confidence: confirmed
       oauth_support:
-        supported: true
+        status: mapped
         mechanism: "Remote servers using the streamable-http transport support OAuth authentication; static client credentials can be used instead of dynamic registration. The documentation explicitly notes OAuth as a streamable-http capability."
         confidence: confirmed
       env_var_expansion:
-        supported: true
+        status: mapped
         mechanism: "Server configuration supports variable interpolation using ${env:NAME} for environment variables, ${userHome} for the user's home directory, ${workspaceFolder} for the workspace root, and ${pathSeparator} / ${/} for the OS path separator — not limited to env blocks alone (documented under 'Config interpolation')."
         confidence: confirmed
       tool_filtering:
-        supported: true
+        status: mapped
         mechanism: "Enterprise admins define an MCP Allowlist (Team Settings > MCP Configuration) where per-server tool allowlists restrict which tools from an approved server may run automatically; command entries approve local stdio servers and URL entries approve remote HTTP/SSE servers (documented under the 'MCP Allowlist' heading, added 2026-07-13)."
         confidence: confirmed
       auto_approve:
-        supported: true
+        status: mapped
         mechanism: "Users can configure permanent permissions through permissions.json files so that specific MCP tools do not require per-invocation approval. MCP also follows the same Run Modes as terminal commands: in Auto-review mode allowlisted MCP tools run immediately and everything else is routed through the classifier (documented under the 'Run Mode' heading — formerly 'Auto-run')."
         confidence: confirmed
       marketplace:
-        supported: true
+        status: mapped
         mechanism: "Cursor ships an in-IDE MCP Marketplace for discovering and installing community MCP servers with one-click installation."
         confidence: confirmed
       resource_referencing:
-        supported: true
+        status: mapped
         mechanism: "MCP resources (structured data sources) are documented as a supported protocol capability alongside tools, prompts, roots, elicitation, and Apps."
         confidence: confirmed
       enterprise_management:
-        supported: true
+        status: mapped
         mechanism: "The 2026-07-13 refetch added an 'Enterprise admin controls' section: enterprise admins configure MCP policy from the Cursor dashboard (Team MCP distribution of shared servers, an MCP Allowlist of approved servers/tools, per-server Network controls, and governance of User MCP extensions). Documented under 'Enterprise admin controls' / 'Team MCP distribution' / 'MCP Allowlist' / 'Network controls' / 'User MCP extensions' headings."
         confidence: confirmed
     provider_extensions:
@@ -441,7 +441,7 @@ content_types:
         graduation_candidate: false
         conversion: not-portable
     loading_model: "MCP servers are configured in .cursor/mcp.json at the project root (project scope) or in ~/.cursor/mcp.json (user-global scope). Each entry under the top-level mcpServers map names a server and supplies a transport (stdio with command and args, sse with url, or streamable-http with url) plus an optional env map for stdio servers. Configuration supports variable interpolation via ${env:NAME}, ${userHome}, ${workspaceFolder}, and ${pathSeparator} / ${/} syntax. On session start, Cursor connects to each configured server and surfaces its tool set to the Agent; the Agent requests approval before invoking tools by default. MCP follows the same Run Modes as terminal commands (in Auto-review mode allowlisted tools run immediately), and permanent per-tool approval can be configured through permissions.json files. Enterprise admins can additionally govern MCP centrally: Team MCP distribution of shared servers, an MCP Allowlist of approved servers/tools, and per-server network controls, all managed from the Cursor dashboard. Remote streamable-http servers with OAuth requirements can use static client credentials rather than dynamic registration."
-    notes: "Install path is JSON-merge: installers merge server entries into .cursor/mcp.json rather than replacing the file. OAuth support is confirmed for streamable-http transport. The auto_approve capability is confirmed via permissions.json plus Run Modes (the 'Auto-run' heading was renamed 'Run Mode' in the 2026-07-13 refetch). tool_filtering and enterprise_management flipped to supported: true in the 2026-07-13 refetch, which added an 'Enterprise admin controls' block (Team MCP distribution, MCP Allowlist with per-server tool allowlists, per-server Network controls, and User MCP extensions). Resource referencing is confirmed as a supported protocol capability. Transport names in the config are stdio, sse, and streamable-http. Config interpolation now also documents ${pathSeparator} / ${/}. Global-scope MCP config lives under ~/.cursor/ alongside the user-global rules and skills locations."
+    notes: "Install path is JSON-merge: installers merge server entries into .cursor/mcp.json rather than replacing the file. OAuth support is confirmed for streamable-http transport. The auto_approve capability is confirmed via permissions.json plus Run Modes (the 'Auto-run' heading was renamed 'Run Mode' in the 2026-07-13 refetch). tool_filtering and enterprise_management flipped to status: mapped in the 2026-07-13 refetch, which added an 'Enterprise admin controls' block (Team MCP distribution, MCP Allowlist with per-server tool allowlists, per-server Network controls, and User MCP extensions). Resource referencing is confirmed as a supported protocol capability. Transport names in the config are stdio, sse, and streamable-http. Config interpolation now also documents ${pathSeparator} / ${/}. Global-scope MCP config lives under ~/.cursor/ alongside the user-global rules and skills locations."
 
   agents:
     status: supported
@@ -453,32 +453,32 @@ content_types:
         fetched_at: "2026-07-14T18:58:14Z"
     canonical_mappings:
       definition_format:
-        supported: true
+        status: mapped
         mechanism: "Markdown files with YAML frontmatter in .cursor/agents/ (project) or ~/.cursor/agents/ (user); the frontmatter declares name, description, model, readonly, and is_background, and the Markdown body becomes the agent's system prompt."
         confidence: confirmed
       tool_restrictions:
-        supported: true
+        status: mapped
         mechanism: "readonly frontmatter flag restricts an agent to read-only tools; fine-grained per-tool allow/deny lists are not documented."
         confidence: confirmed
       invocation_patterns:
-        supported: true
+        status: mapped
         mechanism: "Custom agents are invoked through the Cursor IDE agent picker; background-enabled agents can also run concurrently via the background agents UI. Subagents can be spawned by other agents for parallel execution workstreams."
         confidence: inferred
       agent_scopes:
-        supported: true
+        status: mapped
         mechanism: "Two scopes: project (.cursor/agents/) and user-global (~/.cursor/agents/)."
         confidence: confirmed
       model_selection:
-        supported: true
+        status: mapped
         provider_field: "model"
         mechanism: "model frontmatter field selects a specific model for the agent, overriding the session default. A 'Model parameters' syntax (added 2026-07-13) appends bracketed id=value options to the model id — e.g. claude-opus-4-8[effort=high,context=300k] or composer-2.5[fast=false] — to set per-model speed, reasoning effort, and context window."
         confidence: confirmed
       per_agent_mcp:
-        supported: false
+        status: absent
         mechanism: "Cursor custom agents do not document a per-agent mcpServers field; they inherit the workspace MCP configuration."
         confidence: inferred
       subagent_spawning:
-        supported: true
+        status: mapped
         mechanism: "Since Cursor 2.5, subagents can launch child subagents to create a tree of coordinated work. Nested launches require Task tool access and can be restricted by hooks or tool policies."
         confidence: confirmed
     provider_extensions:
@@ -527,7 +527,7 @@ content_types:
         graduation_candidate: false
         conversion: not-portable
     loading_model: "Custom agents load at session start from .cursor/agents/ within the project and from ~/.cursor/agents/ for user-global scope. Each agent is a Markdown file whose name (minus the extension) is the agent identifier; its frontmatter declares name, description, an optional model override, a readonly flag, and an is_background flag, while the Markdown body becomes the agent's system prompt. Custom agents are invoked through the Cursor agent picker in the IDE. Subagents run in isolated context windows — long research tasks and parallel workstreams use subagents to preserve the main conversation's context. Cursor's three built-in subagents (Explore, Bash, Browser) are shipped with the harness and coexist with user-authored agents; they are not file-overridable. Running multiple subagents in parallel consumes more tokens than sequential execution."
-    notes: "File-based custom agents were added in Cursor 2.4. Only user-authored agents under .cursor/agents/ or ~/.cursor/agents/ are portable; the three built-in subagents (Explore, Bash, Browser) are harness-owned and cannot be replaced with a file. Subagent spawning (since Cursor 2.5) requires Task tool access. Context isolation is a primary design motivation — subagents run in separate context windows so parallel or long-running tasks do not consume the main conversation's context. The 2026-07-13 refetch added a 'Model parameters' bracket syntax for per-model options and a 'Cloud subagents' surface (/in-cloud, /babysit) that runs a subagent on a dedicated cloud VM/branch; cloud subagents draw MCP from the team config at cursor.com/agents, not the local session (so per_agent_mcp remains supported: false — local subagents still inherit MCP from the parent)."
+    notes: "File-based custom agents were added in Cursor 2.4. Only user-authored agents under .cursor/agents/ or ~/.cursor/agents/ are portable; the three built-in subagents (Explore, Bash, Browser) are harness-owned and cannot be replaced with a file. Subagent spawning (since Cursor 2.5) requires Task tool access. Context isolation is a primary design motivation — subagents run in separate context windows so parallel or long-running tasks do not consume the main conversation's context. The 2026-07-13 refetch added a 'Model parameters' bracket syntax for per-model options and a 'Cloud subagents' surface (/in-cloud, /babysit) that runs a subagent on a dedicated cloud VM/branch; cloud subagents draw MCP from the team config at cursor.com/agents, not the local session (so per_agent_mcp remains status: absent — local subagents still inherit MCP from the parent)."
 
   commands:
     status: unsupported
