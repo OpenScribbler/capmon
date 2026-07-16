@@ -16,7 +16,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: decision_control
       supported: true
-      mechanism: PreToolUse hooks return JSON with allow/deny/ask decision field; exit code 2 blocks with stderr fed back to Droid; non-zero non-2 shows stderr to user as non-blocking error
+      mechanism: PreToolUse hooks return hookSpecificOutput.permissionDecision (allow/deny/ask) with permissionDecisionReason; the flat decision/reason fields are deprecated for PreToolUse. Exit code 2 blocks with stderr fed back to Droid; non-zero non-2 shows stderr to user as non-blocking error
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -28,7 +28,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: hook_scopes
       supported: true
-      mechanism: 'Four scopes documented: user-level (~/.factory/settings.json), project-level (.factory/settings.json), local-uncommitted (.factory/settings.local.json), and enterprise managed policies'
+      mechanism: 'Three scopes documented: user-level (~/.factory/hooks.json), project-level (.factory/hooks.json), and enterprise managed policy hooks; if hooks.json is absent Droid falls back to hooks declared under the hooks key in the matching settings.json'
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -52,7 +52,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: permission_control
       supported: true
-      mechanism: PreToolUse hooks return allow, deny, or ask in the JSON decision field to bypass, block, or escalate tool permission decisions
+      mechanism: PreToolUse hooks return allow, deny, or ask via hookSpecificOutput.permissionDecision (with permissionDecisionReason) to bypass, block, or escalate tool permission decisions; the flat decision/reason fields are deprecated
       source_field: ""
       source_value: ""
       confidence: confirmed

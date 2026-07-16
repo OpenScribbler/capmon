@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:55:16Z
+# Generated at: 2026-07-16T04:32:32Z
 
 content_type: rules
 providers:
@@ -209,7 +209,7 @@ providers:
                         confidence: inferred
                     glob:
                         supported: true
-                        mechanism: glob-based path matching activates steering files (documented under 'Conditional inclusion' inclusion mode)
+                        mechanism: 'glob-based path matching via inclusion: fileMatch with a fileMatchPattern glob field (single pattern or array) activates steering files (documented under ''Conditional inclusion'' inclusion mode)'
                         confidence: inferred
                     manual:
                         supported: true
@@ -228,7 +228,7 @@ providers:
                         confidence: inferred
             file_imports:
                 supported: true
-                mechanism: steering files can reference other files (documented under 'File references' heading)
+                mechanism: steering files can reference other files via '#[[file:<relative>]]' syntax (documented under 'File references' heading)
                 confidence: inferred
             hierarchical_loading:
                 supported: true

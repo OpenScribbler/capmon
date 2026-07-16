@@ -26,19 +26,16 @@ content_types:
         mechanism: "yaml frontmatter key: description (required)"
         confidence: confirmed
       license:
-        status: mapped
-        provider_field: "license"
-        mechanism: "yaml frontmatter key: license (optional)"
+        status: absent
+        mechanism: "Not documented — live POWER.md frontmatter spec lists only name/displayName/description/keywords/author"
         confidence: confirmed
       compatibility:
-        status: mapped
-        provider_field: "compatibility"
-        mechanism: "yaml frontmatter key: compatibility (optional)"
+        status: absent
+        mechanism: "Not documented — live POWER.md frontmatter spec lists only name/displayName/description/keywords/author"
         confidence: confirmed
       metadata_map:
-        status: mapped
-        provider_field: "metadata"
-        mechanism: "yaml frontmatter key: metadata (optional map)"
+        status: absent
+        mechanism: "Not documented — live POWER.md frontmatter spec lists only name/displayName/description/keywords/author"
         confidence: confirmed
       project_scope:
         status: mapped
@@ -94,6 +91,14 @@ content_types:
         graduation_notes: "The auto-invocation concept is captured by the auto_invocable canonical key (issue #73). The keywords-array mechanism is Kiro-specific and remains as an extension."
         provider_field: keywords
         conversion: embedded
+      - id: kiro_power_author
+        name: "author frontmatter field"
+        summary: "Optional 'author' frontmatter key attributing the power's creator (e.g. author: \"Supabase\"). Documented in the POWER.md frontmatter spec alongside name/displayName/description/keywords."
+        source_ref: "https://kiro.dev/docs/powers/create/"
+        graduation_candidate: true
+        graduation_notes: "Author attribution is a cross-provider useful metadata field for community-shared skills/powers."
+        provider_field: author
+        conversion: embedded
       - id: steering_files
         name: "steering/ directory"
         summary: "Optional steering/ subdirectory containing workflow-specific guidance files loaded on-demand. Complex powers can map different steering files to specific workflows to avoid context overload."
@@ -129,11 +134,11 @@ content_types:
     canonical_mappings:
       activation_mode:
         status: mapped
-        mechanism: "kiro_steering_inclusion_mode: Kiro steering files support always, conditional, auto, and manual inclusion modes"
+        mechanism: "kiro_steering_inclusion_mode: Kiro steering files support always, fileMatch (conditional; inclusion: fileMatch with a fileMatchPattern glob field), auto, and manual inclusion modes"
         confidence: confirmed
       file_imports:
         status: mapped
-        mechanism: "kiro_steering_file_references: Kiro steering files can reference other files using @file syntax"
+        mechanism: "kiro_steering_file_references: Kiro steering files can reference other files using '#[[file:<relative>]]' syntax"
         confidence: confirmed
       cross_provider_recognition:
         status: mapped
@@ -150,22 +155,22 @@ content_types:
     provider_extensions:
       - id: kiro_steering_inclusion_mode
         name: "Inclusion mode frontmatter field"
-        summary: "Frontmatter field controlling when a steering file loads: 'always' (every interaction), 'conditional' (when active file matches glob patterns), 'auto' (model decides based on relevance), or 'manual' (explicit user invocation via hashtag)."
+        summary: "Frontmatter field controlling when a steering file loads: 'always' (every interaction), 'fileMatch' (conditional — loads when the active file matches the 'fileMatchPattern' glob field, which accepts a single pattern or an array), 'auto' (model decides based on relevance), or 'manual' (explicit user invocation via hashtag)."
         source_ref: "https://kiro.dev/docs/steering/"
         graduation_candidate: true
         graduation_notes: "Conditional (glob-gated) and auto (model-driven) inclusion modes are plausibly cross-provider useful — analogous to rule activation signals in other providers."
         provider_field: inclusion
         conversion: embedded
       - id: kiro_steering_file_references
-        name: "File references (@path/to/file) in steering files"
-        summary: "Body syntax '@path/to/file' that Kiro inlines into the steering context, enabling modular composition."
+        name: "File references (#[[file:<path>]]) in steering files"
+        summary: "Body syntax '#[[file:<relative_path>]]' (e.g. '#[[file:api/openapi.yaml]]') that Kiro inlines into the steering context, enabling modular composition."
         source_ref: "https://kiro.dev/docs/steering/"
         graduation_candidate: false
         graduation_notes: "Reference syntax is Kiro-specific — other providers use different mechanisms for including external file content."
         conversion: preserved
       - id: kiro_foundational_steering
         name: "Foundational steering files (auto-created)"
-        summary: "Kiro auto-creates three baseline steering files on workspace init: product_requirements.md (business context), tech_stack.md (frameworks and tools), and architecture.md (organization patterns)."
+        summary: "Kiro auto-creates three baseline steering files on workspace init: product.md (product overview / business context), tech.md (technology stack — frameworks and tools), and structure.md (project structure / organization patterns)."
         source_ref: "https://kiro.dev/docs/steering/"
         graduation_candidate: false
         graduation_notes: "Auto-created project scaffold is IDE-specific behavior with no direct cross-provider equivalent."
@@ -184,7 +189,7 @@ content_types:
         graduation_candidate: false
         graduation_notes: "MDM-based distribution is a Kiro-specific enterprise deployment mechanism — not representable as a portable steering file format."
         conversion: not-portable
-    loading_model: "Steering files in .kiro/steering/ (workspace) or ~/.kiro/steering/ (global) are evaluated per-interaction based on their inclusion mode. 'always' files are injected into every agent context. 'conditional' files are injected only when the active file matches the frontmatter 'globs' pattern. 'auto' files are loaded at model discretion based on relevance. 'manual' files require explicit user invocation via hashtag in chat. Workspace steering overrides global steering on conflict. AGENTS.md in the repo root is also recognized as a steering source. Team steering can be deployed centrally via MDM or a central repository for organization-wide coverage."
+    loading_model: "Steering files in .kiro/steering/ (workspace) or ~/.kiro/steering/ (global) are evaluated per-interaction based on their inclusion mode. 'always' files are injected into every agent context. 'fileMatch' (conditional) files are injected only when the active file matches the frontmatter 'fileMatchPattern' glob (single pattern or array). 'auto' files are loaded at model discretion based on relevance. 'manual' files require explicit user invocation via hashtag in chat. Workspace steering overrides global steering on conflict. AGENTS.md in the repo root is also recognized as a steering source. Team steering can be deployed centrally via MDM or a central repository for organization-wide coverage."
     notes: "Kiro calls this content type 'steering' (not 'rules'). Three scope types exist: workspace (.kiro/steering/), global (~/.kiro/steering/), and 'team' (workspace files tracked in version control and optionally distributed via MDM — same path as workspace, distinguished by intent). Workspace overrides global on conflict. The inclusion mode system is the primary mechanism for context-sensitive rule loading. Source recommends keeping steering files focused on single domains, using descriptive naming, explaining reasoning behind standards, providing code examples, avoiding sensitive data, and treating steering updates like code reviews."
 
   hooks:
@@ -370,7 +375,7 @@ content_types:
         confidence: confirmed
       tool_restrictions:
         status: mapped
-        mechanism: "tools array with exact names, wildcards (computer_*), or MCP-namespaced refs (@server_name); allowedTools list for tools requiring no user approval; toolsSettings map for per-tool behavioral config"
+        mechanism: "tools array with exact names, wildcard patterns (e.g. @server/read_*, @server/*_get), or MCP-namespaced refs (@server_name); allowedTools list for tools requiring no user approval; toolsSettings map for per-tool behavioral config"
         confidence: confirmed
       invocation_patterns:
         status: mapped
@@ -378,7 +383,7 @@ content_types:
         confidence: inferred
       agent_scopes:
         status: mapped
-        mechanism: "project (.kiro/agents/) + global (~/.kiro/agents/); global overrides local on name collision — reverse of most Kiro content types"
+        mechanism: "project (.kiro/agents/) + global (~/.kiro/agents/); local (project) agent takes precedence over the global agent on name collision (with a warning message) — same workspace-wins model as other Kiro content types"
         confidence: confirmed
       model_selection:
         status: mapped
@@ -473,8 +478,32 @@ content_types:
         graduation_notes: "UI presentation detail — no cross-provider portability value."
         provider_field: welcomeMessage
         conversion: not-portable
-    loading_model: "Custom agents are JSON config files in .kiro/agents/ (project/local scope) or ~/.kiro/agents/ (global scope). Global agents override local agents with the same name — same precedence model as skills. Each agent config declares its system prompt (inline or file URI), available tools (exact names, wildcards, or @server_name MCP patterns), allowedTools for no-approval execution, optional inline MCP servers, resource attachments (files, skills, knowledge bases), per-agent lifecycle hooks, and optional IDE metadata (keyboard shortcut, welcome message). The agent's effective tool set is resolved from its 'tools' array plus any MCP servers (inline and/or workspace .kiro/settings/mcp.json depending on includeMcpJson). Write tool permissions operate under the user account's filesystem permissions, including access to ~/.kiro/ directory contents."
-    notes: "Kiro custom agents are JSON files, not Markdown. The file URI prompt pattern enables prompt reuse across agents. Global scope overrides local scope (unlike most content types where workspace overrides global). Tool patterns support wildcards (computer_*) and @server_name MCP-namespaced references. The 'model' field allows per-agent model selection, overriding the workspace default, with fallback to the default model if unavailable. Security considerations include restricting write tools to specific paths using allowedPaths constraints, reviewing resources before installation, and leveraging audit hooks for sensitive operations."
+      - id: kiro_agent_disable_inherited_resources
+        name: "chat.disableInheritingDefaultResources opt-out"
+        summary: "Setting that stops a custom agent from inheriting Kiro's default resources (default steering files, skills, and AGENTS.md). Built-in agents always inherit defaults; only custom agents can opt out."
+        source_ref: "https://kiro.dev/docs/cli/custom-agents/configuration-reference/"
+        graduation_candidate: false
+        graduation_notes: "Resource-inheritance opt-out is tied to Kiro's default-resource model — no direct cross-provider equivalent."
+        provider_field: chat.disableInheritingDefaultResources
+        conversion: not-portable
+      - id: kiro_agent_shell_command_lists
+        name: "Shell tool command allow/deny lists"
+        summary: "Per-agent shell tool configuration (in toolsSettings) supporting allowedCommands, deniedCommands, and autoAllowReadonly to constrain which shell commands the agent may execute."
+        source_ref: "https://kiro.dev/docs/cli/custom-agents/configuration-reference/"
+        graduation_candidate: true
+        graduation_notes: "Command-level allow/deny lists for shell execution are a cross-provider useful safety pattern — analogous to permission allowlists in other agent frameworks."
+        provider_field: toolsSettings.shell
+        conversion: embedded
+      - id: kiro_agent_mcp_oauth
+        name: "Per-agent MCP OAuth block"
+        summary: "Per-agent mcpServers entries for HTTP-based MCP servers accept an OAuth block with clientId, redirectUri, and oauthScopes to authenticate remote servers scoped to a single agent."
+        source_ref: "https://kiro.dev/docs/cli/custom-agents/configuration-reference/"
+        graduation_candidate: false
+        graduation_notes: "Per-agent MCP OAuth config is tied to Kiro's per-agent MCP isolation model — not applicable outside Kiro's agent framework."
+        provider_field: oauth
+        conversion: embedded
+    loading_model: "Custom agents are JSON config files in .kiro/agents/ (project/local scope) or ~/.kiro/agents/ (global scope). Local (project) agents take precedence over global agents with the same name (a warning is shown) — the same workspace-wins model as other Kiro content types. Each agent config declares its system prompt (inline or file URI), available tools (exact names, wildcards, or @server_name MCP patterns), allowedTools for no-approval execution, optional inline MCP servers, resource attachments (files, skills, knowledge bases), per-agent lifecycle hooks, and optional IDE metadata (keyboard shortcut, welcome message). The agent's effective tool set is resolved from its 'tools' array plus any MCP servers (inline and/or workspace .kiro/settings/mcp.json depending on includeMcpJson). Write tool permissions operate under the user account's filesystem permissions, including access to ~/.kiro/ directory contents."
+    notes: "Kiro custom agents are JSON files, not Markdown. The file URI prompt pattern enables prompt reuse across agents. Local (workspace) scope takes precedence over global scope on name collision (with a warning), consistent with Kiro's other content types. Tool patterns support wildcard patterns (e.g. @server/read_*, @server/*_get) and @server_name MCP-namespaced references. Documented built-in tools are read/write/shell plus the hook-matcher names fs_read, fs_write, execute_bash, use_aws, and knowledge. The 'model' field allows per-agent model selection, overriding the workspace default, with fallback to the default model if unavailable. Security considerations include restricting write tools to specific paths using allowedPaths constraints, reviewing resources before installation, and leveraging audit hooks for sensitive operations."
 
   commands:
     status: unsupported

@@ -4,7 +4,7 @@ format: ""
 proposed_mappings:
     - canonical_key: activation_mode
       supported: true
-      mechanism: 'kiro_steering_inclusion_mode: Kiro steering files support always, conditional, auto, and manual inclusion modes'
+      mechanism: 'kiro_steering_inclusion_mode: Kiro steering files support always, fileMatch (conditional; inclusion: fileMatch with a fileMatchPattern glob field), auto, and manual inclusion modes'
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -22,7 +22,7 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: file_imports
       supported: true
-      mechanism: 'kiro_steering_file_references: Kiro steering files can reference other files using @file syntax'
+      mechanism: 'kiro_steering_file_references: Kiro steering files can reference other files using ''#[[file:<relative>]]'' syntax'
       source_field: ""
       source_value: ""
       confidence: confirmed

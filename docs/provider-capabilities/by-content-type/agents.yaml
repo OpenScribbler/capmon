@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:55:16Z
+# Generated at: 2026-07-16T04:32:32Z
 
 content_type: agents
 providers:
@@ -159,11 +159,11 @@ providers:
                 capabilities:
                     project:
                         supported: true
-                        mechanism: project-scoped agents stored under .kiro/agents/ documented under 'Local agents (project-specific)' heading; precedence rules under 'Agent precedence'
+                        mechanism: project-scoped agents stored under .kiro/agents/ documented under 'Local agents (project-specific)' heading; local (project) agent takes precedence over global on name collision (with a warning), per 'Agent precedence'
                         confidence: inferred
                     user:
                         supported: true
-                        mechanism: user-scoped agents stored under ~/.kiro/agents/ documented under 'Global agents (user-wide)' heading; precedence rules under 'Agent precedence'
+                        mechanism: user-scoped agents stored under ~/.kiro/agents/ documented under 'Global agents (user-wide)' heading; global agent is the fallback when no local agent of the same name exists, per 'Agent precedence'
                         confidence: inferred
             definition_format:
                 supported: true

@@ -4,7 +4,7 @@ format: ""
 proposed_mappings:
     - canonical_key: agent_scopes
       supported: true
-      mechanism: project (.kiro/agents/) + global (~/.kiro/agents/); global overrides local on name collision — reverse of most Kiro content types
+      mechanism: project (.kiro/agents/) + global (~/.kiro/agents/); local (project) agent takes precedence over the global agent on name collision (with a warning message) — same workspace-wins model as other Kiro content types
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -40,7 +40,7 @@ proposed_mappings:
       confidence: inferred
     - canonical_key: tool_restrictions
       supported: true
-      mechanism: tools array with exact names, wildcards (computer_*), or MCP-namespaced refs (@server_name); allowedTools list for tools requiring no user approval; toolsSettings map for per-tool behavioral config
+      mechanism: tools array with exact names, wildcard patterns (e.g. @server/read_*, @server/*_get), or MCP-namespaced refs (@server_name); allowedTools list for tools requiring no user approval; toolsSettings map for per-tool behavioral config
       source_field: ""
       source_value: ""
       confidence: confirmed
