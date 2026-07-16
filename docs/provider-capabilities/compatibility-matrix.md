@@ -31,7 +31,7 @@ Last updated: 2026-07-11. Authoritative sources: `docs/provider-sources/*.yaml` 
 | pi               |   ✓   |   ✓    |   ✗    |    ✓     |  ✗  |   ✓   |
 | roo-code         |   ✓   |   ✓    |   ✓    |    ✓     |  ✓  |   ✗   |
 | windsurf         |   ✓   |   ✓    |   ~    |    ~     |  ✓  |   ✓   |
-| crush            |   ✓   |   ✓    |   ✗    |    ✗     |  ✓  |   ✗   |
+| crush            |   ✓   |   ✓    |   ✗    |    ✗     |  ✓  |   ✓   |
 | zed              |   ✓   |   ✗    |   ⚙    |    ⚙     |  ✓  |   ✗   |
 
 ---
@@ -78,7 +78,7 @@ Supports rules (.roo/rules/ with per-mode subdirs like .roo/rules-code/), skills
 Supports rules (.windsurfrules + Cascade memories), skills, hooks (per-tool-category split events), MCP. Agents tracked for AGENTS.md convention only — no windsurf-native agent files. CLI commands are not user-definable.
 
 ### crush
-Supports rules (AGENTS.md project only), skills (`.crush/skills/`, `~/.config/crush/skills/` — XDG-compliant), and MCP (`crush.json` with stdio/http/sse transports). No hooks (open issue charmbracelet/crush#2038). No agents, no commands.
+Supports rules (AGENTS.md project only), skills (`.crush/skills/`, `~/.config/crush/skills/` — XDG-compliant), MCP (`crush.json` with stdio/http/sse transports), and hooks (single `PreToolUse` event under the `crush.json` `hooks` key; Claude Code-compatible flat `HookConfig` shape). No agents, no commands.
 
 ### zed
 Supports rules (.rules, plain markdown), MCP. Agent "profiles" (write/ask/minimal) and slash commands are all builtin — not user-definable files. No hooks, no skills.
@@ -94,8 +94,8 @@ Supports rules (.rules, plain markdown), MCP. Agent "profiles" (write/ask/minima
 | Agents       |      15        |         6          |         3            |        2          |         4         |
 | Commands     |      15        |         8          |         2            |        1          |         4         |
 | MCP          |      15        |        14          |         0            |        0          |         1         |
-| Hooks        |      15        |        10          |         0            |        0          |         5         |
+| Hooks        |      15        |        11          |         0            |        0          |         4         |
 
 **Rules** is the most universally supported content type — every provider has it.  
-**Hooks** is the most selective — only 10 of 15 providers support lifecycle hooks.  
+**Hooks** is the most selective — only 11 of 15 providers support lifecycle hooks.  
 **Agents** has the most variation — true user-definable agent files in only 6 providers; 3 more use cross-provider AGENTS.md convention only.
