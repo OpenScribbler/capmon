@@ -1,5 +1,5 @@
 # Crush — Provider Source Manifest
-# Good source: public Go repo with JSON Schema. No hooks, no commands. Skills via Agent Skills standard.
+# Good source: public Go repo with JSON Schema. PreToolUse hooks; no commands. Skills via Agent Skills standard.
 #
 # Lineage: the Crush team originally built opencode-ai/opencode (archived
 # read-only 2025-09-18, final release v0.0.55), then moved to Charm and built
@@ -36,9 +36,8 @@ config_schema:
 
 content_types:
   # ── Support summary ───────────────────────────────────────────────────
-  # Crush supports: rules, skills, mcp
-  # Not supported: hooks (issue #2038 open, not implemented), agents (no user-definable agent format), commands (no command system)
-  #   No hooks yet — see charmbracelet/crush#2038.
+  # Crush supports: rules, skills, mcp, hooks (PreToolUse)
+  # Not supported: agents (no user-definable agent format), commands (no command system)
   # ─────────────────────────────────────────────────────────────────────
 
   # --- Rules / Instructions ---
@@ -54,10 +53,17 @@ content_types:
     # No .crushrules or .crush/rules/ equivalent.
 
   # --- Hooks ---
-  # Not supported. internal/event/ is PostHog telemetry only.
+  # PreToolUse hooks shipped (official docs/hooks/README.md). Configured in
+  # crush.json under the "hooks" key; Claude Code-compatible shape. Single
+  # event PreToolUse; flat HookConfig {name?, matcher?, command, timeout?};
+  # exit 2 blocks, exit 49 halts; JSON stdin + envelope (decision/context/
+  # updated_input). Supersedes the earlier "not implemented / #2038" read.
   hooks:
-    supported: false
-    # Plugin proposal: https://github.com/charmbracelet/crush/issues/2038 (open, not implemented)
+    sources:
+      - url: https://raw.githubusercontent.com/charmbracelet/crush/main/docs/hooks/README.md
+        type: docs
+        format: markdown
+        extracts: [event_names, hook_config_fields, config_examples]
 
   # --- MCP ---
   # Configured via crush.json "mcp" key. Supports stdio, http, sse transports.

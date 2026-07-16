@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:55:16Z
+# Generated at: 2026-07-16T00:33:50Z
 
 content_type: hooks
 providers:
@@ -159,6 +159,45 @@ providers:
                 supported: true
                 mechanism: hooks receive event-specific JSON on stdin (inline schema per event under 'Hook event input payloads') and return JSON decision output (per-event 'decision control' / 'postToolUse output' headings)
                 confidence: inferred
+    crush:
+        supported: true
+        capabilities:
+            async_execution:
+                supported: false
+                mechanism: Matching hooks run in parallel with each other, but the tool call waits for all of them to finish (or time out) before proceeding — there is no fire-and-forget mode. A hook exceeding its timeout is treated as a non-blocking 'no opinion' error and the call proceeds.
+                confidence: confirmed
+            context_injection:
+                supported: true
+                mechanism: The output envelope's context field accepts a string or an array of strings, appended to what the model sees for the current turn. Across multiple hooks, context values concatenate in config order and empty entries are dropped.
+                confidence: confirmed
+            decision_control:
+                supported: true
+                mechanism: Exit code 2 blocks the tool call (stderr is the deny reason); exit 49 halts the whole turn; other non-zero codes are non-blocking errors and the call proceeds. On exit 0 stdout is parsed as a JSON envelope whose decision field is allow, deny, or null — 'allow' is affirmative pre-approval, null/omitted is no opinion. Across hooks the precedence is deny > allow > null, composed in config order.
+                confidence: confirmed
+            handler_types:
+                supported: false
+                mechanism: 'Crush hooks are shell commands only (the command field in HookConfig) — no HTTP, LLM-prompt, or agent handler types. Commands run through Crush''s embedded POSIX shell (mvdan.cc/sh): inline commands and shebang-less scripts execute in-process, while #!-shebang scripts dispatch to the named interpreter via os/exec, so a hook script can be written in any language — but the handler is always a shell command.'
+                confidence: confirmed
+            hook_scopes:
+                supported: true
+                mechanism: Hooks are configured in crush.json (or .crush.json) at both the user-global (~/.config/crush/crush.json) and project level, with project-level hooks taking precedence. Global-config commands must use an absolute path or an inline command; relative paths resolve against the working directory.
+                confidence: confirmed
+            input_modification:
+                supported: true
+                mechanism: 'The exit-0 JSON envelope may carry updated_input: a shallow-merge patch against tool_input (included keys overwrite, omitted keys are preserved, nested objects replaced wholesale). Patches from multiple hooks merge sequentially in config order and are ignored if the final decision is deny or halt. Implemented as UpdatedInput in internal/hooks/hooks.go.'
+                confidence: confirmed
+            json_io_protocol:
+                supported: true
+                mechanism: Stdin delivers a JSON payload (event, session_id, cwd, plus tool_name and tool_input for PreToolUse). On exit 0 stdout is parsed as a JSON output envelope (version, decision, halt, reason, context, updated_input). Simple hooks may skip JSON and use CRUSH_* environment variables plus exit codes instead.
+                confidence: confirmed
+            matcher_patterns:
+                supported: true
+                mechanism: 'HookConfig has an optional matcher field: a regex tested against the tool name (e.g. bash, edit, mcp_github_create_pull_request). Omitted or empty matcher matches all tools.'
+                confidence: confirmed
+            permission_control:
+                supported: true
+                mechanism: 'Hook results are applied before permission checks: an aggregated deny blocks the tool call before any prompt; an aggregated allow is affirmative pre-approval that skips the prompt; silence (no decision) falls through to the normal permission flow.'
+                confidence: confirmed
     cursor:
         supported: true
         capabilities:

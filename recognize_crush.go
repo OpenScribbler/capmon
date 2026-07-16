@@ -4,6 +4,18 @@ func init() {
 	RegisterRecognizer("crush", RecognizerKindGoStruct, recognizeCrush)
 }
 
+// Hooks recognition is intentionally NOT landmark-wired for crush. Crush
+// shipped PreToolUse hooks with official docs (docs/hooks/README.md), and the
+// hooks capabilities are curated at "confirmed" confidence directly from that
+// doc in docs/provider-formats/crush.yaml and mirrored into the master
+// docs/provider-capabilities/crush.yaml (7 of 9 canonical keys supported;
+// handler_types command-only and async_execution blocking are the two false).
+// A landmark recognizer would emit those keys at "inferred" — strictly weaker
+// than the confirmed curation already published — so it is deliberately not
+// added. If crush later ships additional hook events or the curation must be
+// machine-cross-checked, wire landmark recognition against the cached
+// hooks.0 (docs/hooks/README.md) then.
+//
 // recognizeCrush recognizes skills capabilities for the Crush provider.
 // Crush implements the Agent Skills open standard (GoStruct pattern).
 //
