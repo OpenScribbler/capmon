@@ -96,7 +96,7 @@ func (e *checkTestEnv) captureGHCalls(t *testing.T) *[][]string {
 		copy(cp, args)
 		*calls = append(*calls, cp)
 		// Return appropriate responses per command
-		if len(args) >= 2 && args[0] == "issue" && args[1] == "list" {
+		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			return []byte(`[]`), nil
 		}
 		if len(args) >= 2 && args[0] == "issue" && args[1] == "create" {
@@ -357,9 +357,9 @@ content_types:
 	var issueListForWarnCalled bool
 	var closeListCalled bool
 	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if len(args) >= 2 && args[0] == "issue" && args[1] == "list" {
+		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			for _, a := range args {
-				if a == "capmon-warn" {
+				if strings.Contains(a, "labels=") && strings.Contains(a, "capmon-warn") {
 					issueListForWarnCalled = true
 				}
 			}
@@ -494,7 +494,7 @@ func TestRunCapmonCheck_BatchFlush_OpenIssueExists(t *testing.T) {
 
 	var createCalls int
 	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if len(args) >= 2 && args[0] == "issue" && args[1] == "list" {
+		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			// Return an existing open provider issue with the provider-only anchor.
 			return []byte(`[{"number":55,"body":"<!-- capmon-check: test-provider -->\nsome previous body"}]`), nil
 		}
@@ -532,7 +532,7 @@ func TestRunCapmonCheck_FetchErrorOnly_ProducesIssue(t *testing.T) {
 	var listCalls, createCalls int
 	var capturedBody string
 	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if len(args) >= 2 && args[0] == "issue" && args[1] == "list" {
+		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			listCalls++
 			return []byte(`[]`), nil
 		}
@@ -576,7 +576,7 @@ func TestRunCapmonCheck_FlushError_Aborts(t *testing.T) {
 	env.setHTTPResponse(t, testContent, "text/html")
 
 	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if len(args) >= 2 && args[0] == "issue" && args[1] == "list" {
+		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			return nil, errors.New("gh: authentication failed")
 		}
 		return []byte(""), nil
@@ -643,7 +643,7 @@ content_types:
 	var createCalls, listCalls int
 	var capturedBody string
 	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if len(args) >= 2 && args[0] == "issue" && args[1] == "list" {
+		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			listCalls++
 			return []byte(`[]`), nil
 		}

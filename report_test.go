@@ -359,7 +359,7 @@ func TestCreateCapmonWarningIssue_InvalidSlug(t *testing.T) {
 func TestCloseResolvedWarningIssues_ClosesStale(t *testing.T) {
 	var closedNumbers []string
 	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if len(args) >= 2 && args[0] == "issue" && args[1] == "list" {
+		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			return []byte(`[
 				{"number":10,"body":"<!-- capmon-warn: aaaa1111bbbb2222 -->\nstale warning"},
 				{"number":20,"body":"<!-- capmon-warn: cccc3333dddd4444 -->\nstill active"}
@@ -390,7 +390,7 @@ func TestCloseResolvedWarningIssues_NoneToClose(t *testing.T) {
 		if len(args) >= 2 && args[0] == "issue" && args[1] == "close" {
 			closeCalled = true
 		}
-		if len(args) >= 2 && args[0] == "issue" && args[1] == "list" {
+		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			return []byte(`[{"number":10,"body":"<!-- capmon-warn: aaaa1111bbbb2222 -->\nwarning"}]`), nil
 		}
 		return []byte(""), nil

@@ -261,30 +261,11 @@ func acifGraduationAnchor(extensionID string) string {
 
 func findOpenACIFGraduationIssue(extensionID string) (int, bool, error) {
 	anchor := acifGraduationAnchor(extensionID)
-	out, err := ghRunner("issue", "list",
-		"--repo", acifChangeRepo,
-		"--label", acifChangeLabel,
-		"--label", acifClassCLabel,
-		"--state", "open",
-		"--limit", "100",
-		"--json", "number,body",
+	return findOpenIssueByAnchor(
+		acifChangeRepo,
+		[]string{acifChangeLabel, acifClassCLabel},
+		anchor,
 	)
-	if err != nil {
-		return 0, false, fmt.Errorf("gh issue list: %w", err)
-	}
-	var issues []struct {
-		Number int    `json:"number"`
-		Body   string `json:"body"`
-	}
-	if err := json.Unmarshal(out, &issues); err != nil {
-		return 0, false, fmt.Errorf("parse issue list: %w", err)
-	}
-	for _, iss := range issues {
-		if strings.Contains(iss.Body, anchor) {
-			return iss.Number, true, nil
-		}
-	}
-	return 0, false, nil
 }
 
 func createACIFGraduationIssue(state graduationState, qualifyingProviders []string) (int, error) {

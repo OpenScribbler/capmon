@@ -91,27 +91,7 @@ func RecordConsecutiveHealFailure(cacheRoot, provider, contentType string, sourc
 // whose body contains the anchor for (provider, contentType, sourceIndex).
 func findOpenHealFailureIssue(provider, contentType string, sourceIndex int) (int, bool, error) {
 	anchor := HealFailureAnchor(provider, contentType, sourceIndex)
-	out, err := ghRunner("issue", "list",
-		"--label", healFailureLabel,
-		"--state", "open",
-		"--json", "number,body",
-	)
-	if err != nil {
-		return 0, false, fmt.Errorf("gh issue list: %w", err)
-	}
-	var issues []struct {
-		Number int    `json:"number"`
-		Body   string `json:"body"`
-	}
-	if err := json.Unmarshal(out, &issues); err != nil {
-		return 0, false, fmt.Errorf("parse issue list: %w", err)
-	}
-	for _, iss := range issues {
-		if strings.Contains(iss.Body, anchor) {
-			return iss.Number, true, nil
-		}
-	}
-	return 0, false, nil
+	return findOpenIssueByAnchor("", []string{healFailureLabel}, anchor)
 }
 
 // createHealFailureIssue opens a new capmon-heal-fail issue. Caller

@@ -59,6 +59,62 @@ func SanitizeSlug(slug string) (string, error) {
 	return slug, nil
 }
 
+// issueRef is the minimal open-issue projection — number plus body — needed to
+// match a hidden dedup anchor.
+type issueRef struct {
+	Number int    `json:"number"`
+	Body   string `json:"body"`
+}
+
+// listOpenIssues returns EVERY open issue carrying all of the given labels,
+// paginating the GitHub REST API to exhaustion. repo is "owner/name"; the empty
+// string targets the current repository (gh resolves the {owner}/{repo}
+// placeholder from the git remote).
+//
+// This deliberately replaces `gh issue list --limit N`: that command windows the
+// result set (default 30, or whatever --limit says), so a dedup anchor sitting
+// past the window is never seen and the caller files a DUPLICATE. The REST list
+// endpoint is immediately consistent (no search-index lag) and, under
+// --paginate, gh merges every page's array into one — no cap.
+func listOpenIssues(repo string, labels []string) ([]issueRef, error) {
+	path := "repos/{owner}/{repo}/issues"
+	if repo != "" {
+		path = "repos/" + repo + "/issues"
+	}
+	args := []string{"api", "--paginate", "-X", "GET", path,
+		"-f", "state=open",
+		"-f", "per_page=100",
+	}
+	if len(labels) > 0 {
+		args = append(args, "-f", "labels="+strings.Join(labels, ","))
+	}
+	out, err := ghRunner(args...)
+	if err != nil {
+		return nil, fmt.Errorf("gh api issues list: %w", err)
+	}
+	var issues []issueRef
+	if err := json.Unmarshal(out, &issues); err != nil {
+		return nil, fmt.Errorf("parse issue list: %w", err)
+	}
+	return issues, nil
+}
+
+// findOpenIssueByAnchor returns the number of the first open issue (across all
+// pages) whose body contains anchor, scoped to repo and labels. Anchors are
+// unique per dedup key, so "first match" is unambiguous.
+func findOpenIssueByAnchor(repo string, labels []string, anchor string) (int, bool, error) {
+	issues, err := listOpenIssues(repo, labels)
+	if err != nil {
+		return 0, false, err
+	}
+	for _, iss := range issues {
+		if strings.Contains(iss.Body, anchor) {
+			return iss.Number, true, nil
+		}
+	}
+	return 0, false, nil
+}
+
 // DeduplicatePR checks if an open PR exists for capmon/drift-<provider>.
 // Returns (existingPRURL, true) if found; ("", false) if not found.
 func DeduplicatePR(_ context.Context, provider string) (string, bool, error) {
@@ -162,32 +218,7 @@ func FindOpenCapmonIssue(provider, contentType string) (int, bool, error) {
 		return 0, false, err
 	}
 	anchor := fmt.Sprintf("<!-- capmon-check: %s/%s -->", slug, contentType)
-
-	out, err := ghRunner("issue", "list",
-		"--label", "capmon-change",
-		"--label", "provider:"+slug,
-		"--state", "open",
-		"--limit", "100",
-		"--json", "number,body",
-	)
-	if err != nil {
-		return 0, false, fmt.Errorf("gh issue list: %w", err)
-	}
-
-	var issues []struct {
-		Number int    `json:"number"`
-		Body   string `json:"body"`
-	}
-	if err := json.Unmarshal(out, &issues); err != nil {
-		return 0, false, fmt.Errorf("parse issue list: %w", err)
-	}
-
-	for _, iss := range issues {
-		if strings.Contains(iss.Body, anchor) {
-			return iss.Number, true, nil
-		}
-	}
-	return 0, false, nil
+	return findOpenIssueByAnchor("", []string{"capmon-change", "provider:" + slug}, anchor)
 }
 
 // CreateCapmonChangeIssue creates a GitHub issue for a content-change event.
@@ -236,32 +267,7 @@ func FindOpenCapmonProviderIssue(provider string) (int, bool, error) {
 		return 0, false, err
 	}
 	anchor := fmt.Sprintf("<!-- capmon-check: %s -->", slug)
-
-	out, err := ghRunner("issue", "list",
-		"--label", "capmon-change",
-		"--label", "provider:"+slug,
-		"--state", "open",
-		"--limit", "100",
-		"--json", "number,body",
-	)
-	if err != nil {
-		return 0, false, fmt.Errorf("gh issue list: %w", err)
-	}
-
-	var issues []struct {
-		Number int    `json:"number"`
-		Body   string `json:"body"`
-	}
-	if err := json.Unmarshal(out, &issues); err != nil {
-		return 0, false, fmt.Errorf("parse issue list: %w", err)
-	}
-
-	for _, iss := range issues {
-		if strings.Contains(iss.Body, anchor) {
-			return iss.Number, true, nil
-		}
-	}
-	return 0, false, nil
+	return findOpenIssueByAnchor("", []string{"capmon-change", "provider:" + slug}, anchor)
 }
 
 // CreateCapmonProviderIssue creates a GitHub issue for a per-provider batched
@@ -318,31 +324,7 @@ func FindOpenCapmonWarningIssue(provider string, w ValidationWarning) (int, bool
 		return 0, false, err
 	}
 	anchor := fmt.Sprintf("<!-- capmon-warn: %s -->", w.DeduplicationKey())
-
-	out, err := ghRunner("issue", "list",
-		"--label", "capmon-warn",
-		"--label", "provider:"+slug,
-		"--state", "open",
-		"--json", "number,body",
-	)
-	if err != nil {
-		return 0, false, fmt.Errorf("gh issue list: %w", err)
-	}
-
-	var issues []struct {
-		Number int    `json:"number"`
-		Body   string `json:"body"`
-	}
-	if err := json.Unmarshal(out, &issues); err != nil {
-		return 0, false, fmt.Errorf("parse issue list: %w", err)
-	}
-
-	for _, iss := range issues {
-		if strings.Contains(iss.Body, anchor) {
-			return iss.Number, true, nil
-		}
-	}
-	return 0, false, nil
+	return findOpenIssueByAnchor("", []string{"capmon-warn", "provider:" + slug}, anchor)
 }
 
 // CreateCapmonWarningIssue creates a GitHub issue for a validation warning.
@@ -388,22 +370,9 @@ func CloseResolvedWarningIssues(_ context.Context, provider string, seenKeys map
 		return err
 	}
 
-	out, err := ghRunner("issue", "list",
-		"--label", "capmon-warn",
-		"--label", "provider:"+slug,
-		"--state", "open",
-		"--json", "number,body",
-	)
+	issues, err := listOpenIssues("", []string{"capmon-warn", "provider:" + slug})
 	if err != nil {
-		return fmt.Errorf("gh issue list for close: %w", err)
-	}
-
-	var issues []struct {
-		Number int    `json:"number"`
-		Body   string `json:"body"`
-	}
-	if err := json.Unmarshal(out, &issues); err != nil {
-		return fmt.Errorf("parse issue list: %w", err)
+		return fmt.Errorf("list open warning issues for close: %w", err)
 	}
 
 	for _, iss := range issues {

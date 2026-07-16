@@ -21,9 +21,9 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 	var createCall []string
 	var createBody string
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if isGH(args, "issue", "list") {
-			if !hasArgPair(args, "--repo", acifChangeRepo) {
-				t.Fatalf("list missing --repo %s: %v", acifChangeRepo, args)
+		if isIssueListCall(args) {
+			if !hasArg(args, "repos/"+acifChangeRepo+"/issues") {
+				t.Fatalf("list missing repos/%s/issues path: %v", acifChangeRepo, args)
 			}
 			return []byte(`[]`), nil
 		}
@@ -139,7 +139,7 @@ func TestScanGraduationCandidates_CommentsWhenQualifyingSetChanges(t *testing.T)
 	var creates int
 	var comments int
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if isGH(args, "issue", "list") {
+		if isIssueListCall(args) {
 			return []byte(`[]`), nil
 		}
 		if isGH(args, "issue", "create") {

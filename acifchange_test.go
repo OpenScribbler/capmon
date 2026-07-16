@@ -21,7 +21,7 @@ func TestRecordUnmappedForm_ThresholdCreatesIssue(t *testing.T) {
 	var createBody string
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
 		calls = append(calls, copyArgs(args))
-		if isGH(args, "issue", "list") {
+		if isIssueListCall(args) {
 			return []byte(`[]`), nil
 		}
 		if isGH(args, "issue", "create") {
@@ -102,7 +102,7 @@ func TestRecordUnmappedForm_DedupCommentsExistingIssue(t *testing.T) {
 	var comments int
 	var commentedIssue string
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if isGH(args, "issue", "list") {
+		if isIssueListCall(args) {
 			return []byte(`[]`), nil
 		}
 		if isGH(args, "issue", "create") {
@@ -152,9 +152,9 @@ func TestRecordUnmappedForm_StateLostAnchorFoundComments(t *testing.T) {
 	var creates int
 	var comments int
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if isGH(args, "issue", "list") {
-			if !hasArgPair(args, "--repo", acifChangeRepo) {
-				t.Fatalf("list missing --repo %s: %v", acifChangeRepo, args)
+		if isIssueListCall(args) {
+			if !hasArg(args, "repos/"+acifChangeRepo+"/issues") {
+				t.Fatalf("list missing repos/%s/issues path: %v", acifChangeRepo, args)
 			}
 			return []byte(`[{"number":88,"body":"` + anchor + `"}]`), nil
 		}
@@ -288,7 +288,7 @@ func TestRecordUnmappedForm_StateRoundTripThroughJSON(t *testing.T) {
 	}
 
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if isGH(args, "issue", "list") {
+		if isIssueListCall(args) {
 			return []byte(`[]`), nil
 		}
 		if isGH(args, "issue", "create") {
@@ -324,6 +324,13 @@ func isGH(args []string, first, second string) bool {
 	return len(args) >= 2 && args[0] == first && args[1] == second
 }
 
+// isIssueListCall reports whether args is the exhaustive open-issue listing
+// call (`gh api --paginate ... /issues`) that replaced `gh issue list` for
+// dedup anchor lookups.
+func isIssueListCall(args []string) bool {
+	return isGH(args, "api", "--paginate")
+}
+
 func findGHCall(calls [][]string, first, second string) []string {
 	for _, call := range calls {
 		if isGH(call, first, second) {
@@ -340,6 +347,15 @@ func argValue(args []string, key string) string {
 		}
 	}
 	return ""
+}
+
+func hasArg(args []string, val string) bool {
+	for _, a := range args {
+		if a == val {
+			return true
+		}
+	}
+	return false
 }
 
 func hasArgPair(args []string, key, value string) bool {

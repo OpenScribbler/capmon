@@ -40,7 +40,7 @@ func TestRecordConsecutiveHealFailure_HitsThreshold_CreatesIssue(t *testing.T) {
 	cacheRoot := t.TempDir()
 
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if args[0] == "issue" && args[1] == "list" {
+		if isIssueListCall(args) {
 			return []byte(`[]`), nil
 		}
 		if args[0] == "issue" && args[1] == "create" {
@@ -75,7 +75,7 @@ func TestRecordConsecutiveHealFailure_ExistingIssueAppends(t *testing.T) {
 	anchor := HealFailureAnchor("claude-code", "skills", 0)
 	var commentedOn int
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if args[0] == "issue" && args[1] == "list" {
+		if isIssueListCall(args) {
 			return []byte(`[{"number": 42, "body": "old ` + anchor + ` body"}]`), nil
 		}
 		if args[0] == "issue" && args[1] == "comment" {
@@ -119,7 +119,7 @@ func TestResolveHealFailure_ClosesOpenIssueAndClearsCounter(t *testing.T) {
 
 	var closedNum int
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if args[0] == "issue" && args[1] == "list" {
+		if isIssueListCall(args) {
 			return []byte(`[{"number": 99, "body": "old ` + anchor + `"}]`), nil
 		}
 		if args[0] == "issue" && args[1] == "close" {
@@ -144,7 +144,7 @@ func TestResolveHealFailure_ClosesOpenIssueAndClearsCounter(t *testing.T) {
 func TestResolveHealFailure_NoOpenIssue(t *testing.T) {
 	cacheRoot := t.TempDir()
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if args[0] == "issue" && args[1] == "list" {
+		if isIssueListCall(args) {
 			return []byte(`[]`), nil
 		}
 		if args[0] == "issue" && args[1] == "close" {
@@ -312,7 +312,7 @@ func TestRecordConsecutiveHealFailure_AppendUsesFailReason(t *testing.T) {
 	anchor := HealFailureAnchor("claude-code", "skills", 0)
 	var capturedComment string
 	SetGHCommandForTest(func(args ...string) ([]byte, error) {
-		if args[0] == "issue" && args[1] == "list" {
+		if isIssueListCall(args) {
 			return []byte(`[{"number": 88, "body": "old ` + anchor + ` body"}]`), nil
 		}
 		if args[0] == "issue" && args[1] == "comment" {
