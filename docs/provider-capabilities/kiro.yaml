@@ -11,11 +11,11 @@ content_types:
         capabilities:
           project:
             supported: true
-            mechanism: project-scoped agents stored under .kiro/agents/ documented under 'Local agents (project-specific)' heading; precedence rules under 'Agent precedence'
+            mechanism: project-scoped agents stored under .kiro/agents/ documented under 'Local agents (project-specific)' heading; local (project) agent takes precedence over global on name collision (with a warning), per 'Agent precedence'
             confidence: inferred
           user:
             supported: true
-            mechanism: user-scoped agents stored under ~/.kiro/agents/ documented under 'Global agents (user-wide)' heading; precedence rules under 'Agent precedence'
+            mechanism: user-scoped agents stored under ~/.kiro/agents/ documented under 'Global agents (user-wide)' heading; global agent is the fallback when no local agent of the same name exists, per 'Agent precedence'
             confidence: inferred
       definition_format:
         supported: true
@@ -75,7 +75,7 @@ content_types:
             confidence: inferred
           glob:
             supported: true
-            mechanism: glob-based path matching activates steering files (documented under 'Conditional inclusion' inclusion mode)
+            mechanism: 'glob-based path matching via inclusion: fileMatch with a fileMatchPattern glob field (single pattern or array) activates steering files (documented under ''Conditional inclusion'' inclusion mode)'
             confidence: inferred
           manual:
             supported: true
@@ -94,7 +94,7 @@ content_types:
             confidence: inferred
       file_imports:
         supported: true
-        mechanism: steering files can reference other files (documented under 'File references' heading)
+        mechanism: "steering files can reference other files via '#[[file:<relative>]]' syntax (documented under 'File references' heading)"
         confidence: inferred
       hierarchical_loading:
         supported: true

@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-16T03:01:21Z
+# Generated at: 2026-07-16T04:32:32Z
 
 content_type: hooks
 providers:
@@ -218,8 +218,8 @@ providers:
         capabilities:
             decision_control:
                 supported: true
-                mechanism: 'hook_exit_code_behavior: Factory Droid hooks use exit codes to signal block (non-zero) or allow (zero) decisions on the triggering action; documented under per-event ''Decision Control'' headings'
-                confidence: inferred
+                mechanism: PreToolUse hooks return hookSpecificOutput.permissionDecision (allow/deny/ask) with permissionDecisionReason; the flat decision/reason fields are deprecated for PreToolUse. Exit code 2 blocks with stderr fed back to Droid; non-zero non-2 shows stderr to user as non-blocking error
+                confidence: confirmed
     gemini-cli:
         supported: true
         capabilities:

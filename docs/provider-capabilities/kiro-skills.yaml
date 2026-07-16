@@ -15,8 +15,8 @@ proposed_mappings:
       source_value: ""
       confidence: confirmed
     - canonical_key: compatibility
-      supported: true
-      mechanism: 'yaml frontmatter key: compatibility (optional)'
+      supported: false
+      mechanism: Not documented — live POWER.md frontmatter spec lists only name/displayName/description/keywords/author
       source_field: ""
       source_value: ""
       confidence: confirmed
@@ -51,14 +51,14 @@ proposed_mappings:
       source_value: ""
       confidence: confirmed
     - canonical_key: license
-      supported: true
-      mechanism: 'yaml frontmatter key: license (optional)'
+      supported: false
+      mechanism: Not documented — live POWER.md frontmatter spec lists only name/displayName/description/keywords/author
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: metadata_map
-      supported: true
-      mechanism: 'yaml frontmatter key: metadata (optional map)'
+      supported: false
+      mechanism: Not documented — live POWER.md frontmatter spec lists only name/displayName/description/keywords/author
       source_field: ""
       source_value: ""
       confidence: confirmed

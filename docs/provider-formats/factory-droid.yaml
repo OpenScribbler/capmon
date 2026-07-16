@@ -137,27 +137,20 @@ content_types:
         conversion: translated
       - id: global_rules_path
         name: Global Rules Path
-        summary: "A global ~/AGENTS.md applies across all projects, overridden by any project-level or subdirectory AGENTS.md."
+        summary: "A global ~/.factory/AGENTS.md personal override applies across all projects, overridden by any project-level or subdirectory AGENTS.md (the file closest to the one being edited wins)."
         source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
         graduation_candidate: false
         conversion: translated
-      - id: custom_instructions_setting
-        name: Custom Instructions Setting
-        summary: "Provides always-on guidance to the Droid regardless of which project is open, configured via the personal settings file's customInstructions key."
-        source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
-        graduation_candidate: false
-        provider_field: "customInstructions"
-        conversion: embedded
       - id: settings_local_override
         name: Local Settings Override
-        summary: "settings.local.json alongside settings.json in any .factory/ folder provides machine-specific overrides that merge on top of the corresponding settings.json; intended to be gitignored."
-        source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
+        summary: "settings.local.json alongside settings.json in any .factory/ folder (user-level or project-level) provides machine-specific overrides that merge on top of the corresponding settings.json; intended to be gitignored."
+        source_ref: "https://docs.factory.ai/cli/configuration/settings"
         graduation_candidate: false
         conversion: not-portable
       - id: legacy_droid_yaml
         name: Legacy .droid.yaml Migration
         summary: ".droid.yaml was an older project configuration surface; current configuration uses .factory/settings.json, AGENTS.md, and purpose-specific files (mcp, hooks, skills)."
-        source_ref: "https://docs.factory.ai/cli/configuration/agents-md"
+        source_ref: "https://docs.factory.ai/cli/configuration/settings"
         graduation_candidate: false
         conversion: not-portable
     loading_model: ""
@@ -187,7 +180,7 @@ content_types:
         confidence: confirmed
       decision_control:
         status: mapped
-        mechanism: "PreToolUse hooks return JSON with allow/deny/ask decision field; exit code 2 blocks with stderr fed back to Droid; non-zero non-2 shows stderr to user as non-blocking error"
+        mechanism: "PreToolUse hooks return hookSpecificOutput.permissionDecision (allow/deny/ask) with permissionDecisionReason; the flat decision/reason fields are deprecated for PreToolUse. Exit code 2 blocks with stderr fed back to Droid; non-zero non-2 shows stderr to user as non-blocking error"
         confidence: confirmed
       input_modification:
         status: mapped
@@ -199,7 +192,7 @@ content_types:
         confidence: confirmed
       hook_scopes:
         status: mapped
-        mechanism: "Four scopes documented: user-level (~/.factory/settings.json), project-level (.factory/settings.json), local-uncommitted (.factory/settings.local.json), and enterprise managed policies"
+        mechanism: "Three scopes documented: user-level (~/.factory/hooks.json), project-level (.factory/hooks.json), and enterprise managed policy hooks; if hooks.json is absent Droid falls back to hooks declared under the hooks key in the matching settings.json"
         confidence: confirmed
       json_io_protocol:
         status: mapped
@@ -211,7 +204,7 @@ content_types:
         confidence: confirmed
       permission_control:
         status: mapped
-        mechanism: "PreToolUse hooks return allow, deny, or ask in the JSON decision field to bypass, block, or escalate tool permission decisions"
+        mechanism: "PreToolUse hooks return allow, deny, or ask via hookSpecificOutput.permissionDecision (with permissionDecisionReason) to bypass, block, or escalate tool permission decisions; the flat decision/reason fields are deprecated"
         confidence: confirmed
     provider_extensions:
       - id: hook_events
@@ -229,13 +222,13 @@ content_types:
         conversion: translated
       - id: hook_scope_files
         name: Hook Scope Files
-        summary: "Hooks live in scoped settings files: ~/.factory/settings.json (user-level), .factory/settings.json (project-level), .factory/settings.local.json (local uncommitted), plus enterprise managed policies."
+        summary: "Hooks live in dedicated scoped files: ~/.factory/hooks.json (user-level, applies to all projects), .factory/hooks.json (project-level, commit to share), plus enterprise managed policy hooks. If hooks.json is absent, Droid falls back to hooks declared under the hooks key in the matching settings.json."
         source_ref: "https://docs.factory.ai/cli/configuration/hooks-guide"
         graduation_candidate: false
         conversion: not-portable
       - id: hook_exit_code_behavior
         name: Hook Exit Code Behavior
-        summary: "Exit code 0 = success (stdout shown in transcript, or adds context for UserPromptSubmit/SessionStart); exit code 2 = blocking error (stderr fed back to Droid); other non-zero = non-blocking error (stderr shown to user). JSON output fields: continue, stopReason, suppressOutput, systemMessage, plus event-specific fields (allow/deny/ask/updatedInput for PreToolUse; block/additionalContext for PostToolUse and UserPromptSubmit; block for Stop/SubagentStop; additionalContext for SessionStart)."
+        summary: "Exit code 0 = success (stdout shown in transcript, or adds context for UserPromptSubmit/SessionStart); exit code 2 = blocking error (stderr fed back to Droid); other non-zero = non-blocking error (stderr shown to user). JSON output fields: continue, stopReason, suppressOutput, systemMessage, plus event-specific fields (hookSpecificOutput.permissionDecision allow/deny/ask with permissionDecisionReason, and updatedInput, for PreToolUse — the flat decision/reason fields are deprecated; block/additionalContext for PostToolUse and UserPromptSubmit; block for Stop/SubagentStop; additionalContext for SessionStart)."
         source_ref: "https://docs.factory.ai/reference/hooks-reference"
         graduation_candidate: true
         conversion: translated
@@ -264,8 +257,26 @@ content_types:
         source_ref: "https://docs.factory.ai/reference/hooks-reference"
         graduation_candidate: false
         conversion: not-portable
+      - id: hooks_json_migration
+        name: "hooks.json Auto-Migration"
+        summary: "Droid previously wrote hooks to a nested hooks/hooks.json file; existing files keep working unchanged, and the next save writes hooks.json at the scope root while archiving the old file as hooks/hooks.migrated.json."
+        source_ref: "https://docs.factory.ai/reference/hooks-reference"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: permission_mode_values
+        name: Permission Mode Values
+        summary: "The permission_mode field in hook stdin input reports the current session autonomy level as one of off, spec, auto-low, auto-medium, or auto-high."
+        source_ref: "https://docs.factory.ai/reference/hooks-reference"
+        graduation_candidate: false
+        conversion: not-portable
+      - id: plugin_hook_description
+        name: Plugin Hook Description Field
+        summary: "Plugin hooks use the same format as regular hooks with an optional description field to explain the hook's purpose."
+        source_ref: "https://docs.factory.ai/reference/hooks-reference"
+        graduation_candidate: false
+        conversion: not-portable
     loading_model: ""
-    notes: "Hook structure closely mirrors Claude Code's hook system (same event names, same JSON config shape, same exit-code semantics). Key updates from reference source: matcher_patterns are now confirmed supported (regex, exact, wildcard); input_modification is supported via updatedInput; context_injection is supported via additionalContext and systemMessage; permission_control is supported via allow/deny/ask decision field; json_io_protocol is fully confirmed (JSON stdin for input, JSON stdout for output); async_execution is confirmed (concurrent within same event). Default command timeout is 60 seconds. Plugin hooks via plugins/[name]/hooks/hooks.json auto-merge with user configs. hooksDisabled setting in settings.json globally disables all hooks without removing configurations."
+    notes: "Hook structure closely mirrors Claude Code's hook system (same event names, same JSON config shape, same exit-code semantics). Hooks are stored in dedicated hooks.json files: ~/.factory/hooks.json (user), .factory/hooks.json (project), plus enterprise managed policy hooks; the hooks key inside the matching settings.json is only a fallback used when hooks.json is absent. The former .factory/settings.local.json local hook scope is no longer documented — only user, project, and managed scopes remain. Droid auto-migrates legacy nested hooks/hooks.json files, archiving the old file as hooks/hooks.migrated.json. Key mechanisms: matcher_patterns are confirmed supported (regex, exact, wildcard); input_modification is supported via updatedInput; context_injection is supported via additionalContext and systemMessage; permission_control/decision_control use hookSpecificOutput.permissionDecision (allow/deny/ask) with permissionDecisionReason — the flat decision/reason fields are deprecated for PreToolUse; json_io_protocol is fully confirmed (JSON stdin for input, JSON stdout for output; permission_mode reports off/spec/auto-low/auto-medium/auto-high); async_execution is confirmed (concurrent within same event). Default command timeout is 60 seconds. Plugin hooks via plugins/[name]/hooks/hooks.json auto-merge with user configs and accept an optional description field. The org-managed allowManagedHooksOnly setting, when true, loads only org-managed and plugin hooks and ignores user- and project-level hooks; the hooks reference no longer documents hooksDisabled, though it remains listed as a user setting on the settings page."
 
   mcp:
     status: supported

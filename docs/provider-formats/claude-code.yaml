@@ -547,10 +547,10 @@ content_types:
         graduation_candidate: false
 
       - id: hook_mcp_tool_output_override
-        name: PostToolUse MCP Tool Output Override
-        summary: "PostToolUse hooks for MCP tools return updatedMCPToolOutput to filter/transform/annotate tool results before Claude sees them."
+        name: PostToolUse Tool Output Override
+        summary: "PostToolUse hooks return updatedToolOutput to replace a tool's result before Claude sees it; this is the preferred form and works for ALL tools (the value must match the tool's output shape). updatedMCPToolOutput is the older, narrower form that replaces output for MCP tools only. Only what Claude sees changes — the tool has already run, so files, commands, network requests, and telemetry captured the original output."
         conversion: embedded
-        provider_field: "updatedMCPToolOutput"
+        provider_field: "updatedToolOutput"
         source_ref: "https://code.claude.com/docs/en/hooks.md#posttooluse-decision-control"
         graduation_candidate: false
 
@@ -629,6 +629,14 @@ content_types:
         conversion: not-portable
         provider_field: "shell"
         source_ref: "https://code.claude.com/docs/en/hooks.md#command-hook-fields"
+        graduation_candidate: false
+
+      - id: hook_terminal_sequence
+        name: terminalSequence Terminal Escape Output
+        summary: "Hooks return terminalSequence in JSON output with an allowlisted terminal escape sequence that Claude Code emits on the hook's behalf — a desktop notification, window title, or bell. Restricted to OSC 0/1/2/9/99/777 and BEL; a value containing anything outside the allowlist is ignored. Race-free replacement for writing escape sequences directly to /dev/tty (unavailable to hooks); works inside tmux and GNU screen and on Windows. Requires Claude Code v2.1.141 or later."
+        conversion: not-portable
+        provider_field: "terminalSequence"
+        source_ref: "https://code.claude.com/docs/en/hooks.md#emit-terminal-notifications"
         graduation_candidate: false
 
     loading_model: >
@@ -1040,7 +1048,7 @@ content_types:
         confidence: confirmed
       builtin_commands:
         status: mapped
-        mechanism: "100+ built-in slash commands including /add-dir, /advisor, /agents, /autofix-pr, /background, /batch [Skill], /branch, /btw, /cd, /chrome, /claude-api [Skill], /clear, /code-review [Skill], /color, /compact, /config, /context, /copy, /cost, /dataviz [Skill], /debug [Skill], /deep-research, /design-login, /design-sync [Skill], /desktop, /diff, /doctor [Skill], /effort, /exit, /export, /fast, /feedback, /fewer-permission-prompts [Skill], /focus, /fork, /goal, /heapdump, /help, /hooks, /ide, /init, /insights, /install-github-app, /install-slack-app, /keybindings, /login, /logout, /loop [Skill], /mcp, /memory, /mobile, /model, /passes, /permissions, /plan, /plugin, /powerup, /pr-comments, /privacy-settings, /radio, /recap, /release-notes, /reload-plugins, /reload-skills, /remote-control, /remote-env, /rename, /resume, /review, /rewind, /run [Skill], /run-skill-generator [Skill], /sandbox, /schedule, /scroll-speed, /security-review, /setup-bedrock, /setup-vertex, /simplify [Skill], /skills, /stats, /status, /statusline, /stickers, /stop, /tasks, /team-onboarding, /teleport, /terminal-setup, /theme, /tui, /ultraplan, /ultrareview, /upgrade, /usage, /usage-credits, /verify [Skill], /vim, /voice, /web-setup, /workflows; not user-modifiable; availability varies by platform and plan"
+        mechanism: "100+ built-in slash commands including /add-dir, /advisor, /agents, /autofix-pr, /background, /batch [Skill], /branch, /btw, /cd, /chrome, /claude-api [Skill], /clear, /code-review [Skill], /color, /compact, /config, /context, /copy, /cost, /dataviz [Skill], /debug [Skill], /deep-research [Workflow], /design-login, /design-sync [Skill], /desktop, /diff, /doctor [Skill], /effort, /exit, /export, /fast, /feedback, /fewer-permission-prompts [Skill], /focus, /fork, /goal, /heapdump, /help, /hooks, /ide, /init, /insights, /install-github-app, /install-slack-app, /keybindings, /login, /logout, /loop [Skill], /mcp, /memory, /mobile, /model, /passes, /permissions, /plan, /plugin, /powerup, /pr-comments [removed v2.1.91], /privacy-settings, /radio, /recap, /release-notes, /reload-plugins, /reload-skills, /remote-control, /remote-env, /rename, /resume, /review, /rewind, /run [Skill], /run-skill-generator [Skill], /sandbox, /schedule, /scroll-speed, /security-review, /setup-bedrock, /setup-vertex, /simplify [Skill], /skills, /stats, /status, /statusline, /stickers, /stop, /tasks, /team-onboarding, /teleport, /terminal-setup, /theme, /tui, /ultraplan, /ultrareview, /upgrade, /usage, /usage-credits, /verify [Skill], /vim [removed v2.1.92], /voice, /web-setup, /workflows; not user-modifiable; availability varies by platform and plan"
         confidence: confirmed
     provider_extensions:
       - id: command_file_format
@@ -1060,6 +1068,13 @@ content_types:
       - id: bundled_skill_commands
         name: Bundled Skill Commands
         summary: "Thirteen commands ship as bundled prompt-based skills rather than fixed CLI logic (/batch, /claude-api, /code-review, /dataviz, /debug, /design-sync, /doctor, /fewer-permission-prompts, /loop, /run, /run-skill-generator, /simplify, /verify); they use the skill mechanism, appear marked [Skill] in the commands table, and can be disabled via the disableBundledSkills setting (/doctor exempt in CC v2.1.205+)."
+        conversion: not-portable
+        source_ref: "https://code.claude.com/docs/en/commands.md"
+        graduation_candidate: false
+
+      - id: bundled_workflow_commands
+        name: Bundled Workflow Commands
+        summary: "Some built-in commands ship as bundled dynamic workflows rather than fixed CLI logic or prompt-based skills — currently /deep-research. A workflow fans work out across many subagents and runs in the background; entries are marked [Workflow] in the commands table. This is a distinct category from [Skill] (a prompt handed to Claude, also auto-invocable) and from plain built-ins (behavior coded into the CLI)."
         conversion: not-portable
         source_ref: "https://code.claude.com/docs/en/commands.md"
         graduation_candidate: false
@@ -1088,5 +1103,6 @@ content_types:
       Custom commands and skills are the same mechanism under different names; .claude/commands/ is
       the legacy path while .claude/skills/ (with SKILL.md per-skill) is the current approach with
       richer features (frontmatter, auto-invocation, argument hints, etc.). If both exist with the
-      same name, the skill wins. The commands reference page lists both built-in commands and
-      bundled skills in the same table, with [Skill] annotations on the skill entries.
+      same name, the skill wins. The commands reference page lists built-in commands, bundled skills,
+      and bundled workflows in the same table, with [Skill] annotations on skill entries and
+      [Workflow] annotations on workflow entries.
