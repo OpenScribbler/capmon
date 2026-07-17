@@ -92,6 +92,14 @@ var ValidMappingStatuses = []string{
 // deferred Class B confirmation step runs a conforming canonicalizer over this
 // snippet to confirm the totality-net diagnostic before any filing.
 //
+// MechanismToken is the curator's source-mechanism token claim for a
+// status:"unmapped" entry, when the mechanism is nameable in ACIF's published
+// source-mechanism vocabulary (conformance/source-mechanisms.yaml). Optional —
+// leave empty when no token plausibly names the mechanism. Consumed by
+// `capmon acif-change confirm`: a claimed token that is a member of the export
+// with recognition_requiring:false is machine-rejected as already-mapped.
+// Only meaningful when Status is "unmapped".
+//
 // ProviderField names the actual native field (frontmatter key, config key, TOML
 // field, dot-notation path) when the mapping corresponds to a specific named
 // field. Omitted when the mapping is structural or behavioral.
@@ -101,13 +109,14 @@ var ValidMappingStatuses = []string{
 // The canonical mapping is the authority; the extension is the detail — so the
 // authority points to the detail, not the other way around.
 type CanonicalMapping struct {
-	Status        string   `yaml:"status"`
-	SourceForm    string   `yaml:"source_form,omitempty"`
-	Mechanism     string   `yaml:"mechanism"`
-	Paths         []string `yaml:"paths,omitempty"`
-	Confidence    string   `yaml:"confidence"`
-	ProviderField string   `yaml:"provider_field,omitempty"`
-	ExtensionID   string   `yaml:"extension_id,omitempty"`
+	Status         string   `yaml:"status"`
+	SourceForm     string   `yaml:"source_form,omitempty"`
+	MechanismToken string   `yaml:"mechanism_token,omitempty"`
+	Mechanism      string   `yaml:"mechanism"`
+	Paths          []string `yaml:"paths,omitempty"`
+	Confidence     string   `yaml:"confidence"`
+	ProviderField  string   `yaml:"provider_field,omitempty"`
+	ExtensionID    string   `yaml:"extension_id,omitempty"`
 }
 
 // ExtensionExample is a runnable snippet attached to a provider extension. Examples

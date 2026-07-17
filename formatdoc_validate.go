@@ -241,6 +241,9 @@ func ValidateFormatDoc(formatsDir, canonicalKeysPath, provider string) error {
 			if mapping.Status != MappingStatusUnmapped && mapping.SourceForm != "" {
 				errs = append(errs, fmt.Sprintf("✗ content_types.%s.canonical_mappings.%s.source_form: only allowed when status is \"unmapped\" (got status %q)", ct, key, mapping.Status))
 			}
+			if mapping.Status != MappingStatusUnmapped && mapping.MechanismToken != "" {
+				errs = append(errs, fmt.Sprintf("✗ content_types.%s.canonical_mappings.%s.mechanism_token: only allowed when status is \"unmapped\" (got status %q)", ct, key, mapping.Status))
+			}
 		}
 
 		// Rule 3: provider_extensions required fields
