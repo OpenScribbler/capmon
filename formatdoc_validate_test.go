@@ -680,3 +680,66 @@ func TestValidationWarning_DeduplicationKey(t *testing.T) {
 		t.Errorf("dedup key must be 16 hex chars, got len %d: %q", len(w1.DeduplicationKey()), w1.DeduplicationKey())
 	}
 }
+
+func TestValidateFormatDoc_MechanismTokenRequiresUnmappedStatus(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	canonicalKeysPath := writeTestCanonicalKeys(t, dir)
+	formatsDir := filepath.Join(dir, "formats")
+	if err := os.MkdirAll(formatsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	content := `provider: test-provider
+docs_url: "https://example.com/docs"
+category: cli
+last_fetched_at: "2026-04-11T00:00:00Z"
+content_types:
+  skills:
+    status: supported
+    canonical_mappings:
+      display_name:
+        status: mapped
+        mechanism_token: always_on
+        mechanism: "some mechanism"
+        confidence: confirmed
+`
+	writeTestFormatDoc(t, formatsDir, "test-provider", content)
+
+	err := ValidateFormatDoc(formatsDir, canonicalKeysPath, "test-provider")
+	if err == nil {
+		t.Fatal("expected error for mechanism_token on a mapped entry")
+	}
+	if !strings.Contains(err.Error(), "mechanism_token: only allowed when status is \"unmapped\"") {
+		t.Errorf("error should flag mechanism_token, got: %v", err)
+	}
+}
+
+func TestValidateFormatDoc_MechanismTokenAllowedWhenUnmapped(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	canonicalKeysPath := writeTestCanonicalKeys(t, dir)
+	formatsDir := filepath.Join(dir, "formats")
+	if err := os.MkdirAll(formatsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	content := `provider: test-provider
+docs_url: "https://example.com/docs"
+category: cli
+last_fetched_at: "2026-04-11T00:00:00Z"
+content_types:
+  skills:
+    status: supported
+    canonical_mappings:
+      display_name:
+        status: unmapped
+        mechanism_token: always_on
+        source_form: "name: thing"
+        mechanism: "some mechanism"
+        confidence: confirmed
+`
+	writeTestFormatDoc(t, formatsDir, "test-provider", content)
+
+	if err := ValidateFormatDoc(formatsDir, canonicalKeysPath, "test-provider"); err != nil {
+		t.Errorf("expected no error for mechanism_token on unmapped entry, got: %v", err)
+	}
+}
