@@ -1,6 +1,7 @@
 package capmon
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -23,6 +24,9 @@ func TestRecordUnmappedForm_ThresholdCreatesIssue(t *testing.T) {
 		calls = append(calls, copyArgs(args))
 		if isIssueListCall(args) {
 			return []byte(`[]`), nil
+		}
+		if isGH(args, "api", "-X") {
+			return nil, nil // provider label ensure
 		}
 		if isGH(args, "issue", "create") {
 			createBody = argValue(args, "--body")
@@ -105,6 +109,9 @@ func TestRecordUnmappedForm_DedupCommentsExistingIssue(t *testing.T) {
 		if isIssueListCall(args) {
 			return []byte(`[]`), nil
 		}
+		if isGH(args, "api", "-X") {
+			return nil, nil // provider label ensure
+		}
 		if isGH(args, "issue", "create") {
 			creates++
 			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/77\n"), nil
@@ -164,6 +171,9 @@ func TestRecordUnmappedForm_StateLostAnchorFoundComments(t *testing.T) {
 				t.Fatalf("comment issue = %q, want 88", args[2])
 			}
 			return nil, nil
+		}
+		if isGH(args, "api", "-X") {
+			return nil, nil // provider label ensure
 		}
 		if isGH(args, "issue", "create") {
 			creates++
@@ -291,6 +301,9 @@ func TestRecordUnmappedForm_StateRoundTripThroughJSON(t *testing.T) {
 		if isIssueListCall(args) {
 			return []byte(`[]`), nil
 		}
+		if isGH(args, "api", "-X") {
+			return nil, nil // provider label ensure
+		}
 		if isGH(args, "issue", "create") {
 			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/66\n"), nil
 		}
@@ -375,4 +388,58 @@ func labelValues(args []string) map[string]bool {
 		}
 	}
 	return labels
+}
+
+func TestCreateACIFUnmappedIssue_EnsuresProviderLabelFirst(t *testing.T) {
+	var calls [][]string
+	SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		calls = append(calls, copyArgs(args))
+		if isGH(args, "api", "-X") {
+			return nil, nil
+		}
+		if isGH(args, "issue", "create") {
+			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/44\n"), nil
+		}
+		t.Fatalf("unexpected gh call: %v", args)
+		return nil, nil
+	})
+	defer SetGHCommandForTest(nil)
+
+	state := unmappedObservationState{
+		DiagnosticID: "acif.rule.activation_mode_unmappable",
+		Provider:     "claude-code",
+		SourceForm:   "background-agent",
+		ContentItems: map[string]bool{"a": true, "b": true},
+	}
+	if _, err := createACIFUnmappedIssue(state, "deadbeef"); err != nil {
+		t.Fatalf("createACIFUnmappedIssue: %v", err)
+	}
+	if len(calls) != 2 || !isGH(calls[0], "api", "-X") || !isGH(calls[1], "issue", "create") {
+		t.Fatalf("want label ensure then create, got: %v", calls)
+	}
+	if !hasArg(calls[0], "name=provider:claude-code") {
+		t.Fatalf("label ensure missing provider label name: %v", calls[0])
+	}
+}
+
+func TestEnsureACIFLabel_TreatsAlreadyExistsAsSuccess(t *testing.T) {
+	SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		return nil, fmt.Errorf("exit status 1: gh: Validation Failed (HTTP 422) already_exists")
+	})
+	defer SetGHCommandForTest(nil)
+
+	if err := ensureACIFLabel("provider:claude-code", "ededed", "test"); err != nil {
+		t.Fatalf("ensureACIFLabel on already_exists: %v", err)
+	}
+}
+
+func TestEnsureACIFLabel_SurfacesRealErrors(t *testing.T) {
+	SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		return nil, fmt.Errorf("exit status 1: gh: Not Found (HTTP 404)")
+	})
+	defer SetGHCommandForTest(nil)
+
+	if err := ensureACIFLabel("provider:claude-code", "ededed", "test"); err == nil {
+		t.Fatal("expected real gh error to surface")
+	}
 }

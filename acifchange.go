@@ -171,7 +171,29 @@ func findOpenACIFUnmappedIssue(diagnosticID, provider, keyHash string) (int, boo
 	)
 }
 
+// ensureACIFLabel creates a label on the ACIF repo if it does not exist yet.
+// gh refuses to create an issue carrying a nonexistent label, and dynamic
+// labels (provider:<slug>) cannot be pre-created for every provider — so a
+// filing path ensures its dynamic labels right before creating the issue.
+// An HTTP 422 (already_exists) is success, not an error.
+func ensureACIFLabel(name, color, description string) error {
+	if _, err := ghRunner("api", "-X", "POST", "repos/"+acifChangeRepo+"/labels",
+		"-f", "name="+name,
+		"-f", "color="+color,
+		"-f", "description="+description,
+	); err != nil {
+		if strings.Contains(err.Error(), "already_exists") || strings.Contains(err.Error(), "HTTP 422") {
+			return nil
+		}
+		return fmt.Errorf("ensure label %q: %w", name, err)
+	}
+	return nil
+}
+
 func createACIFUnmappedIssue(state unmappedObservationState, keyHash string) (int, error) {
+	if err := ensureACIFLabel("provider:"+state.Provider, "ededed", "ACIF change signal scoped to provider "+state.Provider); err != nil {
+		return 0, err
+	}
 	title := fmt.Sprintf("acif-change: %s on %s (class-b candidate)", state.DiagnosticID, state.Provider)
 	body := buildACIFUnmappedIssueBody(state, keyHash)
 	out, err := ghRunner("issue", "create",
