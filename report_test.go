@@ -414,7 +414,7 @@ func TestFindOpenCapmonProviderIssue_Found(t *testing.T) {
 	})
 	defer capmon.SetGHCommandForTest(nil)
 
-	num, found, err := capmon.FindOpenCapmonProviderIssue("test-provider")
+	num, body, found, err := capmon.FindOpenCapmonProviderIssue("test-provider")
 	if err != nil {
 		t.Fatalf("FindOpenCapmonProviderIssue: %v", err)
 	}
@@ -424,6 +424,11 @@ func TestFindOpenCapmonProviderIssue_Found(t *testing.T) {
 	if num != 101 {
 		t.Errorf("issue number = %d, want 101", num)
 	}
+	// The body comes back so the caller can refresh the issue without a
+	// second round trip.
+	if body != "<!-- capmon-check: test-provider -->\nsome body" {
+		t.Errorf("body = %q, want the full issue body", body)
+	}
 }
 
 func TestFindOpenCapmonProviderIssue_NotFound(t *testing.T) {
@@ -432,7 +437,7 @@ func TestFindOpenCapmonProviderIssue_NotFound(t *testing.T) {
 	})
 	defer capmon.SetGHCommandForTest(nil)
 
-	num, found, err := capmon.FindOpenCapmonProviderIssue("test-provider")
+	num, _, found, err := capmon.FindOpenCapmonProviderIssue("test-provider")
 	if err != nil {
 		t.Fatalf("FindOpenCapmonProviderIssue: %v", err)
 	}
@@ -448,7 +453,7 @@ func TestFindOpenCapmonProviderIssue_WrongAnchor(t *testing.T) {
 	})
 	defer capmon.SetGHCommandForTest(nil)
 
-	_, found, err := capmon.FindOpenCapmonProviderIssue("test-provider")
+	_, _, found, err := capmon.FindOpenCapmonProviderIssue("test-provider")
 	if err != nil {
 		t.Fatalf("FindOpenCapmonProviderIssue: %v", err)
 	}
@@ -465,7 +470,7 @@ func TestFindOpenCapmonProviderIssue_InvalidSlug(t *testing.T) {
 	})
 	defer capmon.SetGHCommandForTest(nil)
 
-	_, _, err := capmon.FindOpenCapmonProviderIssue("INVALID SLUG")
+	_, _, _, err := capmon.FindOpenCapmonProviderIssue("INVALID SLUG")
 	if err == nil {
 		t.Error("expected error for invalid slug")
 	}
@@ -538,5 +543,83 @@ func TestBuildPRBody_NoTemplateInjection(t *testing.T) {
 	}
 	if !strings.Contains(body, "Pipeline output is not ground truth") {
 		t.Error("fixed footer disclaimer must be present")
+	}
+}
+
+func TestUpdateCapmonProviderIssue_EditsAndKeepsAnchor(t *testing.T) {
+	var gotArgs []string
+	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		gotArgs = args
+		return []byte(""), nil
+	})
+	defer capmon.SetGHCommandForTest(nil)
+
+	edited, err := capmon.UpdateCapmonProviderIssue(
+		context.Background(), "test-provider", 55,
+		"<!-- capmon-check: test-provider -->\nold body",
+		"new body",
+	)
+	if err != nil {
+		t.Fatalf("UpdateCapmonProviderIssue: %v", err)
+	}
+	if !edited {
+		t.Error("expected edited=true when the body differs")
+	}
+	if len(gotArgs) < 3 || gotArgs[0] != "issue" || gotArgs[1] != "edit" || gotArgs[2] != "55" {
+		t.Fatalf("expected `issue edit 55`, got %v", gotArgs)
+	}
+	var body string
+	for i, a := range gotArgs {
+		if a == "--body" && i+1 < len(gotArgs) {
+			body = gotArgs[i+1]
+		}
+	}
+	// Dropping the anchor would orphan the issue from FindOpenCapmonProviderIssue
+	// and the next run would file a duplicate.
+	if body != "<!-- capmon-check: test-provider -->\nnew body" {
+		t.Errorf("body = %q, want anchor + new body", body)
+	}
+}
+
+func TestUpdateCapmonProviderIssue_NoOpWhenUnchanged(t *testing.T) {
+	ghCalled := false
+	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		ghCalled = true
+		return []byte(""), nil
+	})
+	defer capmon.SetGHCommandForTest(nil)
+
+	existing := "<!-- capmon-check: test-provider -->\nsame body"
+	edited, err := capmon.UpdateCapmonProviderIssue(
+		context.Background(), "test-provider", 55, existing, "same body",
+	)
+	if err != nil {
+		t.Fatalf("UpdateCapmonProviderIssue: %v", err)
+	}
+	if edited {
+		t.Error("expected edited=false when the rendered body is unchanged")
+	}
+	// The daily pipeline re-runs against untriaged issues; a redundant edit
+	// would re-notify every watcher each morning.
+	if ghCalled {
+		t.Error("expected no gh call when the body is unchanged")
+	}
+}
+
+func TestUpdateCapmonProviderIssue_InvalidSlug(t *testing.T) {
+	ghCalled := false
+	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		ghCalled = true
+		return []byte(""), nil
+	})
+	defer capmon.SetGHCommandForTest(nil)
+
+	if _, err := capmon.UpdateCapmonProviderIssue(
+		context.Background(), "INVALID SLUG", 55, "old", "new",
+	); err == nil {
+		t.Error("expected error for invalid slug")
+	}
+	if ghCalled {
+		t.Error("expected no gh call when slug is invalid")
 	}
 }

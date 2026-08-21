@@ -493,6 +493,7 @@ func TestRunCapmonCheck_BatchFlush_OpenIssueExists(t *testing.T) {
 	env.setHTTPResponse(t, testContent, "text/html")
 
 	var createCalls int
+	var editArgs []string
 	capmon.SetGHCommandForTest(func(args ...string) ([]byte, error) {
 		if len(args) >= 2 && args[0] == "api" && args[1] == "--paginate" {
 			// Return an existing open provider issue with the provider-only anchor.
@@ -501,6 +502,10 @@ func TestRunCapmonCheck_BatchFlush_OpenIssueExists(t *testing.T) {
 		if len(args) >= 2 && args[0] == "issue" && args[1] == "create" {
 			createCalls++
 			return []byte("https://github.com/test/repo/issues/99\n"), nil
+		}
+		if len(args) >= 2 && args[0] == "issue" && args[1] == "edit" {
+			editArgs = args
+			return []byte(""), nil
 		}
 		return []byte(""), nil
 	})
@@ -512,6 +517,29 @@ func TestRunCapmonCheck_BatchFlush_OpenIssueExists(t *testing.T) {
 	}
 	if createCalls != 0 {
 		t.Errorf("expected zero issue creates when open issue exists, got %d", createCalls)
+	}
+	// The open issue must be refreshed, not skipped: a stale untriaged issue
+	// used to hide every subsequent change for this provider.
+	if editArgs == nil {
+		t.Fatal("expected the existing issue to be updated, got no gh issue edit call")
+	}
+	if editArgs[2] != "55" {
+		t.Errorf("edited issue %q, want 55", editArgs[2])
+	}
+	var newBody string
+	for i, a := range editArgs {
+		if a == "--body" && i+1 < len(editArgs) {
+			newBody = editArgs[i+1]
+		}
+	}
+	if !strings.HasPrefix(newBody, "<!-- capmon-check: test-provider -->\n") {
+		t.Errorf("updated body lost its dedup anchor: %q", newBody)
+	}
+	if !strings.Contains(newBody, "https://example.com/skills.md") {
+		t.Errorf("updated body missing the drifted source, got %q", newBody)
+	}
+	if strings.Contains(newBody, "some previous body") {
+		t.Errorf("updated body should replace the stale content, got %q", newBody)
 	}
 }
 

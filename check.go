@@ -92,7 +92,8 @@ func buildProviderIssueBody(batch *providerBatch) string {
 }
 
 // flushProviderBatch writes at most one GitHub issue for the accumulated batch.
-// If an open issue already exists for the provider, this is a silent no-op.
+// If an open issue already exists for the provider, its body is refreshed in
+// place so newly detected drift is never hidden behind an untriaged issue.
 // Does nothing when the batch is empty. DryRun logs a summary to stderr and skips
 // all GitHub calls.
 func flushProviderBatch(ctx context.Context, opts CapmonCheckOptions, provider string, batch *providerBatch) error {
@@ -108,14 +109,22 @@ func flushProviderBatch(ctx context.Context, opts CapmonCheckOptions, provider s
 	// FindOpenCapmonProviderIssue before either creates an issue. The window is
 	// narrow (one race opportunity per provider per run, not per content type) and
 	// duplicates are dedup-detectable by anchor. See ADR-0009.
-	_, found, err := FindOpenCapmonProviderIssue(provider)
+	issueNum, existingBody, found, err := FindOpenCapmonProviderIssue(provider)
 	if err != nil {
 		return fmt.Errorf("find provider issue for %s: %w", provider, err)
 	}
-	if found {
-		return nil // open issue already exists — silent skip (ADR-0010)
-	}
 	body := buildProviderIssueBody(batch)
+	if found {
+		// An open anchor issue used to suppress the batch outright, so any
+		// drift detected after the issue was filed stayed invisible until a
+		// human happened to close it. Refresh the body instead: the issue
+		// always reflects the latest run rather than the first one.
+		_, err := UpdateCapmonProviderIssue(ctx, provider, issueNum, existingBody, body)
+		if err != nil {
+			return fmt.Errorf("update provider issue for %s: %w", provider, err)
+		}
+		return nil
+	}
 	title := fmt.Sprintf("capmon: changes detected for %s", provider)
 	_, err = CreateCapmonProviderIssue(ctx, provider, title, body)
 	return err
