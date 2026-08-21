@@ -3,6 +3,7 @@ package capmon
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -210,5 +211,93 @@ func TestTokenizeStem(t *testing.T) {
 				t.Errorf("tokenizeStem(%q)[%d] = %q, want %q", tt.input, i, got[i], tt.want[i])
 			}
 		}
+	}
+}
+
+// TestDetectGitHubRename_PrefersPathContextOverBareBasename reproduces the
+// codex/skills regression. openai/codex renamed the crate core-skills → skills,
+// so codex-rs/skills/src/model.rs is the correct heal for
+// codex-rs/core-skills/src/model.rs. But codex-rs/tui/src/exec_cell/model.rs
+// also has a perfect basename match, and under basename-only scoring both tied
+// at 1.0 — the winner was whichever the sort happened to place first. The
+// pipeline picked the TUI file and pushed it as a branch every day for two
+// weeks.
+func TestDetectGitHubRename_PrefersPathContextOverBareBasename(t *testing.T) {
+	tree := gitTreeResponse{
+		Tree: []gitTreeEntry{
+			// Listed before the correct answer on purpose: if path context is
+			// ignored, this ties and wins on ordering alone.
+			{Path: "codex-rs/tui/src/exec_cell/model.rs", Type: "blob"},
+			{Path: "codex-rs/app-server/src/model.rs", Type: "blob"},
+			{Path: "codex-rs/skills/src/model.rs", Type: "blob"},
+			{Path: "codex-rs/skills/src/parser.rs", Type: "blob"},
+			{Path: "README.md", Type: "blob"},
+		},
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(tree)
+	}))
+	defer srv.Close()
+
+	SetGitHubBaseURLForTest(srv.URL)
+	defer SetGitHubBaseURLForTest("")
+
+	got, err := DetectGitHubRename(context.Background(),
+		"https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/model.rs")
+	if err != nil {
+		t.Fatalf("DetectGitHubRename: %v", err)
+	}
+	if len(got) == 0 {
+		t.Fatal("expected at least one candidate")
+	}
+	if got[0].Path != "codex-rs/skills/src/model.rs" {
+		t.Errorf("top candidate = %q, want codex-rs/skills/src/model.rs (path context must outrank a bare basename tie)", got[0].Path)
+	}
+	// The margin must be real, not a coin flip: an equal top-two score means
+	// the ordering is still arbitrary even if this run happened to pass.
+	if len(got) > 1 && got[0].Score == got[1].Score {
+		t.Errorf("top two candidates tied at %.4f (%q vs %q); the winner is arbitrary",
+			got[0].Score, got[0].Path, got[1].Path)
+	}
+}
+
+// TestDetectGitHubRename_CapAppliesAfterRanking guards the second half of the
+// same bug: maxRenameCandidates used to break out of the tree walk, so in a
+// large repo the best candidate could be discarded before it was ever scored.
+func TestDetectGitHubRename_CapAppliesAfterRanking(t *testing.T) {
+	entries := []gitTreeEntry{}
+	// Enough weak-but-passing candidates to overflow the cap, all listed
+	// before the obvious correct answer.
+	for i := 0; i < maxRenameCandidates+50; i++ {
+		entries = append(entries, gitTreeEntry{
+			Path: fmt.Sprintf("vendor/pkg%d/settings-legacy.md", i),
+			Type: "blob",
+		})
+	}
+	entries = append(entries, gitTreeEntry{Path: "docs/settings.md", Type: "blob"})
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(gitTreeResponse{Tree: entries})
+	}))
+	defer srv.Close()
+
+	SetGitHubBaseURLForTest(srv.URL)
+	defer SetGitHubBaseURLForTest("")
+
+	got, err := DetectGitHubRename(context.Background(),
+		"https://raw.githubusercontent.com/owner/repo/main/docs/settings-old.md")
+	if err != nil {
+		t.Fatalf("DetectGitHubRename: %v", err)
+	}
+	if len(got) == 0 {
+		t.Fatal("expected candidates")
+	}
+	if got[0].Path != "docs/settings.md" {
+		t.Errorf("top candidate = %q, want docs/settings.md — the cap must truncate the ranked result, not the scan", got[0].Path)
+	}
+	if len(got) > maxRenameCandidates {
+		t.Errorf("returned %d candidates, want at most %d", len(got), maxRenameCandidates)
 	}
 }
