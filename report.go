@@ -103,16 +103,24 @@ func listOpenIssues(repo string, labels []string) ([]issueRef, error) {
 // pages) whose body contains anchor, scoped to repo and labels. Anchors are
 // unique per dedup key, so "first match" is unambiguous.
 func findOpenIssueByAnchor(repo string, labels []string, anchor string) (int, bool, error) {
+	num, _, found, err := findOpenIssueBodyByAnchor(repo, labels, anchor)
+	return num, found, err
+}
+
+// findOpenIssueBodyByAnchor is findOpenIssueByAnchor plus the matched issue's
+// body. listOpenIssues already carries the body, so a caller that wants to
+// update the issue in place gets it without a second API round trip.
+func findOpenIssueBodyByAnchor(repo string, labels []string, anchor string) (int, string, bool, error) {
 	issues, err := listOpenIssues(repo, labels)
 	if err != nil {
-		return 0, false, err
+		return 0, "", false, err
 	}
 	for _, iss := range issues {
 		if strings.Contains(iss.Body, anchor) {
-			return iss.Number, true, nil
+			return iss.Number, iss.Body, true, nil
 		}
 	}
-	return 0, false, nil
+	return 0, "", false, nil
 }
 
 // DeduplicatePR checks if an open PR exists for capmon/drift-<provider>.
@@ -258,16 +266,49 @@ func CreateCapmonChangeIssue(_ context.Context, provider, contentType, title, bo
 
 // FindOpenCapmonProviderIssue searches for an open GitHub issue with the
 // capmon-change label and the provider:slug label, filtered by the provider-only
-// anchor <!-- capmon-check: <provider> -->. Returns (issueNumber, true, nil)
-// when found, or (0, false, nil) when no matching issue exists.
+// anchor <!-- capmon-check: <provider> -->. Returns (issueNumber, body, true, nil)
+// when found, or (0, "", false, nil) when no matching issue exists.
 // Legacy per-(provider,contentType) anchors (<!-- capmon-check: slug/ct -->) do not match.
-func FindOpenCapmonProviderIssue(provider string) (int, bool, error) {
+//
+// The body is returned so callers can refresh a stale anchor issue in place
+// rather than skipping the run's findings entirely.
+func FindOpenCapmonProviderIssue(provider string) (int, string, bool, error) {
 	slug, err := SanitizeSlug(provider)
 	if err != nil {
-		return 0, false, err
+		return 0, "", false, err
 	}
 	anchor := fmt.Sprintf("<!-- capmon-check: %s -->", slug)
-	return findOpenIssueByAnchor("", []string{"capmon-change", "provider:" + slug}, anchor)
+	return findOpenIssueBodyByAnchor("", []string{"capmon-change", "provider:" + slug}, anchor)
+}
+
+// UpdateCapmonProviderIssue refreshes the body of an existing provider anchor
+// issue, re-prefixing the anchor so the issue stays dedup-discoverable.
+//
+// When the rendered body matches existingBody the edit is skipped: the daily
+// pipeline re-runs against providers whose issues nobody has triaged yet, and
+// rewriting an identical body would re-notify every watcher each morning until
+// the bot gets muted — which would recreate the very blind spot this replaced.
+// Returns true when GitHub was actually written to.
+func UpdateCapmonProviderIssue(_ context.Context, provider string, issueNum int, existingBody, body string) (bool, error) {
+	slug, err := SanitizeSlug(provider)
+	if err != nil {
+		return false, err
+	}
+	fullBody := ProviderIssueBodyWithAnchor(slug, body)
+	if fullBody == existingBody {
+		return false, nil
+	}
+	if _, err := ghRunner("issue", "edit", strconv.Itoa(issueNum), "--body", fullBody); err != nil {
+		return false, fmt.Errorf("gh issue edit %d: %w", issueNum, err)
+	}
+	return true, nil
+}
+
+// ProviderIssueBodyWithAnchor prefixes body with the provider dedup anchor.
+// Create and update must agree on this exact layout or an updated issue stops
+// matching FindOpenCapmonProviderIssue.
+func ProviderIssueBodyWithAnchor(slug, body string) string {
+	return fmt.Sprintf("<!-- capmon-check: %s -->", slug) + "\n" + body
 }
 
 // CreateCapmonProviderIssue creates a GitHub issue for a per-provider batched
@@ -278,8 +319,7 @@ func CreateCapmonProviderIssue(_ context.Context, provider, title, body string) 
 	if err != nil {
 		return 0, err
 	}
-	anchor := fmt.Sprintf("<!-- capmon-check: %s -->", slug)
-	fullBody := anchor + "\n" + body
+	fullBody := ProviderIssueBodyWithAnchor(slug, body)
 
 	out, err := ghRunner("issue", "create",
 		"--title", title,

@@ -289,6 +289,18 @@ func tryHealSource(ctx context.Context, opts PipelineOptions, providerSlug, cont
 		// validated), but we couldn't open the review PR. Escalate as a
 		// heal failure so operators see it.
 		event.FailReason = "heal found " + result.NewURL + " but PR open failed: " + perr.Error()
+		// Setting FailReason alone only marks the in-memory event, which
+		// nothing surfaces: the branch is already pushed and the workflow
+		// still exits 0, so a PR-open failure looked identical to success.
+		// Route it through the same counter/issue path as a heal-strategy
+		// failure. (codex/skills failed this way for 14 consecutive days
+		// without producing a single capmon-heal-fail issue.)
+		failed := *result
+		failed.Success = false
+		failed.FailReason = event.FailReason
+		if issueNum, ierr := RecordConsecutiveHealFailure(opts.CacheRoot, providerSlug, contentType, sourceIndex, &failed); ierr == nil {
+			event.IssueNumber = issueNum
+		}
 		return event
 	}
 	event.PRURL = prURL

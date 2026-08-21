@@ -197,3 +197,98 @@ func TestTryHealSource_SuccessOpensPRAndClearsCounter(t *testing.T) {
 		t.Errorf("counter file should have been removed: %v", err)
 	}
 }
+
+// TestTryHealSource_PROpenFailureEscalates covers the gap that hid the
+// codex/skills breakage: the heal itself succeeded, the branch was pushed, and
+// `gh pr create` failed. That used to set event.FailReason and return, which
+// nothing surfaced — the workflow still exited 0. The failure must instead go
+// through the same counter/issue path as a heal-strategy failure.
+func TestTryHealSource_PROpenFailureEscalates(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/docs/foo_bar.md", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/markdown")
+		_, _ = w.Write(validBody)
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	repoDir := t.TempDir()
+	manifestsDir := filepath.Join(repoDir, "sources")
+	if err := os.MkdirAll(manifestsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	manifestPath := filepath.Join(manifestsDir, "test-provider.yaml")
+	manifestBody := strings.ReplaceAll(pipelineHealManifest, "__URL__", srv.URL+"/docs/foo-bar.md")
+	if err := os.WriteFile(manifestPath, []byte(manifestBody), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	var createdTitle, createdBody string
+	SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		if args[0] == "pr" && args[1] == "list" {
+			return []byte(`[]`), nil
+		}
+		if args[0] == "pr" && args[1] == "create" {
+			// What the real repo does today: Actions is not permitted to
+			// create pull requests, so the push lands and this is refused.
+			return nil, errors.New("GitHub Actions is not permitted to create or approve pull requests")
+		}
+		if args[0] == "api" {
+			return []byte(`[]`), nil
+		}
+		if args[0] == "issue" && args[1] == "create" {
+			for i, a := range args {
+				if a == "--title" && i+1 < len(args) {
+					createdTitle = args[i+1]
+				}
+				if a == "--body" && i+1 < len(args) {
+					createdBody = args[i+1]
+				}
+			}
+			return []byte("https://github.com/org/repo/issues/321\n"), nil
+		}
+		return nil, nil
+	})
+	defer SetGHCommandForTest(nil)
+	SetGitRunnerForTest(func(dir string, args ...string) ([]byte, error) { return nil, nil })
+	defer SetGitRunnerForTest(nil)
+
+	// Seed one prior failure so this attempt trips healFailureThreshold (2).
+	cacheRoot := t.TempDir()
+	counterPath := healFailureCountFile(cacheRoot, "test-provider", "skills", 0)
+	if err := os.MkdirAll(filepath.Dir(counterPath), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(counterPath, []byte("1"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	src := SourceEntry{
+		URL:     srv.URL + "/docs/foo-bar.md",
+		Healing: &HealingConfig{Strategies: []string{"variant"}},
+	}
+	opts := PipelineOptions{
+		CacheRoot:          cacheRoot,
+		RepoRoot:           repoDir,
+		SourceManifestsDir: manifestsDir,
+	}
+	evt := tryHealSource(context.Background(), opts, "test-provider", "skills", 0, src, nil, errors.New("404"), "run-43")
+	if evt == nil {
+		t.Fatal("expected an event")
+	}
+	if evt.PRURL != "" {
+		t.Errorf("PRURL should be empty when PR open failed, got %q", evt.PRURL)
+	}
+	if !strings.Contains(evt.FailReason, "PR open failed") {
+		t.Errorf("FailReason = %q, want it to mention the PR open failure", evt.FailReason)
+	}
+	if evt.IssueNumber != 321 {
+		t.Errorf("IssueNumber = %d, want 321 (escalation issue)", evt.IssueNumber)
+	}
+	if !strings.Contains(createdTitle, "heal failed 2x") {
+		t.Errorf("issue title = %q, want the 2x heal-failure title", createdTitle)
+	}
+	if !strings.Contains(createdBody, "PR open failed") {
+		t.Errorf("issue body should carry the PR-open failure reason, got %q", createdBody)
+	}
+}
