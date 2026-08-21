@@ -199,12 +199,21 @@ content_types:
 
   skills:
     sources:
-      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/model.rs
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/skills/src/model.rs
         type: source-code
         format: rust
         extracts: [file_format, frontmatter_fields, config_fields]
 
-      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/loader.rs
+      # The core-skills crate was renamed to skills, and its loader.rs split
+      # into a constants module and the directory walk. Both halves are needed:
+      # mod.rs carries the literal values (SKILL.md, MAX_SCAN_DEPTH = 6) and
+      # discovery.rs carries the traversal that applies them.
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/ext/skills/src/loader/mod.rs
+        type: source-code
+        format: rust
+        extracts: [discovery_rules, file_locations]
+
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/ext/skills/src/loader/discovery.rs
         type: source-code
         format: rust
         extracts: [discovery_rules, file_locations]

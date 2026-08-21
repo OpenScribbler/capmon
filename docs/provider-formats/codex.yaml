@@ -9,15 +9,20 @@ content_types:
   skills:
     status: supported
     sources:
-      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/model.rs"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/skills/src/model.rs"
         type: source_code
         fetch_method: gh_raw
-        content_hash: "sha256:23360b3d490b614ba932336ff7bcc1548e9ac42e90220d85657051464eaa1150"
+        content_hash: ""
         fetched_at: "2026-07-14T00:38:05Z"
-      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/loader.rs"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/ext/skills/src/loader/mod.rs"
         type: source_code
         fetch_method: gh_raw
-        content_hash: "sha256:9bbdbf2af932e4b9c68e87565f6b63dc4e45b12648c9c3e64db28fb19659af16"
+        content_hash: ""
+        fetched_at: "2026-07-14T00:38:05Z"
+      - uri: "https://raw.githubusercontent.com/openai/codex/main/codex-rs/ext/skills/src/loader/discovery.rs"
+        type: source_code
+        fetch_method: gh_raw
+        content_hash: ""
         fetched_at: "2026-07-14T00:38:05Z"
       - uri: "https://raw.githubusercontent.com/openai/codex/main/docs/skills.md"
         type: documentation
