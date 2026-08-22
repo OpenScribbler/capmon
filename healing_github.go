@@ -37,6 +37,10 @@ type RenameCandidate struct {
 	Score float64
 	// Reason briefly describes why this candidate was chosen (for PR body).
 	Reason string
+	// exactStem records whether the candidate's basename matched the original
+	// exactly. Ranking treats that as a tier rather than folding it into
+	// Score — see the sort in DetectGitHubRename.
+	exactStem bool
 }
 
 // DetectGitHubRename looks for a likely replacement file in the same repo
@@ -88,40 +92,114 @@ func DetectGitHubRename(ctx context.Context, rawURL string) ([]RenameCandidate, 
 			continue
 		}
 
-		score := stemSimilarity(origStem, candStem)
-		if score < renameScoreFloor {
+		stem := stemSimilarity(origStem, candStem)
+		if stem < renameScoreFloor {
 			continue
 		}
 
-		// Light directory-proximity nudge: a candidate in the same directory
-		// is slightly preferred over one elsewhere.
+		// Path context breaks ties the basename cannot. A repo can hold many
+		// files with the same name; the plausible rename is the one whose
+		// surrounding path still resembles the original. Without this,
+		// codex-rs/core-skills/src/model.rs and codex-rs/tui/src/exec_cell/model.rs
+		// both scored a perfect 1.0 and the winner was whichever the sort
+		// happened to place first — which is how a skills source got bound to a
+		// TUI render cell for two weeks.
 		candDir := path.Dir(entry.Path)
-		reason := fmt.Sprintf("stem similarity %.2f (%q → %q)", score, origStem, candStem)
-		if candDir == origDir {
-			score += 0.05
-			reason += "; same directory"
-		} else if strings.HasPrefix(candDir, origDir+"/") || strings.HasPrefix(origDir, candDir+"/") {
-			score += 0.02
-			reason += "; nearby directory"
-		}
+		dir := dirSimilarity(origDir, candDir)
+		score := stemWeight*stem + dirWeight*dir
+		reason := fmt.Sprintf("stem similarity %.2f (%q → %q); path similarity %.2f (%q → %q)",
+			stem, origStem, candStem, dir, origDir, candDir)
 
 		// Rebuild the raw URL for this candidate.
 		candURL := fmt.Sprintf("https://%s/%s/%s/%s/%s", rawGitHubHost, owner, repo, ref, entry.Path)
 		candidates = append(candidates, RenameCandidate{
-			Path:   entry.Path,
-			URL:    candURL,
-			Score:  score,
-			Reason: reason,
+			Path:      entry.Path,
+			URL:       candURL,
+			Score:     score,
+			Reason:    reason,
+			exactStem: stem == 1.0,
 		})
-		if len(candidates) >= maxRenameCandidates {
-			break
-		}
 	}
 
 	sort.Slice(candidates, func(i, j int) bool {
-		return candidates[i].Score > candidates[j].Score
+		// A file that kept its name exactly outranks any fuzzy match, whatever
+		// the paths look like. Path context is only allowed to separate
+		// candidates the basename could not, never to overturn it: because dir
+		// contributes additively, a decoy sitting in the original directory
+		// could otherwise outscore a genuine cross-tree move that kept its name
+		// ("claude-code-hooks" losing to "claude-code-hooks-reference"). Tiering
+		// states that invariant directly instead of tuning dirWeight low enough
+		// to make the inversion improbable — the latter silently reopens the
+		// moment stemSimilarity gets more generous.
+		if candidates[i].exactStem != candidates[j].exactStem {
+			return candidates[i].exactStem
+		}
+		if candidates[i].Score != candidates[j].Score {
+			return candidates[i].Score > candidates[j].Score
+		}
+		// Deterministic tiebreak: an arbitrary order here is what let an
+		// unrelated file win a tie on different days.
+		return candidates[i].Path < candidates[j].Path
 	})
+	// Cap AFTER ranking. Capping during the scan truncated the tree walk
+	// instead of the result set, so in a large repo the best candidate could
+	// be discarded before it was ever scored.
+	if len(candidates) > maxRenameCandidates {
+		candidates = candidates[:maxRenameCandidates]
+	}
 	return candidates, nil
+}
+
+// Weights for the composite rename score. Stem stays dominant — a file that
+// kept its name is the strongest single rename signal — but path context gets
+// enough weight to separate identical basenames living in different parts of
+// a repo. Exact-basename matches are tiered above fuzzy ones in the sort, so
+// these weights only order candidates within a tier and cannot promote a
+// fuzzy match over a file that kept its name.
+const (
+	stemWeight = 0.75
+	dirWeight  = 0.25
+)
+
+// dirSimilarity scores two directory paths by word-token overlap across all
+// their segments, so codex-rs/core-skills/src scores far closer to
+// codex-rs/skills/src than to codex-rs/tui/src/exec_cell. Segments are split
+// into words, which is what lets "core-skills" partially match "skills"
+// instead of being treated as an unrelated segment.
+func dirSimilarity(a, b string) float64 {
+	if a == b {
+		return 1.0
+	}
+	at := uniqueTokens(tokenizePath(a))
+	bt := uniqueTokens(tokenizePath(b))
+	if len(at) == 0 || len(bt) == 0 {
+		return 0
+	}
+	intersect := 0
+	for tok := range at {
+		if bt[tok] {
+			intersect++
+		}
+	}
+	union := len(at) + len(bt) - intersect
+	if union == 0 {
+		return 0
+	}
+	return float64(intersect) / float64(union)
+}
+
+// tokenizePath splits a directory path into lowercase words, treating the path
+// separator as just another word boundary alongside -, _ and .
+func tokenizePath(p string) []string {
+	return tokenizeStem(strings.ToLower(strings.ReplaceAll(p, "/", " ")))
+}
+
+func uniqueTokens(toks []string) map[string]bool {
+	set := make(map[string]bool, len(toks))
+	for _, t := range toks {
+		set[t] = true
+	}
+	return set
 }
 
 // renameScoreFloor is the minimum stem similarity to treat a file as a
