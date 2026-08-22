@@ -37,6 +37,10 @@ type RenameCandidate struct {
 	Score float64
 	// Reason briefly describes why this candidate was chosen (for PR body).
 	Reason string
+	// exactStem records whether the candidate's basename matched the original
+	// exactly. Ranking treats that as a tier rather than folding it into
+	// Score — see the sort in DetectGitHubRename.
+	exactStem bool
 }
 
 // DetectGitHubRename looks for a likely replacement file in the same repo
@@ -109,14 +113,27 @@ func DetectGitHubRename(ctx context.Context, rawURL string) ([]RenameCandidate, 
 		// Rebuild the raw URL for this candidate.
 		candURL := fmt.Sprintf("https://%s/%s/%s/%s/%s", rawGitHubHost, owner, repo, ref, entry.Path)
 		candidates = append(candidates, RenameCandidate{
-			Path:   entry.Path,
-			URL:    candURL,
-			Score:  score,
-			Reason: reason,
+			Path:      entry.Path,
+			URL:       candURL,
+			Score:     score,
+			Reason:    reason,
+			exactStem: stem == 1.0,
 		})
 	}
 
 	sort.Slice(candidates, func(i, j int) bool {
+		// A file that kept its name exactly outranks any fuzzy match, whatever
+		// the paths look like. Path context is only allowed to separate
+		// candidates the basename could not, never to overturn it: because dir
+		// contributes additively, a decoy sitting in the original directory
+		// could otherwise outscore a genuine cross-tree move that kept its name
+		// ("claude-code-hooks" losing to "claude-code-hooks-reference"). Tiering
+		// states that invariant directly instead of tuning dirWeight low enough
+		// to make the inversion improbable — the latter silently reopens the
+		// moment stemSimilarity gets more generous.
+		if candidates[i].exactStem != candidates[j].exactStem {
+			return candidates[i].exactStem
+		}
 		if candidates[i].Score != candidates[j].Score {
 			return candidates[i].Score > candidates[j].Score
 		}
@@ -136,7 +153,9 @@ func DetectGitHubRename(ctx context.Context, rawURL string) ([]RenameCandidate, 
 // Weights for the composite rename score. Stem stays dominant — a file that
 // kept its name is the strongest single rename signal — but path context gets
 // enough weight to separate identical basenames living in different parts of
-// a repo.
+// a repo. Exact-basename matches are tiered above fuzzy ones in the sort, so
+// these weights only order candidates within a tier and cannot promote a
+// fuzzy match over a file that kept its name.
 const (
 	stemWeight = 0.75
 	dirWeight  = 0.25

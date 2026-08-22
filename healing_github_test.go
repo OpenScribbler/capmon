@@ -301,3 +301,50 @@ func TestDetectGitHubRename_CapAppliesAfterRanking(t *testing.T) {
 		t.Errorf("returned %d candidates, want at most %d", len(got), maxRenameCandidates)
 	}
 }
+
+// TestDetectGitHubRename_ExactBasenameBeatsSuffixedSiblingInOriginalDir pins the
+// tiering invariant. The composite score alone gets this wrong: the decoy keeps
+// the original directory (dir 1.00) and its stem clears the 0.667 break-even,
+// so 0.75*0.71 + 0.25*1.00 = 0.785 outranks the genuine cross-tree move at
+// 0.75*1.00 + 0.25*0.00 = 0.750. Only the exact-stem tier saves it.
+func TestDetectGitHubRename_ExactBasenameBeatsSuffixedSiblingInOriginalDir(t *testing.T) {
+	tree := gitTreeResponse{
+		Tree: []gitTreeEntry{
+			// Suffixed sibling left behind in the original directory. Listed
+			// first on purpose so an ordering bug cannot mask a scoring bug.
+			{Path: "docs/claude-code/build/claude-code-hooks-reference.md", Type: "blob"},
+			// The real move: same basename, entirely different subtree.
+			{Path: "api/reference/tools/claude-code-hooks.md", Type: "blob"},
+			{Path: "README.md", Type: "blob"},
+		},
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(tree)
+	}))
+	defer srv.Close()
+
+	SetGitHubBaseURLForTest(srv.URL)
+	defer SetGitHubBaseURLForTest("")
+
+	got, err := DetectGitHubRename(context.Background(),
+		"https://raw.githubusercontent.com/anthropics/docs/main/docs/claude-code/build/claude-code-hooks.md")
+	if err != nil {
+		t.Fatalf("DetectGitHubRename: %v", err)
+	}
+	if len(got) < 2 {
+		t.Fatalf("expected both candidates to be scored, got %d", len(got))
+	}
+	if got[0].Path != "api/reference/tools/claude-code-hooks.md" {
+		t.Errorf("top candidate = %q, want api/reference/tools/claude-code-hooks.md (an exact basename must outrank a fuzzy match in the original directory)", got[0].Path)
+	}
+	if !got[0].exactStem {
+		t.Errorf("top candidate %q should be an exact-stem match", got[0].Path)
+	}
+	// Guard the tier, not the arithmetic: this must hold even where the decoy
+	// wins on raw composite score, which is exactly the case here.
+	if got[0].Score >= got[1].Score {
+		t.Logf("note: exact match also wins on composite (%.4f vs %.4f); the tier is untested by this fixture",
+			got[0].Score, got[1].Score)
+	}
+}
