@@ -398,3 +398,77 @@ func TestProposeManifestHealPR_FullFlow(t *testing.T) {
 		t.Error("manifest was not updated with new URL")
 	}
 }
+
+// healLayoutFixture mirrors the quirks of a real docs/provider-sources/*.yaml:
+// 2-space indent, blank lines between sections, a comment banner, a trailing
+// comment on a value line, and both quoted and unquoted URLs. Re-encoding the
+// document through yaml.Marshal destroys every one of these.
+const healLayoutFixture = `# Test Provider — Provider Source Manifest
+# Second header line.
+
+schema_version: "1"
+slug: test-provider
+
+change_detection:
+  method: github-releases
+  baseline: "v1.0.0" # Latest stable.
+
+content_types:
+  # ── Support summary ──────────────────────────────
+  # Supports: skills
+  skills:
+    sources:
+      - url: https://example.com/docs/old.md
+        type: documentation
+        selector: {}
+
+      - url: "https://example.com/docs/other.md"
+        type: documentation
+        selector: {}
+`
+
+// A one-URL heal must produce a one-line diff. The healer's output is the only
+// thing a reviewer sees, and review is the sole gate against a confidently
+// wrong rename — so anything beyond the changed line is a correctness problem,
+// not a cosmetic one.
+func TestUpdateManifestURL_PreservesEveryOtherByte(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "test-provider.yaml")
+	if err := os.WriteFile(path, []byte(healLayoutFixture), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	const oldURL = "https://example.com/docs/old.md"
+	const newURL = "https://example.com/docs/renamed.md"
+
+	if err := UpdateManifestURL(path, "skills", 0, oldURL, newURL); err != nil {
+		t.Fatalf("UpdateManifestURL: %v", err)
+	}
+
+	out, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := strings.Replace(healLayoutFixture, oldURL, newURL, 1)
+	if string(out) != want {
+		gotLines := strings.Split(string(out), "\n")
+		wantLines := strings.Split(want, "\n")
+		changed := 0
+		for i := 0; i < len(gotLines) || i < len(wantLines); i++ {
+			var g, w string
+			if i < len(gotLines) {
+				g = gotLines[i]
+			}
+			if i < len(wantLines) {
+				w = wantLines[i]
+			}
+			if g != w {
+				changed++
+				if changed <= 5 {
+					t.Errorf("line %d:\n  got  %q\n  want %q", i+1, g, w)
+				}
+			}
+		}
+		t.Fatalf("manifest differs on %d lines; a one-URL heal must change exactly one", changed)
+	}
+}

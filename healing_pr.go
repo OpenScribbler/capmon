@@ -31,8 +31,7 @@ type HealPRInputs struct {
 
 // UpdateManifestURL opens the given manifest YAML, replaces the URL at
 // content_types.<contentType>.sources[sourceIndex] with newURL, and
-// writes the file back preserving comments and formatting via the
-// yaml.v3 Node API.
+// writes the file back byte-for-byte identical except for that one line.
 //
 // Returns an error if the target node is not found or the old URL at
 // that location does not match expectedOldURL (defensive check against
@@ -83,13 +82,28 @@ func UpdateManifestURL(manifestPath, contentType string, sourceIndex int, expect
 	if urlNode.Value != expectedOldURL {
 		return fmt.Errorf("source[%d].url mismatch: manifest has %q, expected %q (manifest changed since heal?)", sourceIndex, urlNode.Value, expectedOldURL)
 	}
-	urlNode.Value = newURL
-
-	out, err := yaml.Marshal(&root)
-	if err != nil {
-		return fmt.Errorf("marshal manifest: %w", err)
+	// Splice the new URL into the original bytes instead of re-encoding the
+	// document. yaml.Marshal reflows the whole file — 2-space indent becomes
+	// 4-space, blank lines between sections disappear, and the comment banners
+	// get reindented — which turned a one-URL heal into a 196+/237- diff and
+	// made heal PRs unreviewable by eye. That matters because human review of
+	// the heal diff is the only gate against a confidently-wrong rename
+	// (ValidateContentResponse cannot catch one). The parsed node is used only
+	// to locate and validate the target; Node.Line then tells us the single
+	// line to rewrite, leaving every other byte untouched.
+	lines := strings.Split(string(data), "\n")
+	idx := urlNode.Line - 1 // Node.Line is 1-indexed
+	if idx < 0 || idx >= len(lines) {
+		return fmt.Errorf("source[%d].url reported line %d, outside the file", sourceIndex, urlNode.Line)
 	}
-	if err := os.WriteFile(manifestPath, out, 0644); err != nil {
+	// Bail rather than corrupt: a folded/literal scalar or an escaped value
+	// would put something other than the literal URL on this line.
+	if strings.Count(lines[idx], expectedOldURL) != 1 {
+		return fmt.Errorf("source[%d].url line %d does not contain exactly one literal occurrence of %q", sourceIndex, urlNode.Line, expectedOldURL)
+	}
+	lines[idx] = strings.Replace(lines[idx], expectedOldURL, newURL, 1)
+
+	if err := os.WriteFile(manifestPath, []byte(strings.Join(lines, "\n")), 0644); err != nil {
 		return fmt.Errorf("write manifest: %w", err)
 	}
 	return nil
