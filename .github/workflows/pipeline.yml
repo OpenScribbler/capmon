@@ -1,13 +1,22 @@
 name: capmon — capability monitor pipeline
 
 # Runs the full pipeline against the capability data under docs/ in this
-# repo. Heal PRs and drift issues are opened on this repo using the
-# workflow's own GITHUB_TOKEN — no cross-repo access is needed.
+# repo. Drift issues are opened with the workflow's own GITHUB_TOKEN — no
+# cross-repo access is needed.
 #
-# Note: PRs created with GITHUB_TOKEN do not trigger this repo's other
-# workflows (GitHub prevents recursive workflow runs), so CI does not run
-# automatically on heal PRs. Re-run CI manually or push an empty commit to
-# the heal branch if a CI result is needed before merge.
+# Heal PRs are the exception. The OpenScribbler org policy forbids GitHub
+# Actions from creating or approving pull requests, and that setting is
+# org-level: it overrides any per-repo permission, so `contents: write` still
+# pushes the heal branch while `gh pr create` fails. The result looked like
+# success — a branch appeared, the workflow exited 0, and no PR was ever
+# opened. Stage 1 therefore authenticates with the CAPMON_HEAL_PR secret, a
+# fine-grained PAT scoped to this repo with contents/issues/pull-requests
+# write. If that secret is missing or expired, the stage fails at the first
+# gh call rather than silently skipping; capmon escalates it to a
+# capmon-heal-fail issue after two consecutive failures.
+#
+# Note: unlike GITHUB_TOKEN, a PAT-created PR does trigger this repo's other
+# workflows, so ci.yml now runs on heal PRs automatically.
 
 on:
   schedule:
@@ -85,8 +94,13 @@ jobs:
       - name: Run fetch-extract stage
         run: ./capmon-bin run --stage fetch-extract
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Stage 1 is the only stage that opens PRs (tryHealSource ->
+          # ProposeManifestHealPR), and org policy blocks Actions from doing
+          # that with GITHUB_TOKEN. Use the PAT here only. Both names are set
+          # for parity with the other capmon workflows: gh reads GH_TOKEN,
+          # while capmon gates some CI behavior on GITHUB_TOKEN being present.
+          GITHUB_TOKEN: ${{ secrets.CAPMON_HEAL_PR }}
+          GH_TOKEN: ${{ secrets.CAPMON_HEAL_PR }}
           CHROMEDP_URL: ""
 
       - name: Compute artifact SHA-256
