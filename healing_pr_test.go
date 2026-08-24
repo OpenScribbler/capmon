@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -470,5 +471,106 @@ func TestUpdateManifestURL_PreservesEveryOtherByte(t *testing.T) {
 			}
 		}
 		t.Fatalf("manifest differs on %d lines; a one-URL heal must change exactly one", changed)
+	}
+}
+
+// A heal is a proposal, never an application (ADR-0014). capmon cannot tell a
+// plausible-but-wrong heal from a correct one — ValidateContentResponse passes
+// a different crate's loader.rs quite happily — and the evidence in that ADR
+// rules out a match-score gate, because the known-wrong heal scores highest of
+// all. Human review of the heal PR is therefore the only gate, and a merge
+// invocation anywhere in the heal path would silently remove it.
+func TestHealPathNeverMerges(t *testing.T) {
+	// Quoted Go string literals that would appear in a gh merge invocation.
+	// Matching whole literals rather than the bare word keeps the prose
+	// "must be reviewed before merge" in the PR body from tripping this.
+	goMerge := regexp.MustCompile(`"(merge|--auto|--squash|--rebase|--merge)"`)
+	ymlMerge := regexp.MustCompile(`(?i)gh\s+pr\s+merge|auto-?merge`)
+
+	goFiles, err := filepath.Glob("healing*.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(goFiles) == 0 {
+		t.Fatal("no healing*.go files found — has the heal path been renamed?")
+	}
+	for _, f := range goFiles {
+		if strings.HasSuffix(f, "_test.go") {
+			continue
+		}
+		src, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if m := goMerge.FindString(string(src)); m != "" {
+			t.Errorf("%s invokes gh with %s — heals must never be auto-applied (ADR-0014)", f, m)
+		}
+	}
+
+	wf, err := os.ReadFile(filepath.Join(".github", "workflows", "pipeline.yml"))
+	if err != nil {
+		t.Fatalf("read pipeline.yml: %v", err)
+	}
+	if m := ymlMerge.FindString(string(wf)); m != "" {
+		t.Errorf("pipeline.yml contains %q — heals must never be auto-applied (ADR-0014)", m)
+	}
+}
+
+// The dangerous case is the one where the top candidate validates immediately:
+// probing stops, so CandidateOutcomes holds a single row and the probe table is
+// suppressed. The reviewer must still see what the winner beat.
+func TestBuildHealPRBody_ShowsRunnersUpWhenTopCandidateWins(t *testing.T) {
+	in := HealPRInputs{
+		Provider:    "codex",
+		ContentType: "skills",
+		SourceIndex: 0,
+		RunID:       "test-run",
+		OldURL:      "https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/model.rs",
+		Heal: HealResult{
+			Success:  true,
+			NewURL:   "https://example.com/winner.rs",
+			Strategy: "github-rename",
+			Proof:    "stem similarity 1.00; path similarity 0.80",
+			// Exactly one probe: the first candidate validated.
+			CandidateOutcomes: []CandidateOutcome{
+				{URL: "https://example.com/winner.rs", Strategy: "github-rename", Outcome: OutcomeSuccess},
+			},
+			Considered: []ConsideredCandidate{
+				{URL: "https://example.com/winner.rs", Reason: "stem similarity 1.00; path similarity 0.80"},
+				{URL: "https://example.com/runner-up.rs", Reason: "stem similarity 1.00; path similarity 0.50"},
+				{URL: "https://example.com/third.rs", Reason: "stem similarity 1.00; path similarity 0.43"},
+			},
+		},
+	}
+
+	body := BuildHealPRBody(in)
+
+	for _, want := range []string{
+		"All 3 candidates ranked",
+		"https://example.com/runner-up.rs",
+		"https://example.com/third.rs",
+		"path similarity 0.50",
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("PR body missing %q\n---\n%s", want, body)
+		}
+	}
+	if !strings.Contains(body, "<https://example.com/winner.rs> **← selected**") {
+		t.Errorf("PR body does not mark the selected candidate\n---\n%s", body)
+	}
+}
+
+// A lone candidate has no ranking to show; an empty table would be noise.
+func TestBuildHealPRBody_NoRankedTableForSingleCandidate(t *testing.T) {
+	in := HealPRInputs{
+		Provider: "codex", ContentType: "skills", RunID: "r",
+		OldURL: "https://example.com/old.md",
+		Heal: HealResult{
+			Success: true, NewURL: "https://example.com/new.md", Strategy: "redirect",
+			Considered: []ConsideredCandidate{{URL: "https://example.com/new.md", Reason: "permanent redirect"}},
+		},
+	}
+	if strings.Contains(BuildHealPRBody(in), "candidates ranked") {
+		t.Error("single candidate should not render a ranked table")
 	}
 }

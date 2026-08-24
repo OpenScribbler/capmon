@@ -24,6 +24,22 @@ type HealResult struct {
 	CandidateOutcomes []CandidateOutcome // every probed candidate, in attempt order
 	StrategyDeclines  []string           `json:"strategy_declines,omitempty"` // strategy-level decline reasons (e.g., "redirect: chain contains a temporary (302/307) redirect"), populated regardless of whether candidates were probed
 	FailReason        string             // populated when Success=false — derived summary or strategy-level decline
+	// Considered lists every candidate a strategy ranked, in rank order,
+	// including candidates never probed because an earlier one validated.
+	// CandidateOutcomes only records what was probed, and probing stops at the
+	// first success — so on the single-candidate-succeeds path the PR body had
+	// nothing to show but the answer itself. That is the path most likely to be
+	// wrong (ADR-0014), so the reviewer needs to see what it beat.
+	Considered []ConsideredCandidate `json:"considered,omitempty"`
+}
+
+// ConsideredCandidate is one ranked replacement a strategy proposed, whether or
+// not it was probed. Reason carries the strategy's own explanation — for
+// github-rename that is the stem and path similarity scores, which is what lets
+// a reviewer see whether the winner won comfortably or by a hair.
+type ConsideredCandidate struct {
+	URL    string `json:"url"`
+	Reason string `json:"reason"`
 }
 
 // AttemptHeal runs the configured healing strategies in order for a
@@ -104,6 +120,12 @@ func AttemptHeal(ctx context.Context, src SourceEntry, conventions *DocsConventi
 		default:
 			declineReasons = append(declineReasons, fmt.Sprintf("%s: unknown strategy (ignored)", strategy))
 			continue
+		}
+
+		// Record the ranked set before probing: probing returns at the first
+		// success, so anything recorded afterwards would omit the runners-up.
+		for _, cand := range candidates {
+			result.Considered = append(result.Considered, ConsideredCandidate{URL: cand, Reason: proofs[cand]})
 		}
 
 		for _, cand := range candidates {
