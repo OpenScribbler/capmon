@@ -154,6 +154,13 @@ func BuildHealPRBody(in HealPRInputs) string {
 	// The helper returns "" when StrategyDeclines is empty, so direct concat
 	// is safe — no orphaned header when the slice is nil.
 	b.WriteString(renderStrategyDeclines(in.Heal.StrategyDeclines))
+	// Ranked set first, probe outcomes second. The ranked table is the one that
+	// is always present: probing stops at the first success, so when the top
+	// candidate validates immediately the probe table has a single row and says
+	// nothing about what else was in contention. Per ADR-0014 review is the only
+	// gate on a plausible-but-wrong heal, so the reviewer must be able to see
+	// whether the winner won comfortably or by a hair.
+	b.WriteString(renderConsideredCandidates(in.Heal.Considered, in.Heal.NewURL))
 	if len(in.Heal.CandidateOutcomes) > 1 {
 		b.WriteString("**All candidates probed:**\n\n")
 		b.WriteString(RenderCandidatesTable(in.Heal.CandidateOutcomes))
@@ -163,6 +170,29 @@ func BuildHealPRBody(in HealPRInputs) string {
 	b.WriteString("Auto-opened by capmon. **The healed URL must be reviewed before merge** — ")
 	b.WriteString("content passed capmon's readability gate (min body size, text content-type, same-host) ")
 	b.WriteString("but a human should confirm this is the correct replacement for the originating source.\n")
+	return b.String()
+}
+
+// renderConsideredCandidates renders the ranked candidate set in rank order,
+// marking the one that was selected. Returns "" for fewer than two candidates —
+// a single candidate has no ranking to show, and an empty section header would
+// be noise.
+func renderConsideredCandidates(considered []ConsideredCandidate, chosen string) string {
+	if len(considered) < 2 {
+		return ""
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "**All %d candidates ranked** (best first):\n\n", len(considered))
+	b.WriteString("| # | Candidate | Why |\n")
+	b.WriteString("|---|---|---|\n")
+	for i, c := range considered {
+		marker := ""
+		if c.URL == chosen {
+			marker = " **← selected**"
+		}
+		fmt.Fprintf(&b, "| %d | <%s>%s | %s |\n", i+1, c.URL, marker, c.Reason)
+	}
+	b.WriteString("\n")
 	return b.String()
 }
 
