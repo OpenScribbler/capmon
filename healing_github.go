@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"net/url"
 	"os"
@@ -32,21 +33,24 @@ type RenameCandidate struct {
 	Path string
 	// URL is the raw.githubusercontent.com URL rebuilt from the candidate path.
 	URL string
-	// Score is a similarity score in [0,1] where 1 is a perfect basename match
-	// after normalization. Higher is better.
+	// Score is a similarity score in [0,1] where 1 is a perfect identity-stem
+	// match in the identical directory. Higher is better.
 	Score float64
 	// Reason briefly describes why this candidate was chosen (for PR body).
 	Reason string
-	// exactStem records whether the candidate's basename matched the original
-	// exactly. Ranking treats that as a tier rather than folding it into
-	// Score — see the sort in DetectGitHubRename.
+	// exactStem records whether the candidate's identity stem matched the
+	// original exactly. That is the basename for an ordinary file and the
+	// enclosing directory for a directory-as-identity basename, so
+	// loader/mod.rs is an exact match for loader.rs and mod.rs is not.
+	// Ranking treats this as a tier rather than folding it into Score — see
+	// the sort in DetectGitHubRename.
 	exactStem bool
 }
 
 // DetectGitHubRename looks for a likely replacement file in the same repo
 // and ref when a raw.githubusercontent.com URL 404s. It calls the git/trees
-// API with ?recursive=1 to list all blobs, scores candidates by stem
-// similarity to the original basename, and returns ranked candidates.
+// API with ?recursive=1 to list all blobs, scores candidates by identity-stem
+// similarity plus IDF-weighted path context, and returns ranked candidates.
 //
 // Returns nil (with nil error) if rawURL is not a raw.githubusercontent.com
 // URL or if the repo has no candidates above the similarity threshold.
@@ -68,15 +72,14 @@ func DetectGitHubRename(ctx context.Context, rawURL string) ([]RenameCandidate, 
 	}
 	owner, repo, ref, filePath := m[1], m[2], m[3], m[4]
 
-	origBasename := path.Base(filePath)
-	origDir := path.Dir(filePath)
-	origStem := strings.TrimSuffix(origBasename, path.Ext(origBasename))
-	origExt := path.Ext(origBasename)
+	origExt := path.Ext(path.Base(filePath))
+	origStem, origDir := identityOf(filePath)
 
 	tree, err := fetchRepoTree(ctx, owner, repo, ref)
 	if err != nil {
 		return nil, fmt.Errorf("list repo tree: %w", err)
 	}
+	dirIDF := dirTokenIDF(tree)
 
 	var candidates []RenameCandidate
 	for _, entry := range tree {
@@ -85,12 +88,12 @@ func DetectGitHubRename(ctx context.Context, rawURL string) ([]RenameCandidate, 
 		}
 		candBase := path.Base(entry.Path)
 		candExt := path.Ext(candBase)
-		candStem := strings.TrimSuffix(candBase, candExt)
 		// Only consider candidates with the same extension — a .md is never
 		// a heal for a .json.
 		if !strings.EqualFold(candExt, origExt) {
 			continue
 		}
+		candStem, candDir := identityOf(entry.Path)
 
 		stem := stemSimilarity(origStem, candStem)
 		if stem < renameScoreFloor {
@@ -104,11 +107,14 @@ func DetectGitHubRename(ctx context.Context, rawURL string) ([]RenameCandidate, 
 		// both scored a perfect 1.0 and the winner was whichever the sort
 		// happened to place first — which is how a skills source got bound to a
 		// TUI render cell for two weeks.
-		candDir := path.Dir(entry.Path)
-		dir := dirSimilarity(origDir, candDir)
+		dir := dirSimilarity(origDir, candDir, dirIDF)
 		score := stemWeight*stem + dirWeight*dir
 		reason := fmt.Sprintf("stem similarity %.2f (%q → %q); path similarity %.2f (%q → %q)",
 			stem, origStem, candStem, dir, origDir, candDir)
+		if candStem != strings.TrimSuffix(candBase, candExt) {
+			reason += fmt.Sprintf("; %q is a directory-as-identity basename, so its enclosing directory %q carries the stem",
+				candBase, candStem)
+		}
 
 		// Rebuild the raw URL for this candidate.
 		candURL := fmt.Sprintf("https://%s/%s/%s/%s/%s", rawGitHubHost, owner, repo, ref, entry.Path)
@@ -122,9 +128,9 @@ func DetectGitHubRename(ctx context.Context, rawURL string) ([]RenameCandidate, 
 	}
 
 	sort.Slice(candidates, func(i, j int) bool {
-		// A file that kept its name exactly outranks any fuzzy match, whatever
-		// the paths look like. Path context is only allowed to separate
-		// candidates the basename could not, never to overturn it: because dir
+		// A file that kept its identity stem exactly outranks any fuzzy match,
+		// whatever the paths look like. Path context is only allowed to separate
+		// candidates the stem could not, never to overturn it: because dir
 		// contributes additively, a decoy sitting in the original directory
 		// could otherwise outscore a genuine cross-tree move that kept its name
 		// ("claude-code-hooks" losing to "claude-code-hooks-reference"). Tiering
@@ -152,8 +158,8 @@ func DetectGitHubRename(ctx context.Context, rawURL string) ([]RenameCandidate, 
 
 // Weights for the composite rename score. Stem stays dominant — a file that
 // kept its name is the strongest single rename signal — but path context gets
-// enough weight to separate identical basenames living in different parts of
-// a repo. Exact-basename matches are tiered above fuzzy ones in the sort, so
+// enough weight to separate identical stems living in different parts of
+// a repo. Exact identity-stem matches are tiered above fuzzy ones in the sort, so
 // these weights only order candidates within a tier and cannot promote a
 // fuzzy match over a file that kept its name.
 const (
@@ -161,12 +167,90 @@ const (
 	dirWeight  = 0.25
 )
 
-// dirSimilarity scores two directory paths by word-token overlap across all
-// their segments, so codex-rs/core-skills/src scores far closer to
+// dirIdentityStems are basename stems that carry no identity of their own,
+// because the enclosing directory names the thing. In Rust, foo.rs and
+// foo/mod.rs are the same module; the same holds for index.* in docs and
+// JS/TS trees and __init__.py in a Python package. Scoring such a basename
+// against the original compares boilerplate to boilerplate: every mod.rs in
+// the repo matches exactly and the real answer is indistinguishable from 98
+// others.
+var dirIdentityStems = map[string]bool{
+	"mod":      true,
+	"index":    true,
+	"__init__": true,
+}
+
+// identityOf returns the stem and directory that carry a path's identity.
+// For a directory-as-identity basename it lifts the enclosing directory name
+// into the stem position and drops that segment from the directory, so
+// codex-rs/ext/skills/src/loader/mod.rs is scored as stem "loader" in
+// codex-rs/ext/skills/src — the same shape as codex-rs/core-skills/src/loader.rs,
+// which is the rename it heals. The lift applies to the original path as well
+// as to candidates: without it, a monitored mod.rs source draws every other
+// mod.rs in the repo into the candidate set at an exact-stem tie.
+func identityOf(filePath string) (stem, dir string) {
+	base := path.Base(filePath)
+	dir = path.Dir(filePath)
+	stem = strings.TrimSuffix(base, path.Ext(base))
+	if !dirIdentityStems[strings.ToLower(stem)] {
+		return stem, dir
+	}
+	parent := path.Base(dir)
+	if parent == "." || parent == "/" || parent == "" {
+		return stem, dir
+	}
+	return parent, path.Dir(dir)
+}
+
+// dirTokenIDF weights directory tokens by inverse document frequency over the
+// tree, so a token naming nearly every directory ("src", "codex") says less
+// about where a file lives than one naming a few ("skills"). Unweighted
+// overlap treats them as equally informative, which is how
+// codex-rs/core-plugins/src and codex-rs/ext/skills/src both matched 4 of 5
+// tokens against codex-rs/core-skills/src and tied.
+//
+// Documents are the distinct directories rather than the blobs, so one
+// directory holding hundreds of files does not deflate its own tokens. The
+// tree is already in memory from fetchRepoTree, so this costs no network I/O.
+func dirTokenIDF(tree []gitTreeEntry) map[string]float64 {
+	docFreq := make(map[string]int)
+	counted := make(map[string]bool)
+	total := 0
+	for _, entry := range tree {
+		if entry.Type != "blob" {
+			continue
+		}
+		dir := path.Dir(entry.Path)
+		if counted[dir] {
+			continue
+		}
+		counted[dir] = true
+		total++
+		for tok := range uniqueTokens(tokenizePath(dir)) {
+			docFreq[tok]++
+		}
+	}
+	idf := make(map[string]float64, len(docFreq))
+	for tok, df := range docFreq {
+		// log(1 + N/df) rather than the bare log(N/df): a token present in
+		// every directory keeps a small nonzero weight, so two paths built
+		// only from ubiquitous tokens still score above zero instead of
+		// dividing by a zero-weight union.
+		idf[tok] = math.Log(1 + float64(total)/float64(df))
+	}
+	return idf
+}
+
+// dirSimilarity scores two directory paths by IDF-weighted token overlap
+// across all their segments, so codex-rs/core-skills/src scores far closer to
 // codex-rs/skills/src than to codex-rs/tui/src/exec_cell. Segments are split
 // into words, which is what lets "core-skills" partially match "skills"
 // instead of being treated as an unrelated segment.
-func dirSimilarity(a, b string) float64 {
+//
+// idf comes from dirTokenIDF over the same tree the candidates come from. A
+// token no directory in the tree contains weighs nothing: it cannot separate
+// one candidate from another, and it is absent from every candidate equally.
+func dirSimilarity(a, b string, idf map[string]float64) float64 {
 	if a == b {
 		return 1.0
 	}
@@ -175,17 +259,22 @@ func dirSimilarity(a, b string) float64 {
 	if len(at) == 0 || len(bt) == 0 {
 		return 0
 	}
-	intersect := 0
+	var intersect, union float64
 	for tok := range at {
+		union += idf[tok]
 		if bt[tok] {
-			intersect++
+			intersect += idf[tok]
 		}
 	}
-	union := len(at) + len(bt) - intersect
+	for tok := range bt {
+		if !at[tok] {
+			union += idf[tok]
+		}
+	}
 	if union == 0 {
 		return 0
 	}
-	return float64(intersect) / float64(union)
+	return intersect / union
 }
 
 // tokenizePath splits a directory path into lowercase words, treating the path

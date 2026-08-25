@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -347,4 +348,167 @@ func TestDetectGitHubRename_ExactBasenameBeatsSuffixedSiblingInOriginalDir(t *te
 		t.Logf("note: exact match also wins on composite (%.4f vs %.4f); the tier is untested by this fixture",
 			got[0].Score, got[1].Score)
 	}
+}
+
+func TestIdentityOf(t *testing.T) {
+	cases := []struct {
+		path     string
+		wantStem string
+		wantDir  string
+	}{
+		// Plain basename: identity is the basename, directory is the parent.
+		{"codex-rs/core-skills/src/loader.rs", "loader", "codex-rs/core-skills/src"},
+		// Directory-as-identity: the enclosing directory names the module, so
+		// it becomes the stem and drops out of the directory.
+		{"codex-rs/ext/skills/src/loader/mod.rs", "loader", "codex-rs/ext/skills/src"},
+		{"docs/hooks/index.md", "hooks", "docs"},
+		{"pkg/__init__.py", "pkg", "."},
+		// Case-insensitive: docs trees are inconsistent about this.
+		{"docs/hooks/INDEX.MD", "hooks", "docs"},
+		// At the repo root there is no enclosing directory to lift.
+		{"index.md", "index", "."},
+		{"mod.rs", "mod", "."},
+	}
+	for _, c := range cases {
+		stem, dir := identityOf(c.path)
+		if stem != c.wantStem || dir != c.wantDir {
+			t.Errorf("identityOf(%q) = (%q, %q), want (%q, %q)", c.path, stem, dir, c.wantStem, c.wantDir)
+		}
+	}
+}
+
+// TestDetectGitHubRename_DirectoryAsIdentityBasenameEntersCandidateSet pins the
+// first half of the scoring bug. The heal for codex-rs/core-skills/src/loader.rs
+// is codex-rs/ext/skills/src/loader/mod.rs — the same module, moved. Scoring
+// the literal basename compares "loader" to "mod", which scores 0 and drops the
+// only correct answer before ranking ever runs.
+func TestDetectGitHubRename_DirectoryAsIdentityBasenameEntersCandidateSet(t *testing.T) {
+	tree := gitTreeResponse{
+		Tree: []gitTreeEntry{
+			{Path: "codex-rs/ext/skills/src/loader/mod.rs", Type: "blob"},
+			{Path: "codex-rs/ext/skills/src/loader/tests.rs", Type: "blob"},
+			{Path: "README.md", Type: "blob"},
+		},
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(tree)
+	}))
+	defer srv.Close()
+
+	SetGitHubBaseURLForTest(srv.URL)
+	defer SetGitHubBaseURLForTest("")
+
+	got, err := DetectGitHubRename(context.Background(),
+		"https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/loader.rs")
+	if err != nil {
+		t.Fatalf("DetectGitHubRename: %v", err)
+	}
+	if len(got) == 0 {
+		t.Fatal("expected the moved module as a candidate; a mod.rs basename must not be scored literally")
+	}
+	if got[0].Path != "codex-rs/ext/skills/src/loader/mod.rs" {
+		t.Errorf("top candidate = %q, want codex-rs/ext/skills/src/loader/mod.rs", got[0].Path)
+	}
+	if !got[0].exactStem {
+		t.Errorf("top candidate %q should be an exact-stem match on the enclosing directory", got[0].Path)
+	}
+	// The PR body is the review surface, so the normalization has to be
+	// visible in it — a reviewer seeing stem "loader" against a path ending in
+	// mod.rs needs to know why those were compared.
+	if !strings.Contains(got[0].Reason, "directory-as-identity") {
+		t.Errorf("reason %q does not explain the directory-as-identity normalization", got[0].Reason)
+	}
+}
+
+// TestDetectGitHubRename_ModuleOriginalDoesNotMatchEveryModule pins the same
+// normalization on the original side. codex.yaml already monitors a mod.rs
+// path, so this is the shape a future heal starts from: scoring the literal
+// basename makes every mod.rs in the repo an exact-stem match (99 of them in
+// the live openai/codex tree), leaving the ranking to path context alone and
+// sending all 99 on to content validation.
+func TestDetectGitHubRename_ModuleOriginalDoesNotMatchEveryModule(t *testing.T) {
+	tree := gitTreeResponse{
+		Tree: []gitTreeEntry{
+			{Path: "codex-rs/ext/skills/src/loader.rs", Type: "blob"},
+			{Path: "codex-rs/ext/skills/src/tools/mod.rs", Type: "blob"},
+			{Path: "codex-rs/ext/memories/src/tools/mod.rs", Type: "blob"},
+			{Path: "codex-rs/tui/src/pets/mod.rs", Type: "blob"},
+		},
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(tree)
+	}))
+	defer srv.Close()
+
+	SetGitHubBaseURLForTest(srv.URL)
+	defer SetGitHubBaseURLForTest("")
+
+	got, err := DetectGitHubRename(context.Background(),
+		"https://raw.githubusercontent.com/openai/codex/main/codex-rs/ext/skills/src/loader/mod.rs")
+	if err != nil {
+		t.Fatalf("DetectGitHubRename: %v", err)
+	}
+	if len(got) != 1 || got[0].Path != "codex-rs/ext/skills/src/loader.rs" {
+		t.Fatalf("candidates = %v, want exactly [codex-rs/ext/skills/src/loader.rs]; the unrelated mod.rs files share only boilerplate", paths(got))
+	}
+}
+
+// TestDetectGitHubRename_WeightsDirTokensByInformativeness pins the second half
+// of the bug. Normalization alone leaves the correct answer in an exact tie
+// with the wrong one — both directories match 4 of 5 tokens against
+// codex-rs/core-skills/src — and the tie falls to the lexicographic tiebreak,
+// which the wrong answer wins. Sharing "skills" has to count for more than
+// sharing "core", and the tree itself says which is which: many directories
+// here are named with "core", only one other with "skills".
+func TestDetectGitHubRename_WeightsDirTokensByInformativeness(t *testing.T) {
+	entries := []gitTreeEntry{
+		// The correct answer, listed after the decoy so an ordering bug cannot
+		// masquerade as a scoring fix.
+		{Path: "codex-rs/core-plugins/src/loader.rs", Type: "blob"},
+		{Path: "codex-rs/ext/skills/src/loader.rs", Type: "blob"},
+	}
+	// Filler crates that make "core" a common directory token and leave
+	// "skills" a rare one.
+	for _, crate := range []string{"core", "core-exec", "core-config", "core-mcp", "core-protocol", "core-tui"} {
+		entries = append(entries, gitTreeEntry{Path: "codex-rs/" + crate + "/src/lib.rs", Type: "blob"})
+	}
+	tree := gitTreeResponse{Tree: entries}
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(tree)
+	}))
+	defer srv.Close()
+
+	SetGitHubBaseURLForTest(srv.URL)
+	defer SetGitHubBaseURLForTest("")
+
+	got, err := DetectGitHubRename(context.Background(),
+		"https://raw.githubusercontent.com/openai/codex/main/codex-rs/core-skills/src/loader.rs")
+	if err != nil {
+		t.Fatalf("DetectGitHubRename: %v", err)
+	}
+	if len(got) < 2 {
+		t.Fatalf("expected both loader.rs candidates to be scored, got %v", paths(got))
+	}
+	if got[0].Path != "codex-rs/ext/skills/src/loader.rs" {
+		t.Errorf("top candidate = %q, want codex-rs/ext/skills/src/loader.rs (sharing %q must outweigh sharing %q)",
+			got[0].Path, "skills", "core")
+	}
+	// An equal top-two score means the winner is still the lexicographic
+	// tiebreak, which is what this test exists to remove.
+	if got[0].Score == got[1].Score {
+		t.Errorf("top two tied at %.4f (%q vs %q); unweighted token overlap is still deciding",
+			got[0].Score, got[0].Path, got[1].Path)
+	}
+}
+
+func paths(cands []RenameCandidate) []string {
+	out := make([]string, 0, len(cands))
+	for _, c := range cands {
+		out = append(out, c.Path)
+	}
+	return out
 }
