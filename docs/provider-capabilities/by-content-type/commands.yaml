@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:55:16Z
+# Generated at: 2026-09-30T10:31:26Z
 
 content_type: commands
 providers:
@@ -11,6 +11,8 @@ providers:
                 supported: true
                 mechanism: 5 built-in slash commands documented as individual headings (/newtask, /smol, /newrule, /deep-planning, /reportbug); hardcoded, not user-modifiable
                 confidence: inferred
+    devin:
+        supported: true
     factory-droid:
         supported: true
         capabilities:
@@ -43,6 +45,4 @@ providers:
                 supported: true
                 mechanism: positional shell-style substitution ($1, $2, $@, $ARGUMENTS, ${@:N}, ${@:N:L}) documented under 'Argument Hints' / 'Arguments' / 'Usage' headings
                 confidence: inferred
-    windsurf:
-        supported: true
 schema_version: "1"

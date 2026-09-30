@@ -17,7 +17,7 @@ import (
 // the source of the six draft-2020-12 schemas and field-semantics.md that
 // writeExportTree copies verbatim into the staged tree. Staging with this as
 // PublishAssetsDir is the only configuration validateExportTree can gate: the
-// schemas it compiles live under the staged v1/schemas/ dir.
+// schemas it compiles live under the staged v2/schemas/ dir.
 func publishAssetsDir(t *testing.T) string {
 	t.Helper()
 	return filepath.Join(docsRoot(t), "docs", "publish")
@@ -25,7 +25,7 @@ func publishAssetsDir(t *testing.T) string {
 
 // stageGatedTree writes the three-baseline fixture plus the committed publish
 // assets into a fresh temp tree and returns its root. The resulting tree
-// carries v1/schemas/*.json and v1/spec/field-semantics.md, so it is a
+// carries v2/schemas/*.json and v2/spec/field-semantics.md, so it is a
 // complete, schema-gateable export.
 func stageGatedTree(t *testing.T) string {
 	t.Helper()
@@ -88,7 +88,7 @@ func writeSourceManifests(t *testing.T, slugs ...string) string {
 
 // TestValidateExportTreePassesFixture stages a valid fixture tree (docs + the
 // committed publish assets) and asserts the fail-closed schema gate accepts it:
-// all six schemas compile as draft 2020-12 from the staged v1/schemas/ dir and
+// all six schemas compile as draft 2020-12 from the staged v2/schemas/ dir and
 // every gated document validates against its routed schema.
 func TestValidateExportTreePassesFixture(t *testing.T) {
 	dst := stageGatedTree(t)
@@ -105,7 +105,7 @@ func TestValidateExportTreePassesFixture(t *testing.T) {
 func TestValidateExportTreeFailsClosed(t *testing.T) {
 	dst := stageGatedTree(t)
 
-	docPath := filepath.Join(dst, "v1", "capabilities", "alpha.json")
+	docPath := filepath.Join(dst, "v2", "capabilities", "alpha.json")
 	doc := readJSONMap(t, docPath)
 	agents := mustChild(t, mustChild(t, doc, "content_types"), "agents")
 	agents["supported"] = "yes" // wrong type: string where the schema requires bool
@@ -187,20 +187,20 @@ func TestAssertPublishedSlugsPermanence(t *testing.T) {
 
 // TestFreezeFieldsOptionalFromLaunch stages a valid tree, then adds the freeze
 // fields (status "frozen", superseded_by, frozen_at) to a per-provider document
-// and to v1/index.json, and re-validates. Both schemas must still accept the
+// and to v2/index.json, and re-validates. Both schemas must still accept the
 // tree — the freeze fields are pre-provisioned OPTIONAL from initial
 // publication, the one part of the freeze contract that cannot be retrofitted.
 func TestFreezeFieldsOptionalFromLaunch(t *testing.T) {
 	dst := stageGatedTree(t)
 
-	docPath := filepath.Join(dst, "v1", "capabilities", "alpha.json")
+	docPath := filepath.Join(dst, "v2", "capabilities", "alpha.json")
 	doc := readJSONMap(t, docPath)
 	doc["status"] = "frozen"
 	doc["superseded_by"] = "/v2/"
 	doc["frozen_at"] = "2027-01-01T00:00:00Z"
 	writeJSONFile(t, docPath, doc)
 
-	idxPath := filepath.Join(dst, "v1", "index.json")
+	idxPath := filepath.Join(dst, "v2", "index.json")
 	idx := readJSONMap(t, idxPath)
 	idx["status"] = "frozen"
 	idx["superseded_by"] = "/v2/"

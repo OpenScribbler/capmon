@@ -1,9 +1,16 @@
 {
-  "latest": "v1",
+  "latest": "v2",
   "majors": [
     {
+      "frozen_root_sha256": "cd0ad6101473289f4912903fc24dbd2366ea3bea5dde0f9bc9529313c3c93e54",
       "index": "v1/index.json",
       "prefix": "v1",
+      "status": "frozen",
+      "superseded_by": "/v2/"
+    },
+    {
+      "index": "v2/index.json",
+      "prefix": "v2",
       "status": "live"
     }
   ]

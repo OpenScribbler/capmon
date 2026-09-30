@@ -5,6 +5,11 @@ registry-operator, solo-publisher, valsorda) and signed off by Holden,
 2026-07-11. The three panel-surfaced decisions are settled below.
 Date: 2026-07-11
 
+> **2026-09-30: v2 is live and v1 is frozen** (ADR 0015). The design below
+> is written against v1 and carries over to v2 unchanged except for the
+> `/v2/` prefix, the `windsurf` → `devin` slug, and schema `$id`s under
+> `/v2/schemas/`. `capmon freeze` now exists; see "Major transitions".
+
 ## Settled decisions (2026-07-11 session with Holden)
 
 1. **Self-describing per-provider documents.** Each exported
@@ -204,6 +209,20 @@ live export code paths.
   tree (in the live root `index.json` entry for the frozen major, and a
   signed git tag). CI re-hashes `site-static/` on every pipeline run and
   fails on mismatch. A frozen tree never vouches for itself.
+- As built (v1, 2026-09-30): the root hash is the sha256 of a
+  `sha256sum`-format manifest of every file in the frozen tree except
+  `advisories.json`, sorted by path. It is recorded in `frozenMajors`
+  (`export_freeze.go`) and published as `frozen_root_sha256`. Every export,
+  including the `go test` run in CI, re-hashes `site-static/` and fails
+  closed with `EXPORT_006` on mismatch. Each frozen per-provider document's
+  `superseded_by` names its successor document
+  (`/v2/capabilities/<slug>.json`, with `windsurf` mapped to `devin`), and
+  the frozen index names `/v2/`. `all.json`, the pivots, and
+  `data_revision` keep their last live bytes. The signed git tag is not
+  created yet. The export also checks every digest the frozen index
+  records, and the frozen index records `advisories.json`, so an advisory
+  update to v1 fails closed until the index gains a digest scheme that can
+  change without breaking the root hash.
 - The deprecation signal lives **in the documents consumers actually
   fetch**: every per-provider document carries `status`, and frozen ones
   carry `superseded_by`/`frozen_at` — not only `index.json`.
@@ -250,8 +269,8 @@ unsafe to trust). Consumers pinning any major SHOULD fetch its
 }
 ```
 
-`source_commit` is derived from `git log -1 --format=%H -- docs/` — the
-last commit that changed source data — never from `HEAD`, which moves daily
+`source_commit` is derived from `git log -1 --format=%H -- docs/ site-static/`
+— the last commit that changed source data or a frozen tree — never from `HEAD`, which moves daily
 with heartbeat commits.
 
 ### Root index.json (unversioned, append-only)
@@ -403,7 +422,8 @@ parent-`supported` auto-flip, the `conversion` enum, provenance of
 
 **Deferred (deliberately not built now):** the `capmon freeze` command is
 specified above but implemented when a v2 first approaches — freezing is
-unexercisable until then, and building it now is speculative. What ships in
+unexercisable until then, and building it now is speculative. (Built
+2026-09-30 for the v1 freeze; ADR 0015.) What ships in
 Phase 4 is the part that cannot be retrofitted: the freeze fields
 pre-provisioned as OPTIONAL in every v1 schema from initial publication.
 

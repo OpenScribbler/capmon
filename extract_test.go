@@ -46,8 +46,8 @@ func TestFixtures_ClaudeCodeHooksHTML(t *testing.T) {
 	}
 }
 
-func TestFixtures_WindsurfLLMSTxt(t *testing.T) {
-	raw, err := os.ReadFile("testdata/fixtures/windsurf/llms-full.txt")
+func TestFixtures_DevinLLMSTxt(t *testing.T) {
+	raw, err := os.ReadFile("testdata/fixtures/devin/llms-full.txt")
 	if err != nil {
 		t.Fatalf("read fixture: %v", err)
 	}
@@ -56,10 +56,10 @@ func TestFixtures_WindsurfLLMSTxt(t *testing.T) {
 	}
 	result, err := capmon.Extract(context.Background(), "yaml", raw, cfg)
 	if err != nil {
-		t.Fatalf("Extract yaml from windsurf fixture: %v", err)
+		t.Fatalf("Extract yaml from devin fixture: %v", err)
 	}
 	if len(result.Fields) == 0 {
-		t.Error("expected fields from windsurf fixture, got 0")
+		t.Error("expected fields from devin fixture, got 0")
 	}
 	// Landmarks should include top-level sections
 	wantLandmarks := []string{"hooks", "tools"}

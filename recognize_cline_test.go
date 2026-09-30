@@ -171,7 +171,7 @@ func TestRecognizeCline_NoLandmarks(t *testing.T) {
 // TestRecognizeCline_RealRulesLandmarks proves rules recognition on the merged
 // skills+rules landmarks. Per the seeder spec, cline supports a smaller
 // activation_mode vocabulary (only always_on + frontmatter_globs) than
-// cursor/kiro/windsurf. file_imports, cross_provider_recognition, and
+// cursor/kiro/devin. file_imports, cross_provider_recognition, and
 // auto_memory are intentionally absent.
 func TestRecognizeCline_RealRulesLandmarks(t *testing.T) {
 	merged := append([]string{}, realClineLandmarks...)

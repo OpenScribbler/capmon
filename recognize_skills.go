@@ -8,7 +8,7 @@ package capmon
 //     used by crush, roo-code, opencode, codex, …) — already handled by
 //     SkillsGoStructOptions in recognize.go and the recognizeGoStruct path.
 //
-//  2. Documentation markdown / human-readable specs (windsurf, cursor, kiro,
+//  2. Documentation markdown / human-readable specs (devin, cursor, kiro,
 //     factory-droid, …) — handled by landmark/heading matching via this module's
 //     SkillsLandmarkOptions / SkillsLandmarkPattern helpers.
 //

@@ -40,17 +40,20 @@ func setExportOverrides(t *testing.T) {
 	savedKeys := exportCanonicalKeysPathOverride
 	savedSources := exportSourcesDirOverride
 	savedAssets := exportPublishAssetsDirOverride
+	savedStatic := exportStaticDirOverride
 	t.Cleanup(func() {
 		exportCapsDirOverride = savedCaps
 		exportCanonicalKeysPathOverride = savedKeys
 		exportSourcesDirOverride = savedSources
 		exportPublishAssetsDirOverride = savedAssets
+		exportStaticDirOverride = savedStatic
 	})
 
 	exportCapsDirOverride = filepath.Join(fixture, "caps")
 	exportCanonicalKeysPathOverride = filepath.Join(fixture, "registry.yaml")
 	exportSourcesDirOverride = filepath.Join(fixture, "sources")
 	exportPublishAssetsDirOverride = filepath.Join(root, "docs", "publish")
+	exportStaticDirOverride = filepath.Join(root, "site-static")
 }
 
 func TestExportCmdFlags(t *testing.T) {
@@ -97,7 +100,7 @@ func TestExportCmdFlags(t *testing.T) {
 		}
 	})
 
-	t.Run("valid invocation produces v1/index.json", func(t *testing.T) {
+	t.Run("valid invocation produces v2/index.json", func(t *testing.T) {
 		output.SetForTest(t)
 		setExportOverrides(t)
 
@@ -114,8 +117,8 @@ func TestExportCmdFlags(t *testing.T) {
 		if err := exportCmd.RunE(exportCmd, []string{}); err != nil {
 			t.Fatalf("valid export invocation: %v", err)
 		}
-		if _, err := os.Stat(filepath.Join(outDir, "v1", "index.json")); err != nil {
-			t.Errorf("export did not produce %s/v1/index.json: %v", outDir, err)
+		if _, err := os.Stat(filepath.Join(outDir, "v2", "index.json")); err != nil {
+			t.Errorf("export did not produce %s/v2/index.json: %v", outDir, err)
 		}
 	})
 }
@@ -145,7 +148,7 @@ func TestExportVerifyFlagWiring(t *testing.T) {
 		output.SetForTest(t)
 
 		// A server that 404s every path, so the first thing verify mode does —
-		// fetch v1/index.json — fails with an error that names the base URL.
+		// fetch v2/index.json — fails with an error that names the base URL.
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 		}))
@@ -194,8 +197,8 @@ func TestExportVerifyFlagWiring(t *testing.T) {
 		if err := exportCmd.RunE(exportCmd, []string{}); err != nil {
 			t.Fatalf("normal export mode (no --verify) failed: %v", err)
 		}
-		if _, err := os.Stat(filepath.Join(outDir, "v1", "index.json")); err != nil {
-			t.Errorf("normal mode did not produce %s/v1/index.json: %v", outDir, err)
+		if _, err := os.Stat(filepath.Join(outDir, "v2", "index.json")); err != nil {
+			t.Errorf("normal mode did not produce %s/v2/index.json: %v", outDir, err)
 		}
 	})
 }

@@ -63,16 +63,27 @@ working directory, or point it elsewhere with `CAPMON_ROOT` or `--dir`.
 
 ## Consuming the published data
 
-The `/v1/` contract tree is published to GitHub Pages at
+The `/v2/` contract tree is published to GitHub Pages at
 `https://openscribbler.github.io/capmon/`. It is a **live view of current
-data**, not an archive — the URL major (`/v1/`) versions the contract
+data**, not an archive — the URL major (`/v2/`) versions the contract
 (document shapes, paths, field semantics), never the data.
+
+`/v1/` is frozen (ADR 0015). Its documents keep serving at their URLs with
+`status: "frozen"`, `superseded_by`, and `frozen_at`, but the data and
+`generated_at` no longer change, so a v1 client's staleness check fails
+48 hours after the freeze. v2 differs from v1 in two ways:
+
+- The `windsurf` provider is published as `devin` (Devin Desktop). Frozen
+  `v1/capabilities/windsurf.json` names `/v2/capabilities/devin.json` as its
+  successor.
+- Schema `$id`s live under `/v2/schemas/`. Document shapes and field
+  semantics are unchanged.
 
 ### Fetch flow
 
 1. `GET /index.json` (unversioned root) → read `latest` and the `majors`
-   array; follow the live major's `index` (`v1/index.json`).
-2. `GET /v1/index.json` → compare `data_revision` against your last-known
+   array; follow the live major's `index` (`v2/index.json`).
+2. `GET /v2/index.json` → compare `data_revision` against your last-known
    value. It is a hash over provider data only and changes **only when data
    changes**, so "did anything change?" is one field compare. If unchanged,
    you already have the current data.
@@ -88,17 +99,17 @@ hash. Authenticity comes from build-provenance attestation bound to the
 publishing workflow's identity.
 
 Integrity-sensitive consumers — anything that acts automatically on the
-data — **MUST** verify the attestation over `v1/index.json`, then each
+data — **MUST** verify the attestation over `v2/index.json`, then each
 file's `sha256` against it, and **MUST fail closed**: any mismatch aborts
 the fetch and triggers nothing downstream.
 
 ```bash
-gh attestation verify v1-index.json --repo OpenScribbler/capmon
+gh attestation verify v2-index.json --repo OpenScribbler/capmon
 ```
 
 ### Staleness and polling
 
-- `v1/index.json` carries `generated_at`, `cadence: "daily"`, and
+- `v2/index.json` carries `generated_at`, `cadence: "daily"`, and
   `max_staleness_hours`. If `generated_at` is older than
   `max_staleness_hours`, treat the feed as stale and keep your
   last-known-good copy. The feed is best-effort with no SLA.
@@ -119,7 +130,7 @@ gh attestation verify v1-index.json --repo OpenScribbler/capmon
   producers may add any of these within a major.
 
 Field and canonical-key semantics are specified in
-`v1/spec/field-semantics.md`; the JSON Schemas live under `v1/schemas/`.
+`v2/spec/field-semantics.md`; the JSON Schemas live under `v2/schemas/`.
 
 ## CI
 
@@ -129,8 +140,10 @@ workflow's own `GITHUB_TOKEN`. A scheduled keepalive re-enables the workflow
 through the Actions API so GitHub's 60-day-inactivity rule never disables the
 schedule — no scheduled job holds `contents` write on `main` (ADR 0005).
 
-`.github/workflows/publish.yml` exports the `/v1/` tree, attests it, and
-deploys it to GitHub Pages on any push to `main` under `docs/`. A daily cron
+`.github/workflows/publish.yml` exports the `/v2/` tree, copies the frozen
+`/v1/` tree from `site-static/` after checking its recorded root hash,
+attests the discovery indexes, and deploys to GitHub Pages on any push to
+`main` under `docs/` or `site-static/`. A daily cron
 re-runs the fail-closed gate and always deploys, so the re-stamped
 `generated_at` keeps the published index a truthful liveness heartbeat
 (ADR 0012); `data_revision` remains the change-detection signal.

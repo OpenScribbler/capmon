@@ -51,9 +51,9 @@ _Canonical domain vocabulary for this repo. When a term has a bold canonical nam
 | --- | --- | --- |
 | **Export** | Compilation (`capmon export`) of capability baselines joined with the canonical-key registry into validated JSON documents in a temp dir — distinct from the deploy step that publishes them. | publish (for the compile step) |
 | **Export surface** | The set of published files on GitHub Pages: discovery indexes, per-provider capability documents, pivots, spec files, schemas, and advisories. | the site, the API |
-| **Major** | The URL path prefix (`/v1/`) that versions the contract — document shapes, path layout, field semantics — never the data; only breaking changes bump it. | version (unqualified), API version |
+| **Major** | The URL path prefix (`/v2/`) that versions the contract — document shapes, path layout, field semantics — never the data; only breaking changes bump it. | version (unqualified), API version |
 | **schema_version** | An informational, per-schema monotonic shape-revision counter carried by every published document; never a compatibility signal and never a meaning-change signal. | version (unqualified) |
-| **data_revision** | The hash in `v1/index.json` computed over provider data only, so "did anything change?" is one field compare. | content hash, etag |
+| **data_revision** | The hash in a major's `index.json` computed over provider data only, so "did anything change?" is one field compare. | content hash, etag |
 | **Discovery index** | An `index.json`: the unversioned append-only root listing majors, or the per-major root carrying `generated_at`, cadence, staleness bounds, `data_revision`, `source_commit`, and per-file `sha256` values. | catalog, directory |
 | **Advisory** | A published correction record in a major's `advisories.json` — the sole permitted post-freeze mutation — pointing at a path and key path with a corrected value. | errata, correction notice |
 | **Freeze** | The single tested mutation (`capmon freeze <major>`) that turns a superseded major into an immutable static tree with `status: "frozen"`, `superseded_by`, `frozen_at`, and an externally recorded root hash. | archive, sunset, deprecate |

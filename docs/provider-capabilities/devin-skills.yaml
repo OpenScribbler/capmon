@@ -1,4 +1,4 @@
-provider: windsurf
+provider: devin
 content_type: skills
 format: ""
 proposed_mappings:
@@ -28,19 +28,19 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: global_scope
       supported: true
-      mechanism: Skill directory at ~/.codeium/windsurf/skills/<skill-name>/. Available in all workspaces on the user's machine; not committed to version control. Also discovered at ~/.agents/skills/<skill-name>/ and (if Claude Code config reading is enabled) ~/.claude/skills/<skill-name>/.
+      mechanism: Skill directory at ~/.codeium/windsurf/skills/<skill-name>/ or ~/.config/devin/skills/<skill-name>/ (shared with the Devin CLI). Available in all workspaces on the user's machine; not committed to version control. Also discovered at ~/.agents/skills/<skill-name>/ and (if Claude Code config reading is enabled) ~/.claude/skills/<skill-name>/.
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: project_scope
       supported: true
-      mechanism: Skill directory at .windsurf/skills/<skill-name>/. Committed with the repo; current workspace only. For cross-agent compatibility, also discovered at .agents/skills/<skill-name>/ and (if Claude Code config reading is enabled) .claude/skills/<skill-name>/.
+      mechanism: Skill directory at .devin/skills/<skill-name>/ (preferred; legacy .windsurf/skills/<skill-name>/ still read). Committed with the repo; current workspace only. For cross-agent compatibility, also discovered at .agents/skills/<skill-name>/ and (if Claude Code config reading is enabled) .claude/skills/<skill-name>/.
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: shared_scope
       supported: true
-      mechanism: 'OS-specific system path deployed by enterprise IT; read-only for end users. macOS: /Library/Application Support/Windsurf/skills/<skill-name>/; Linux/WSL: /etc/windsurf/skills/<skill-name>/; Windows: C:\ProgramData\Windsurf\skills\<skill-name>\.'
+      mechanism: 'OS-specific system path deployed by enterprise IT; read-only for end users. macOS: /Library/Application Support/Devin/skills/<skill-name>/; Linux/WSL: /etc/devin/skills/<skill-name>/; Windows: C:\ProgramData\Devin\skills\<skill-name>\.'
       source_field: ""
       source_value: ""
       confidence: confirmed

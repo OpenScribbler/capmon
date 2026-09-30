@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-16T04:32:32Z
+# Generated at: 2026-09-30T10:31:26Z
 
 content_type: hooks
 providers:
@@ -213,6 +213,41 @@ providers:
                 supported: true
                 mechanism: matcher patterns documented under 'Matcher Configuration' heading
                 confidence: inferred
+    devin:
+        supported: true
+        capabilities:
+            context_injection:
+                supported: true
+                mechanism: hookSpecificOutput.additionalContext injects text into the agent's context (UserPromptSubmit and SessionStart examples)
+                confidence: inferred
+            decision_control:
+                supported: true
+                mechanism: top-level decision "approve" or "block" with optional reason; exit code 2 blocks (documented under 'Output format' / 'Exit Codes')
+                confidence: inferred
+            handler_types:
+                supported: true
+                mechanism: each hook has a type of "command" (shell command) or "prompt" (LLM prompt evaluation), documented under 'Hook Format'
+                confidence: inferred
+            hook_scopes:
+                supported: true
+                mechanism: project (.devin/hooks.v1.json, .devin/config.json, .devin/config.local.json) and user (~/.config/devin/config.json) scopes documented under 'Project-Level' / 'User-Level (Global)'
+                confidence: inferred
+            input_modification:
+                supported: true
+                mechanism: PreToolUse hooks rewrite tool input via hookSpecificOutput.updatedInput, merged into the tool's arguments before execution
+                confidence: inferred
+            json_io_protocol:
+                supported: true
+                mechanism: event data passed as JSON on stdin; JSON output on stdout, documented under 'Command Hooks'
+                confidence: inferred
+            matcher_patterns:
+                supported: true
+                mechanism: matcher is a regex against the event's tool_name; empty or omitted matches all tools (documented under 'Using the Matcher' / 'Tool names you can match')
+                confidence: inferred
+            permission_control:
+                supported: true
+                mechanism: PermissionRequest event fires when a permission decision is needed and can approve or block it
+                confidence: inferred
     factory-droid:
         supported: true
         capabilities:
@@ -262,16 +297,5 @@ providers:
             input_modification:
                 supported: true
                 mechanism: tool_call event handlers can intercept and modify tool call inputs before execution (documented under 'tool_call' event)
-                confidence: inferred
-    windsurf:
-        supported: true
-        capabilities:
-            hook_scopes:
-                supported: true
-                mechanism: three-tier config scopes documented under 'System-Level' / 'User-Level' / 'Workspace-Level' headings
-                confidence: inferred
-            json_io_protocol:
-                supported: true
-                mechanism: JSON event context delivered via stdin documented under 'Common Input Structure' heading
                 confidence: inferred
 schema_version: "1"

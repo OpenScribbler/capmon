@@ -25,19 +25,21 @@ const verifyHTTPTimeout = 30 * time.Second
 // orders of magnitude smaller.
 const verifyMaxBodyBytes = 64 << 20
 
-// RunExportVerify rebuilds the /v1/ tree from a source commit and diffs it
-// byte-for-byte against the live published site under baseURL, returning nil on
-// total byte-identity and EXPORT_004 naming the first divergent path otherwise.
-// It is a maintainer/consumer conformance tool and is never part of the publish
-// gate. The live v1/index.json is fetched first so GeneratedAt/SourceCommit can
-// be pinned from it, making the comparison total byte equality on every file —
-// v1/index.json included. docs/ is materialized at the commit via git archive,
-// so the rebuild reflects the committed tree, never the working directory.
+// RunExportVerify rebuilds the whole published site (current major, frozen
+// majors, root index) from a source commit and diffs it byte-for-byte against
+// the live published site under baseURL, returning nil on total byte-identity
+// and EXPORT_004 naming the first divergent path otherwise. It is a
+// maintainer/consumer conformance tool and is never part of the publish gate.
+// The live current-major index.json is fetched first so
+// GeneratedAt/SourceCommit can be pinned from it, making the comparison total
+// byte equality on every file — that index included. docs/ and site-static/
+// are materialized at the commit via git archive, so the rebuild reflects the
+// committed tree, never the working directory.
 func RunExportVerify(commit, baseURL string) error {
 	base := strings.TrimRight(baseURL, "/") + "/"
 	client := &http.Client{Timeout: verifyHTTPTimeout}
 
-	indexURL := base + "v1/index.json"
+	indexURL := base + currentMajor + "/index.json"
 	idxBytes, err := verifyFetch(client, indexURL)
 	if err != nil {
 		return fmt.Errorf("fetch live index %s: %w", indexURL, err)
@@ -72,6 +74,7 @@ func RunExportVerify(commit, baseURL string) error {
 		CanonicalKeysPath: filepath.Join(docs, "spec", "canonical-keys.yaml"),
 		SourcesDir:        filepath.Join(docs, "provider-sources"),
 		PublishAssetsDir:  filepath.Join(docs, "publish"),
+		StaticDir:         filepath.Join(srcDir, "site-static"),
 		OutDir:            outDir,
 		GeneratedAt:       idx.GeneratedAt,
 		SourceCommit:      idx.SourceCommit,
@@ -100,7 +103,7 @@ func RunExportVerify(commit, baseURL string) error {
 		if !bytes.Equal(want, got) {
 			return output.NewStructuredError(
 				"EXPORT_004",
-				fmt.Sprintf("published v1/ document %s diverges from the rebuild of commit %s", rel, commit),
+				fmt.Sprintf("published document %s diverges from the rebuild of commit %s", rel, commit),
 				"The live site no longer matches a deterministic rebuild of this commit; republish from a clean export or investigate the drift.",
 			)
 		}
@@ -139,16 +142,16 @@ func verifyFetch(client *http.Client, url string) ([]byte, error) {
 	return b, nil
 }
 
-// archiveDocs materializes the docs/ subtree at commit into dst via git archive,
-// running git in the current working directory. Using the archive (not the
+// archiveDocs materializes the docs/ and site-static/ subtrees at commit into
+// dst via git archive, running git in the current working directory. Using the archive (not the
 // working tree) guarantees the rebuild sees exactly the committed bytes.
 func archiveDocs(commit, dst string) error {
-	cmd := exec.Command("git", "archive", "--format=tar", commit, "docs")
+	cmd := exec.Command("git", "archive", "--format=tar", commit, "docs", "site-static")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git archive %s docs: %v: %s", commit, err, strings.TrimSpace(stderr.String()))
+		return fmt.Errorf("git archive %s docs site-static: %v: %s", commit, err, strings.TrimSpace(stderr.String()))
 	}
 	return extractTar(&stdout, dst)
 }
