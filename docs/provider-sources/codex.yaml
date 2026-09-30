@@ -240,7 +240,7 @@ content_types:
         format: rust
         extracts: [config_fields, file_format]
 
-      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/src/agent/builtins/awaiter.toml
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/core/assets/agent/builtins/awaiter.toml
         type: example
         format: toml
         extracts: [config_fields]
