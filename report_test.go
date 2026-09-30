@@ -17,7 +17,7 @@ func TestSanitizeSlug(t *testing.T) {
 	}{
 		{"claude-code", false},
 		{"gemini-cli", false},
-		{"windsurf", false},
+		{"devin", false},
 		{"UPPER", true},
 		{"has space", true},
 		{"-leading-dash", true},

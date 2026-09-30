@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:55:16Z
+# Generated at: 2026-09-30T10:13:25Z
 
 content_type: skills
 providers:
@@ -149,6 +149,45 @@ providers:
                 supported: true
                 mechanism: Skills stored in .cursor/skills/<name>/SKILL.md (cursor-native) or .agents/skills/<name>/SKILL.md (cross-provider Agent Skills convention)
                 confidence: confirmed
+    devin:
+        supported: true
+        capabilities:
+            auto_invocable:
+                supported: true
+                mechanism: Cascade invokes a skill when the request matches its description (documented under 'Automatic Invocation')
+                confidence: inferred
+            canonical_filename:
+                supported: true
+                mechanism: SKILL.md is the fixed filename in each skill directory (documented under 'SKILL.md File Format')
+                confidence: inferred
+            description:
+                supported: true
+                mechanism: description frontmatter field used for automatic invocation (documented under 'Required Frontmatter Fields')
+                confidence: inferred
+            display_name:
+                supported: true
+                mechanism: name frontmatter field (documented under 'Required Frontmatter Fields')
+                confidence: inferred
+            global_scope:
+                supported: true
+                mechanism: global skills under ~/.config/devin/skills/<skill-name>/ (documented under 'Skill Scopes')
+                confidence: inferred
+            project_scope:
+                supported: true
+                mechanism: workspace skills under .devin/skills/<skill-name>/ (documented under 'Skill Scopes')
+                confidence: inferred
+            shared_scope:
+                supported: true
+                mechanism: OS-level system skills deployed by enterprise IT (documented under 'System-Level Skills (Enterprise)')
+                confidence: inferred
+            skill_bundled_resources:
+                supported: true
+                mechanism: supporting files alongside SKILL.md in the skill directory (documented under 'Adding Supporting Resources')
+                confidence: inferred
+            user_invocable:
+                supported: true
+                mechanism: '@-mention a skill by name (documented under ''Manual Invocation'')'
+                confidence: inferred
     factory-droid:
         supported: true
         capabilities:

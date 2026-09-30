@@ -10,7 +10,7 @@ This document shows which content types each provider supports natively. Whether
 - `⚙` — Built-in only; not user-definable (no files to install)
 - `✗` — Not supported by this provider
 
-Last updated: 2026-07-11. Authoritative sources: `docs/provider-sources/*.yaml` (native support + monitoring sources) and `docs/provider-formats/*.yaml` (per-capability detail).
+Last updated: 2026-09-30. Authoritative sources: `docs/provider-sources/*.yaml` (native support + monitoring sources) and `docs/provider-formats/*.yaml` (per-capability detail).
 
 ---
 
@@ -24,13 +24,13 @@ Last updated: 2026-07-11. Authoritative sources: `docs/provider-sources/*.yaml` 
 | codex            |   ✓   |   ✓    |   ✓    |    ✓     |  ✓  |   ✓   |
 | copilot-cli      |   ✓   |   ✓    |   ✓    |    ✓     |  ✓  |   ✓   |
 | cursor           |   ✓   |   ✓    |   ~    |    ~     |  ✓  |   ✓   |
+| devin            |   ✓   |   ✓    |   ✓    |    ✓     |  ✓  |   ✓   |
 | factory-droid    |   ✓   |   ✓    |   ✓    |    ✓     |  ✓  |   ✓   |
 | gemini-cli       |   ✓   |   ✓    |   ~    |    ✓     |  ✓  |   ✓   |
 | kiro             |   ✓   |   ✓    |   ✓    |    ✗     |  ✓  |   ✓   |
 | opencode         |   ✓   |   ~    |   ⚙    |    ✓     |  ✓  |   ✗   |
 | pi               |   ✓   |   ✓    |   ✗    |    ✓     |  ✗  |   ✓   |
 | roo-code         |   ✓   |   ✓    |   ✓    |    ✓     |  ✓  |   ✗   |
-| windsurf         |   ✓   |   ✓    |   ~    |    ~     |  ✓  |   ✓   |
 | crush            |   ✓   |   ✓    |   ✗    |    ✗     |  ✓  |   ✓   |
 | zed              |   ✓   |   ✗    |   ⚙    |    ⚙     |  ✓  |   ✗   |
 
@@ -56,6 +56,9 @@ All 6 content types. "Commands" maps to Copilot CLI's plugin system (.agent.md f
 ### cursor
 Supports rules (.cursor/rules/*.mdc + legacy .cursorrules), skills, hooks (~23 events in camelCase), MCP. Agents and commands are tracked in manifest via AGENTS.md and .cursor/commands/ cross-provider conventions — no cursor-native format docs available. cursor.com/docs rate-limits automated fetching.
 
+### devin
+Devin Desktop, formerly Windsurf (slug `windsurf` in the frozen v1 feed). All 6 content types. Rules (`.devin/rules/`, legacy `.windsurf/rules/` and `.windsurfrules`, plus Cascade memories), skills, MCP, hooks (Devin CLI lifecycle hooks: PascalCase events, command and prompt handlers, Claude Code-style config), agents (custom subagents in `.devin/agents/` and `~/.config/devin/agents/`, experimental), and commands (Cascade Workflows in `.devin/workflows/`; the Devin Local agent does not run Workflows).
+
 ### factory-droid
 All 6 content types. Hook schema matches Claude Code format exactly. Custom agents are called "Custom Droids" (`.factory/droids/<name>.md`). Tool restrictions use categorical names (filesystem, shell, search, browser, web_fetch) instead of per-tool allowlists. MCP config: `.factory/mcp.json` (project) and `~/.factory/mcp.json` (user).
 
@@ -74,9 +77,6 @@ Supports rules (AGENTS.md), skills (`.pi/skills/`, `~/.pi/agent/skills/`), hooks
 ### roo-code
 Supports rules (.roo/rules/ with per-mode subdirs like .roo/rules-code/), skills, agents ("Custom Modes" in .roomodes), commands (.roo/commands/), MCP. **No hooks** — deliberately removed from Cline fork.
 
-### windsurf
-Supports rules (.windsurfrules + Cascade memories), skills, hooks (per-tool-category split events), MCP. Agents tracked for AGENTS.md convention only — no windsurf-native agent files. CLI commands are not user-definable.
-
 ### crush
 Supports rules (AGENTS.md project only), skills (`.crush/skills/`, `~/.config/crush/skills/` — XDG-compliant), MCP (`crush.json` with stdio/http/sse transports), and hooks (single `PreToolUse` event under the `crush.json` `hooks` key; Claude Code-compatible flat `HookConfig` shape). No agents, no commands.
 
@@ -91,11 +91,11 @@ Supports rules (.rules, plain markdown), MCP. Agent "profiles" (write/ask/minima
 |--------------|:--------------:|:------------------:|:--------------------:|:-----------------:|:-----------------:|
 | Rules        |      15        |        15          |         0            |        0          |         0         |
 | Skills       |      15        |        13          |         1            |        0          |         1         |
-| Agents       |      15        |         6          |         3            |        2          |         4         |
-| Commands     |      15        |         8          |         2            |        1          |         4         |
+| Agents       |      15        |         7          |         2            |        2          |         4         |
+| Commands     |      15        |         9          |         1            |        1          |         4         |
 | MCP          |      15        |        14          |         0            |        0          |         1         |
 | Hooks        |      15        |        11          |         0            |        0          |         4         |
 
 **Rules** is the most universally supported content type — every provider has it.  
 **Hooks** is the most selective — only 11 of 15 providers support lifecycle hooks.  
-**Agents** has the most variation — true user-definable agent files in only 6 providers; 3 more use cross-provider AGENTS.md convention only.
+**Agents** has the most variation — true user-definable agent files in only 7 providers; 2 more use cross-provider AGENTS.md convention only.

@@ -1,4 +1,6 @@
-# Every provider slug published under v1 — append-only within the major.
+# Every provider slug published under v2 — append-only within the major.
+# The v1 set is frozen in site-static/v1/ and keeps `windsurf`; v2 renamed it
+# to `devin` at the major bump (ADR-0013 tier 3, ADR-0015).
 # The export gate (EXPORT_005) fails closed unless this set exactly matches
 # the exported provider set. Never remove a line to make the gate pass: slugs
 # are permanent within a major (ADR-0013). Onboarding a new provider appends
@@ -10,11 +12,11 @@ codex
 copilot-cli
 crush
 cursor
+devin
 factory-droid
 gemini-cli
 kiro
 opencode
 pi
 roo-code
-windsurf
 zed

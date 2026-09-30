@@ -1,4 +1,4 @@
-provider: windsurf
+provider: devin
 content_type: rules
 format: ""
 proposed_mappings:
@@ -10,19 +10,19 @@ proposed_mappings:
       confidence: confirmed
     - canonical_key: auto_memory
       supported: true
-      mechanism: 'auto_generated_memories: Windsurf AI generates persistent memories stored in ~/.codeium/windsurf/memories/ as rule-like files'
+      mechanism: 'auto_generated_memories: Cascade generates persistent memories stored in ~/.codeium/windsurf/memories/ as rule-like files (legacy Cascade agent only; Devin Local does not persist memories)'
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: cross_provider_recognition
       supported: true
-      mechanism: 'agents_md_auto_scoping: Windsurf reads both AGENTS.md and agents.md (case-insensitive) files from other providers and applies them with workspace-aware scoping'
+      mechanism: 'agents_md_auto_scoping: Devin Desktop reads both AGENTS.md and agents.md (case-insensitive) files from other providers and applies them with workspace-aware scoping'
       source_field: ""
       source_value: ""
       confidence: confirmed
     - canonical_key: file_imports
       supported: false
-      mechanism: No @-import or file inclusion syntax documented for Windsurf rule files
+      mechanism: No @-import or file inclusion syntax documented for Devin Desktop rule files
       source_field: ""
       source_value: ""
       confidence: confirmed

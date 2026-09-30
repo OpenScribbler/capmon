@@ -39,14 +39,14 @@ func snapshotTree(t *testing.T, root string) map[string][]byte {
 func sentinelOutDir(t *testing.T) (string, map[string][]byte) {
 	t.Helper()
 	outDir := filepath.Join(t.TempDir(), "site")
-	if err := os.MkdirAll(filepath.Join(outDir, "v1"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(outDir, "v2"), 0755); err != nil {
 		t.Fatalf("mkdir sentinel: %v", err)
 	}
 	if err := os.WriteFile(filepath.Join(outDir, "index.json"), []byte("SENTINEL-ROOT\n"), 0644); err != nil {
 		t.Fatalf("write sentinel root: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(outDir, "v1", "index.json"), []byte("SENTINEL-V1\n"), 0644); err != nil {
-		t.Fatalf("write sentinel v1: %v", err)
+	if err := os.WriteFile(filepath.Join(outDir, "v2", "index.json"), []byte("SENTINEL-V2\n"), 0644); err != nil {
+		t.Fatalf("write sentinel v2: %v", err)
 	}
 	return outDir, snapshotTree(t, outDir)
 }
@@ -171,7 +171,7 @@ func TestRunExportTrailingSeparatorOutDir(t *testing.T) {
 		t.Fatalf("RunExport with trailing-separator OutDir: %v", err)
 	}
 
-	got := readFileBytes(t, filepath.Join(outDir, "v1", "index.json"))
+	got := readFileBytes(t, filepath.Join(outDir, "v2", "index.json"))
 	if bytes.Contains(got, []byte("SENTINEL")) {
 		t.Error("OutDir still holds the sentinel site after a successful export")
 	}

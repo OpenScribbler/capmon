@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-14T18:55:16Z
+# Generated at: 2026-09-30T10:13:25Z
 
 content_type: mcp
 providers:
@@ -87,6 +87,29 @@ providers:
             transport_types:
                 supported: true
                 mechanism: stdio transport documented under 'STDIO server configuration' heading; SSE and Streamable HTTP variants covered in body text and configuration tables
+                confidence: inferred
+    devin:
+        supported: true
+        capabilities:
+            enterprise_management:
+                supported: true
+                mechanism: organization-level MCP admin controls (allowlist, custom registries, regex matching) documented under 'Admin Controls (Teams & Enterprises)' / 'Admin Configuration Guidelines' headings
+                confidence: inferred
+            env_var_expansion:
+                supported: true
+                mechanism: ${env:VAR_NAME} and ${file:/path} interpolation documented under 'Config Interpolation' heading
+                confidence: inferred
+            marketplace:
+                supported: true
+                mechanism: in-IDE MCP marketplace documented under 'MCP Registry' / 'Configuring Custom Registries' headings
+                confidence: inferred
+            tool_filtering:
+                supported: true
+                mechanism: per-server tool filtering documented under 'Configuring MCP tools' (UI tool toggles, 100-tool cap) and 'MCP Allowlist' (admin-side regex matching) headings
+                confidence: inferred
+            transport_types:
+                supported: true
+                mechanism: transport types (stdio for local, Streamable HTTP and SSE for remote) documented under 'Remote HTTP MCPs' heading; remote servers use serverUrl/url instead of command/args
                 confidence: inferred
     factory-droid:
         supported: true
@@ -180,29 +203,6 @@ providers:
                 supported: true
                 mechanism: 'two types under the mcp key in opencode.json: local (stdio, launched via command array) and remote (HTTP/SSE streamable, connected via url) (documented under ''Local'' / ''Remote'' headings)'
                 confidence: confirmed
-    windsurf:
-        supported: true
-        capabilities:
-            enterprise_management:
-                supported: true
-                mechanism: organization-level MCP admin controls (whitelist, custom registries, regex matching) documented under 'Admin Controls (Teams & Enterprises)' / 'Admin Configuration Guidelines' headings
-                confidence: inferred
-            env_var_expansion:
-                supported: true
-                mechanism: ${env:VAR_NAME} and ${file:/path} interpolation documented under 'Config Interpolation' heading
-                confidence: inferred
-            marketplace:
-                supported: true
-                mechanism: in-IDE MCP marketplace documented under 'MCP Registry' / 'Configuring Custom Registries' headings
-                confidence: inferred
-            tool_filtering:
-                supported: true
-                mechanism: per-server tool filtering documented under 'Configuring MCP tools' (UI tool toggles, 100-tool cap) and 'MCP Whitelist' (admin-side regex matching) headings
-                confidence: inferred
-            transport_types:
-                supported: true
-                mechanism: transport types (stdio for local, Streamable HTTP and SSE for remote) documented under 'Remote HTTP MCPs' heading; remote servers use serverUrl/url instead of command/args
-                confidence: inferred
     zed:
         supported: true
         capabilities:

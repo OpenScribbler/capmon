@@ -1,7 +1,8 @@
 name: publish
 
-# Publishes the deterministic /v1/ contract tree to GitHub Pages with a
-# fail-closed export gate and build-provenance attestation (ADR 0004).
+# Publishes the deterministic contract site — the live current major plus
+# every frozen major copied from site-static/ (ADR 0001) — to GitHub Pages
+# with a fail-closed export gate and build-provenance attestation (ADR 0004).
 #
 # The push trigger is the primary path: any change under docs/ on main
 # republishes. The daily cron re-runs the full gate and always deploys,
@@ -15,6 +16,7 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'site-static/**'
   schedule:
     # Daily at 09:00 UTC — offset from the pipeline cron (06:00) so the
     # health-check publish runs after the day's fetch/report has settled.
@@ -55,7 +57,7 @@ jobs:
       - name: Checkout capmon
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          # Full history so `git log -- docs/` can resolve the last commit
+          # Full history so `git log -- docs/ site-static/` can resolve the last commit
           # that changed source data (never HEAD, which moves on every run).
           fetch-depth: 0
 
@@ -70,10 +72,10 @@ jobs:
       - name: Resolve source commit
         id: source
         run: |
-          SOURCE_COMMIT=$(git log -1 --format=%H -- docs/)
+          SOURCE_COMMIT=$(git log -1 --format=%H -- docs/ site-static/)
           echo "commit=${SOURCE_COMMIT}" >> "$GITHUB_OUTPUT"
 
-      - name: Export /v1/ tree (fail-closed gate)
+      - name: Export site (fail-closed gate)
         run: ./capmon-bin export --out dist --source-commit "${{ steps.source.outputs.commit }}"
 
       # Inlined from actions/upload-pages-artifact: its composite internally
@@ -98,11 +100,14 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-      - name: Attest build provenance over both discovery indexes
+      # The frozen v1 index is re-attested on every deploy so consumers still
+      # pinned to v1 keep finding a bundle for its (unchanging) digest.
+      - name: Attest build provenance over every discovery index
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
         with:
           subject-path: |
             dist/index.json
+            dist/v2/index.json
             dist/v1/index.json
 
       - name: Deploy to GitHub Pages

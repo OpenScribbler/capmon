@@ -164,7 +164,7 @@ content_types:
       scope (all local users), not org/cloud shared scope. The user_invocable key has no
       evidence in the source (no concept of hiding skills from user-facing menus in the Rust
       implementation) — set to status: absent, confidence: confirmed. The openai_yaml_companion_file
-      is flagged graduation_candidate: true because other providers (windsurf, amp, cline,
+      is flagged graduation_candidate: true because other providers (devin, amp, cline,
       claude-code) support additional supporting files in the skill directory beyond the
       primary content file.
       2026-07-13 drift review: model.rs and loader.rs drifted through refactors with NO capability

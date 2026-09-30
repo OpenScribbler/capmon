@@ -1,0 +1,46 @@
+provider: devin
+content_type: agents
+format: ""
+proposed_mappings:
+    - canonical_key: agent_scopes
+      supported: true
+      mechanism: project (.devin/agents/, .agents/agents/) and global (~/.config/devin/agents/, Windows %APPDATA%\devin\agents\)
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: definition_format
+      supported: true
+      mechanism: Markdown file with YAML frontmatter (name, description, model, allowed-tools, max-nesting) followed by the system prompt, as agents/<name>.md or agents/<name>/AGENT.md (AGENTS.md, agent.md, agents.md also accepted)
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: invocation_patterns
+      supported: true
+      mechanism: the agent picks a profile by its description when spawning a subagent; the user can request a profile by name; subagents run in the foreground or background
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: model_selection
+      supported: true
+      mechanism: model frontmatter field overrides the subagent model; the default is the router-selected subagent model, not the parent model
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: per_agent_mcp
+      supported: false
+      mechanism: no per-agent MCP server configuration documented in the custom subagent frontmatter
+      source_field: ""
+      source_value: ""
+      confidence: inferred
+    - canonical_key: subagent_spawning
+      supported: true
+      mechanism: max-nesting frontmatter field lets a custom subagent spawn its own subagents; nesting is disabled by default
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: tool_restrictions
+      supported: true
+      mechanism: allowed-tools frontmatter list (alias tools) restricts the tools a subagent can use; ask_user_question is always withheld
+      source_field: ""
+      source_value: ""
+      confidence: confirmed

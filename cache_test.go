@@ -55,7 +55,7 @@ func TestAgeBasedEvict(t *testing.T) {
 	hash := sha256Hash(content)
 
 	old := capmon.CacheEntry{
-		Provider: "windsurf",
+		Provider: "devin",
 		SourceID: "llms-full",
 		Raw:      content,
 		Meta: capmon.CacheMeta{
@@ -75,7 +75,7 @@ func TestAgeBasedEvict(t *testing.T) {
 	if evicted == 0 {
 		t.Error("expected at least one eviction")
 	}
-	if capmon.IsCached(dir, "windsurf", "llms-full") {
+	if capmon.IsCached(dir, "devin", "llms-full") {
 		t.Error("evicted entry should not be cached")
 	}
 }

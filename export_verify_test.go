@@ -56,7 +56,8 @@ func copyFile(t *testing.T, src, dst string) {
 // buildVerifyRepo creates a throwaway git repo under t.TempDir() whose docs/
 // tree mirrors the real repo layout — provider-capabilities/, spec/canonical-keys.yaml,
 // provider-sources/, and a verbatim copy of the committed docs/publish/ contract
-// assets — populated from the committed export fixture. It commits docs/ and
+// assets — populated from the committed export fixture, plus the real frozen
+// site-static/ tree. It commits docs/ and site-static/ and
 // returns the repo path and the commit SHA. RunExportVerify archives docs/ at
 // that SHA, so the committed tree is the exact source the rebuild sees.
 func buildVerifyRepo(t *testing.T) (string, string) {
@@ -79,11 +80,14 @@ func buildVerifyRepo(t *testing.T) (string, string) {
 		t.Fatalf("copy publish assets: %v", err)
 	}
 	copyFile(t, filepath.Join(fixture, "registry.yaml"), filepath.Join(repo, "docs", "spec", "canonical-keys.yaml"))
+	if err := os.CopyFS(filepath.Join(repo, "site-static"), os.DirFS(filepath.Join(docsRoot(t), "site-static"))); err != nil {
+		t.Fatalf("copy site-static: %v", err)
+	}
 
 	runGit(t, repo, "init", "-q")
 	runGit(t, repo, "config", "user.email", "verify@example.com")
 	runGit(t, repo, "config", "user.name", "Verify Test")
-	runGit(t, repo, "add", "docs")
+	runGit(t, repo, "add", "docs", "site-static")
 	runGit(t, repo, "-c", "commit.gpgsign=false", "commit", "-q", "-m", "fixture docs")
 
 	sha := strings.TrimSpace(runGit(t, repo, "rev-parse", "HEAD"))
@@ -115,7 +119,7 @@ func dirtyWorkingTree(t *testing.T, repo string) {
 // fresh directory, pinning GeneratedAt and SourceCommit so the published tree is
 // deterministic. The returned dir is what an httptest FileServer serves as the
 // "live site". RunExportVerify re-reads generated_at + source_commit from the
-// served v1/index.json, so the pinned values here define what a matching rebuild
+// served v2/index.json, so the pinned values here define what a matching rebuild
 // must reproduce.
 func buildPublishedSite(t *testing.T, repo, sha string) string {
 	t.Helper()
@@ -125,6 +129,7 @@ func buildPublishedSite(t *testing.T, repo, sha string) string {
 		CanonicalKeysPath: filepath.Join(repo, "docs", "spec", "canonical-keys.yaml"),
 		SourcesDir:        filepath.Join(repo, "docs", "provider-sources"),
 		PublishAssetsDir:  filepath.Join(repo, "docs", "publish"),
+		StaticDir:         filepath.Join(repo, "site-static"),
 		OutDir:            site,
 		GeneratedAt:       "2026-07-12T09:00:00Z",
 		SourceCommit:      sha,
@@ -140,7 +145,7 @@ func buildPublishedSite(t *testing.T, repo, sha string) string {
 // TestExportVerifyMatch: a site published from a commit's docs/ verifies clean
 // against a rebuild of that same commit. RunExportVerify archives docs/ at the
 // SHA from the CWD repo (t.Chdir), rebuilds with generated_at + source_commit
-// pinned from the fetched v1/index.json, and byte-compares every published file.
+// pinned from the fetched v2/index.json, and byte-compares every published file.
 func TestExportVerifyMatch(t *testing.T) {
 	requireGit(t)
 
@@ -172,7 +177,7 @@ func TestExportVerifyMismatchFailsClosed(t *testing.T) {
 	site := buildPublishedSite(t, repo, sha)
 	dirtyWorkingTree(t, repo)
 
-	target := filepath.Join(site, "v1", "capabilities", "synthetic.json")
+	target := filepath.Join(site, "v2", "capabilities", "synthetic.json")
 	good, err := os.ReadFile(target)
 	if err != nil {
 		t.Fatalf("read published synthetic.json: %v", err)

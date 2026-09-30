@@ -163,14 +163,13 @@ func TestRecognizeGoStructBatch_EmptyFields(t *testing.T) {
 	}
 }
 
-// TestRecognizeCustomBatch_Supported covers windsurf, gemini-cli, opencode.
+// TestRecognizeCustomBatch_Supported covers gemini-cli and opencode.
 // Each uses the GoStruct pattern under the hood plus provider-specific scope.
 func TestRecognizeCustomBatch_Supported(t *testing.T) {
 	providers := []struct {
 		slug               string
 		projectScopeSubstr string
 	}{
-		{"windsurf", ".windsurf/skills"},
 		{"gemini-cli", ".gemini/skills"},
 		{"opencode", ".opencode/skill"},
 	}

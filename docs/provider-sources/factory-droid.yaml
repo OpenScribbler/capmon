@@ -43,7 +43,7 @@ content_types:
         format: markdown
         extracts: [file_format, file_locations]
     # Format: AGENTS.md in project root (plain Markdown, no frontmatter)
-    # Cross-provider convention shared with Cursor, Windsurf, etc.
+    # Cross-provider convention shared with Cursor, Devin Desktop, etc.
 
   hooks:
     sources:

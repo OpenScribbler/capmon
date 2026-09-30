@@ -9,6 +9,10 @@ import (
 	"github.com/OpenScribbler/capmon/capyaml"
 )
 
+// currentMajor is the one URL major the exporter generates (ADR 0001: freeze,
+// don't fork). Every earlier major is a frozen static tree under site-static/.
+const currentMajor = "v2"
+
 // ExportOptions carries every source path and run-varying value the exporter
 // needs. All source locations are parameterized so tests can point at fixture
 // dirs; GeneratedAt and SourceCommit are passed through verbatim — the exporter
@@ -19,17 +23,21 @@ type ExportOptions struct {
 	SourcesDir        string
 	PublishAssetsDir  string
 	OutDir            string
-	SourceCommit      string
-	GeneratedAt       string
+	// StaticDir holds the frozen majors (site-static/), copied verbatim into
+	// the export after their root hashes verify.
+	StaticDir    string
+	SourceCommit string
+	GeneratedAt  string
 }
 
-// writeExportTree stages the complete deterministic /v1/ document tree under
+// writeExportTree stages the complete deterministic current-major document tree under
 // dst: per-provider docs, all.json, one by-content-type pivot per registry
 // content type, the registry document, advisories, any verbatim publish
-// assets, then v1/index.json, and finally the constant root index.json. The
-// staging order is fixed — every v1/ document and asset is written before any
-// hash is computed, v1/index.json is written after everything it hashes, and
-// the root index is written last.
+// assets, then <major>/index.json, and finally the constant root index.json.
+// The staging order is fixed — every <major>/ document and asset is written
+// before any hash is computed, <major>/index.json is written after everything
+// it hashes, and the root index is written last. Frozen majors are not written
+// here; RunExport copies them in from StaticDir.
 func writeExportTree(dst string, opts ExportOptions) error {
 	reg, err := loadKeyRegistry(opts.CanonicalKeysPath)
 	if err != nil {
@@ -46,7 +54,7 @@ func writeExportTree(dst string, opts ExportOptions) error {
 		return err
 	}
 
-	// staged maps every written v1/ file (slash-relative to v1/) to its exact
+	// staged maps every written <major>/ file (slash-relative to it) to its exact
 	// bytes, so the index hashes the same bytes that landed on disk.
 	staged := map[string][]byte{}
 
@@ -61,7 +69,7 @@ func writeExportTree(dst string, opts ExportOptions) error {
 			return err
 		}
 		staged[rel] = b
-		return writeStagedFile(filepath.Join(dst, "v1", filepath.FromSlash(rel)), b)
+		return writeStagedFile(filepath.Join(dst, currentMajor, filepath.FromSlash(rel)), b)
 	}
 
 	for slug, doc := range providerDocs {
@@ -88,11 +96,11 @@ func writeExportTree(dst string, opts ExportOptions) error {
 		return err
 	}
 
-	idxBytes, err := canonicalJSON(buildV1Index(staged, providerDocs, opts))
+	idxBytes, err := canonicalJSON(buildMajorIndex(staged, providerDocs, opts))
 	if err != nil {
 		return err
 	}
-	if err := writeStagedFile(filepath.Join(dst, "v1", "index.json"), idxBytes); err != nil {
+	if err := writeStagedFile(filepath.Join(dst, currentMajor, "index.json"), idxBytes); err != nil {
 		return err
 	}
 
@@ -219,7 +227,7 @@ func buildRegistryDoc(reg keyRegistry) map[string]any {
 	}
 }
 
-// copyAssets copies every file under assetsDir verbatim into dst/v1/,
+// copyAssets copies every file under assetsDir verbatim into dst/<major>/,
 // preserving relative paths, and records each in staged so it joins the index
 // files map. A empty assetsDir path is a no-op.
 func copyAssets(assetsDir, dst string, staged map[string][]byte) error {
@@ -243,7 +251,7 @@ func copyAssets(assetsDir, dst string, staged map[string][]byte) error {
 			return err
 		}
 		staged[rel] = b
-		return writeStagedFile(filepath.Join(dst, "v1", filepath.FromSlash(rel)), b)
+		return writeStagedFile(filepath.Join(dst, currentMajor, filepath.FromSlash(rel)), b)
 	})
 }
 

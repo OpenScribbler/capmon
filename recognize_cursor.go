@@ -18,7 +18,7 @@ func init() {
 // docs evolved post-spec; we trust the cache as the live source of truth.
 //
 // Activation modes (Always / Auto Attached / Apply Manually / Agent Requested)
-// are documented as Rule Type values in a frontmatter table. Like windsurf,
+// are documented as Rule Type values in a frontmatter table. Like devin,
 // the table cells are not extracted as standalone landmarks — all four
 // sub-keys gate on the parent "Activation and enforcement" heading.
 func cursorRulesLandmarkOptions() LandmarkOptions {

@@ -1,0 +1,58 @@
+provider: devin
+content_type: hooks
+format: ""
+proposed_mappings:
+    - canonical_key: async_execution
+      supported: false
+      mechanism: No async or background handler option documented for Devin lifecycle hooks
+      source_field: ""
+      source_value: ""
+      confidence: inferred
+    - canonical_key: context_injection
+      supported: true
+      mechanism: hookSpecificOutput.additionalContext injects text into the agent context; documented for UserPromptSubmit and SessionStart
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: decision_control
+      supported: true
+      mechanism: top-level decision "approve" or "block" with optional reason; exit code 2 blocks the action
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: handler_types
+      supported: true
+      mechanism: type "command" runs a shell command; type "prompt" evaluates an LLM prompt
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: hook_scopes
+      supported: true
+      mechanism: project scope (.devin/hooks.v1.json, .devin/config.json, .devin/config.local.json, plus .claude/settings.json and .claude/settings.local.json) and user scope (~/.config/devin/config.json, Windows %APPDATA%\devin\config.json, plus ~/.claude.json and ~/.claude/settings.json)
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: input_modification
+      supported: true
+      mechanism: PreToolUse hooks return hookSpecificOutput.updatedInput, merged into the tool arguments before execution
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: json_io_protocol
+      supported: true
+      mechanism: event data passed as JSON on stdin; hooks return JSON on stdout
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: matcher_patterns
+      supported: true
+      mechanism: matcher is a regex matched against the event tool_name; empty or omitted matches every tool
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
+    - canonical_key: permission_control
+      supported: true
+      mechanism: PermissionRequest event fires when a permission decision is needed; a hook can approve or block it
+      source_field: ""
+      source_value: ""
+      confidence: confirmed

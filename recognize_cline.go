@@ -53,7 +53,7 @@ func clineLandmarkOptions() LandmarkOptions {
 //   - "Conditional Rules"
 //
 // Per the seeder spec, cline supports a smaller activation_mode vocabulary
-// than cursor/kiro/windsurf — only always_on (no conditional) and
+// than cursor/kiro/devin — only always_on (no conditional) and
 // frontmatter_globs (paths conditional). file_imports,
 // cross_provider_recognition, and auto_memory are intentionally absent.
 func clineRulesLandmarkOptions() LandmarkOptions {

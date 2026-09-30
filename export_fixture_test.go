@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 )
 
@@ -35,20 +36,33 @@ func committedFixtureOpts(t *testing.T) ExportOptions {
 		CanonicalKeysPath: filepath.Join(root, "registry.yaml"),
 		SourcesDir:        filepath.Join(root, "sources"),
 		PublishAssetsDir:  filepath.Join(docsRoot(t), "docs", "publish"),
+		StaticDir:         filepath.Join(docsRoot(t), "site-static"),
 	}
 }
 
 // copiedAssetRels returns the OutDir-relative slash paths of every verbatim
-// publish asset (schemas + spec/field-semantics.md), i.e. "v1/<rel>" for each
+// publish asset (schemas + spec/field-semantics.md), i.e. "v2/<rel>" for each
 // file under publishDir. These are asserted byte-equal to their docs/publish
 // sources, not committed a second time under expected/.
 func copiedAssetRels(t *testing.T, publishDir string) map[string]bool {
 	t.Helper()
 	set := map[string]bool{}
 	for _, rel := range walkRelFiles(t, publishDir) {
-		set["v1/"+rel] = true
+		set["v2/"+rel] = true
 	}
 	return set
+}
+
+// isFrozenRel reports whether an OutDir-relative path lies inside a frozen
+// major. Frozen trees are copied verbatim from site-static/ and pinned by their
+// root hash, so the fixture's expected/ tree does not duplicate them.
+func isFrozenRel(rel string) bool {
+	for _, fm := range frozenMajors {
+		if strings.HasPrefix(rel, fm.Prefix+"/") {
+			return true
+		}
+	}
+	return false
 }
 
 // diffTrees returns the sorted set of OutDir-relative paths that differ between
@@ -144,7 +158,7 @@ func TestExportFixtureMatchesCommitted(t *testing.T) {
 	// No generated staged file may be absent from expected/. Verbatim publish
 	// assets are excluded (they are contract artifacts, asserted separately).
 	for _, rel := range walkRelFiles(t, opts.OutDir) {
-		if copied[rel] {
+		if copied[rel] || isFrozenRel(rel) {
 			continue
 		}
 		if !expectedSet[rel] {
@@ -154,14 +168,14 @@ func TestExportFixtureMatchesCommitted(t *testing.T) {
 
 	// Verbatim assets: byte-equal to their docs/publish sources.
 	for rel := range copied {
-		src := filepath.Join(opts.PublishAssetsDir, filepath.FromSlash(rel[len("v1/"):]))
+		src := filepath.Join(opts.PublishAssetsDir, filepath.FromSlash(rel[len("v2/"):]))
 		staged := filepath.Join(opts.OutDir, filepath.FromSlash(rel))
 		if _, err := os.Stat(staged); err != nil {
 			t.Errorf("verbatim asset %s missing from staged tree: %v", rel, err)
 			continue
 		}
 		if !bytes.Equal(readFileBytes(t, src), readFileBytes(t, staged)) {
-			t.Errorf("staged %s differs from committed source docs/publish/%s", rel, rel[len("v1/"):])
+			t.Errorf("staged %s differs from committed source docs/publish/%s", rel, rel[len("v2/"):])
 		}
 	}
 
@@ -172,7 +186,7 @@ func TestExportFixtureMatchesCommitted(t *testing.T) {
 // baseline exists to cover.
 func assertSyntheticProviderDoc(t *testing.T, outDir string) {
 	t.Helper()
-	docPath := filepath.Join(outDir, "v1", "capabilities", "synthetic.json")
+	docPath := filepath.Join(outDir, "v2", "capabilities", "synthetic.json")
 	raw := readFileBytes(t, docPath)
 
 	// Pipeline-internal reference provenance must never leak into published bytes.
@@ -272,8 +286,8 @@ func TestDoubleExportDeterminism(t *testing.T) {
 }
 
 // TestGeneratedAtConfinement runs two fixture exports differing ONLY in
-// GeneratedAt and asserts exactly one file differs: v1/index.json. generated_at
-// is the sole run-varying value in the whole tree, confined to the v1 index.
+// GeneratedAt and asserts exactly one file differs: v2/index.json. generated_at
+// is the sole run-varying value in the whole tree, confined to the current-major index.
 func TestGeneratedAtConfinement(t *testing.T) {
 	run := func(generatedAt string) string {
 		opts := committedFixtureOpts(t)
@@ -290,7 +304,7 @@ func TestGeneratedAtConfinement(t *testing.T) {
 	b := run("2027-06-15T12:30:00Z")
 
 	diff := diffTrees(t, a, b)
-	want := []string{"v1/index.json"}
+	want := []string{"v2/index.json"}
 	if len(diff) != 1 || diff[0] != want[0] {
 		t.Errorf("exports differing only in generated_at diverge in %v, want exactly %v", diff, want)
 	}

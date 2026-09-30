@@ -1,0 +1,186 @@
+schema_version: "1"
+slug: devin
+display_name: ""
+last_verified: ""
+content_types:
+  agents:
+    supported: true
+    capabilities:
+      agent_scopes:
+        supported: true
+        capabilities:
+          project:
+            supported: true
+            mechanism: project scope at .devin/agents/ and .agents/agents/
+            confidence: inferred
+          user:
+            supported: true
+            mechanism: 'global scope at ~/.config/devin/agents/ (Windows: %APPDATA%\devin\agents\)'
+            confidence: inferred
+      definition_format:
+        supported: true
+        mechanism: Markdown file with YAML frontmatter (same frontmatter as skills) followed by the system prompt, as agents/<name>.md or agents/<name>/AGENT.md
+        confidence: inferred
+      invocation_patterns:
+        supported: true
+        capabilities:
+          automatic_delegation:
+            supported: true
+            mechanism: the agent sees each profile's description and chooses the most appropriate one when spawning a subagent
+            confidence: inferred
+          background:
+            supported: true
+            mechanism: subagents run in the foreground or background and can be switched while running
+            confidence: inferred
+          natural_language:
+            supported: true
+            mechanism: the user can ask the agent to use a specific profile by name
+            confidence: inferred
+      model_selection:
+        supported: true
+        mechanism: model frontmatter field overrides the subagent's model (default is the router-selected subagent model, not the parent's)
+        confidence: inferred
+      subagent_spawning:
+        supported: true
+        mechanism: max-nesting frontmatter field lets a custom subagent spawn its own subagents; nesting is disabled by default
+        confidence: inferred
+      tool_restrictions:
+        supported: true
+        mechanism: allowed-tools frontmatter list (alias tools) restricts which tools the subagent can use
+        confidence: inferred
+  commands:
+    supported: true
+  hooks:
+    supported: true
+    capabilities:
+      context_injection:
+        supported: true
+        mechanism: hookSpecificOutput.additionalContext injects text into the agent's context (UserPromptSubmit and SessionStart examples)
+        confidence: inferred
+      decision_control:
+        supported: true
+        mechanism: top-level decision "approve" or "block" with optional reason; exit code 2 blocks (documented under 'Output format' / 'Exit Codes')
+        confidence: inferred
+      handler_types:
+        supported: true
+        mechanism: each hook has a type of "command" (shell command) or "prompt" (LLM prompt evaluation), documented under 'Hook Format'
+        confidence: inferred
+      hook_scopes:
+        supported: true
+        mechanism: project (.devin/hooks.v1.json, .devin/config.json, .devin/config.local.json) and user (~/.config/devin/config.json) scopes documented under 'Project-Level' / 'User-Level (Global)'
+        confidence: inferred
+      input_modification:
+        supported: true
+        mechanism: PreToolUse hooks rewrite tool input via hookSpecificOutput.updatedInput, merged into the tool's arguments before execution
+        confidence: inferred
+      json_io_protocol:
+        supported: true
+        mechanism: event data passed as JSON on stdin; JSON output on stdout, documented under 'Command Hooks'
+        confidence: inferred
+      matcher_patterns:
+        supported: true
+        mechanism: matcher is a regex against the event's tool_name; empty or omitted matches all tools (documented under 'Using the Matcher' / 'Tool names you can match')
+        confidence: inferred
+      permission_control:
+        supported: true
+        mechanism: PermissionRequest event fires when a permission decision is needed and can approve or block it
+        confidence: inferred
+  mcp:
+    supported: true
+    capabilities:
+      enterprise_management:
+        supported: true
+        mechanism: organization-level MCP admin controls (allowlist, custom registries, regex matching) documented under 'Admin Controls (Teams & Enterprises)' / 'Admin Configuration Guidelines' headings
+        confidence: inferred
+      env_var_expansion:
+        supported: true
+        mechanism: ${env:VAR_NAME} and ${file:/path} interpolation documented under 'Config Interpolation' heading
+        confidence: inferred
+      marketplace:
+        supported: true
+        mechanism: in-IDE MCP marketplace documented under 'MCP Registry' / 'Configuring Custom Registries' headings
+        confidence: inferred
+      tool_filtering:
+        supported: true
+        mechanism: per-server tool filtering documented under 'Configuring MCP tools' (UI tool toggles, 100-tool cap) and 'MCP Allowlist' (admin-side regex matching) headings
+        confidence: inferred
+      transport_types:
+        supported: true
+        mechanism: transport types (stdio for local, Streamable HTTP and SSE for remote) documented under 'Remote HTTP MCPs' heading; remote servers use serverUrl/url instead of command/args
+        confidence: inferred
+  rules:
+    supported: true
+    capabilities:
+      activation_mode:
+        supported: true
+        capabilities:
+          always:
+            supported: true
+            mechanism: always_on trigger value documented in 'Activation Modes' table — full rule content included in system prompt every message
+            confidence: inferred
+          glob:
+            supported: true
+            mechanism: glob trigger value documented in 'Activation Modes' table — activated when files matching glob pattern are in context
+            confidence: inferred
+          manual:
+            supported: true
+            mechanism: manual trigger value documented in 'Activation Modes' table — activated via @-mention
+            confidence: inferred
+          model_decision:
+            supported: true
+            mechanism: model_decision trigger value documented in 'Activation Modes' table — Cascade decides based on context
+            confidence: inferred
+      auto_memory:
+        supported: true
+        mechanism: Cascade-managed Memories layer auto-writes context based on conversation (documented under 'Memories & Rules' / 'How to Manage Memories')
+        confidence: inferred
+      cross_provider_recognition:
+        supported: true
+        capabilities:
+          agents_md:
+            supported: true
+            mechanism: AGENTS.md fallback documented in dedicated rules.1 doc with 'Comparison with Rules' section
+            confidence: inferred
+      hierarchical_loading:
+        supported: true
+        mechanism: .devin/rules/ (preferred; .windsurf/rules/ legacy fallback) scanned in current workspace, sub-directories, and parent dirs up to git root (documented under 'Rules Discovery' / 'Rules Storage Locations')
+        confidence: inferred
+  skills:
+    supported: true
+    capabilities:
+      auto_invocable:
+        supported: true
+        mechanism: Cascade invokes a skill when the request matches its description (documented under 'Automatic Invocation')
+        confidence: inferred
+      canonical_filename:
+        supported: true
+        mechanism: SKILL.md is the fixed filename in each skill directory (documented under 'SKILL.md File Format')
+        confidence: inferred
+      description:
+        supported: true
+        mechanism: description frontmatter field used for automatic invocation (documented under 'Required Frontmatter Fields')
+        confidence: inferred
+      display_name:
+        supported: true
+        mechanism: name frontmatter field (documented under 'Required Frontmatter Fields')
+        confidence: inferred
+      global_scope:
+        supported: true
+        mechanism: global skills under ~/.config/devin/skills/<skill-name>/ (documented under 'Skill Scopes')
+        confidence: inferred
+      project_scope:
+        supported: true
+        mechanism: workspace skills under .devin/skills/<skill-name>/ (documented under 'Skill Scopes')
+        confidence: inferred
+      shared_scope:
+        supported: true
+        mechanism: OS-level system skills deployed by enterprise IT (documented under 'System-Level Skills (Enterprise)')
+        confidence: inferred
+      skill_bundled_resources:
+        supported: true
+        mechanism: supporting files alongside SKILL.md in the skill directory (documented under 'Adding Supporting Resources')
+        confidence: inferred
+      user_invocable:
+        supported: true
+        mechanism: '@-mention a skill by name (documented under ''Manual Invocation'')'
+        confidence: inferred

@@ -14,15 +14,20 @@ import (
 	"github.com/OpenScribbler/capmon/internal/output"
 )
 
-// schemaIDBase is the published $id prefix every gate schema declares. The
-// gate maps each $id to its local file under the staged v1/schemas/ dir so
-// $ref between schemas resolves offline — the compiler never touches the
-// network.
-const schemaIDBase = "https://openscribbler.github.io/capmon/v1/schemas/"
+// siteBase is the published site root every schema $id hangs off.
+const siteBase = "https://openscribbler.github.io/capmon/"
+
+// schemaIDBase is the published $id prefix every gate schema of major
+// declares. The gate maps each $id to its local file under the staged
+// <major>/schemas/ dir so $ref between schemas resolves offline — the compiler
+// never touches the network.
+func schemaIDBase(major string) string {
+	return siteBase + major + "/schemas/"
+}
 
 // gateSchemaNames are the six published schemas the gate compiles, by base
-// name (without extension). Each lives at v1/schemas/<name>.json in the
-// staged tree and publishes its $id as schemaIDBase+<name>.json.
+// name (without extension). Each lives at <major>/schemas/<name>.json in the
+// staged tree and publishes its $id as schemaIDBase(major)+<name>.json.
 var gateSchemaNames = []string{
 	"provider-capabilities",
 	"all-providers",
@@ -32,28 +37,33 @@ var gateSchemaNames = []string{
 	"canonical-keys",
 }
 
-// validateExportTree is the fail-closed schema gate. It compiles the six
-// published schemas from treeDir/v1/schemas/ as draft 2020-12 (local
-// resources only, never fetched), then routes and validates every gated
-// document under treeDir/v1/. The root index.json, v1/spec/field-semantics.md,
-// and the schema files themselves are not gated by design. On the first
-// violation it returns EXPORT_002 naming the offending file and the first
-// violation detail.
+// validateExportTree is the fail-closed schema gate for the current major.
 func validateExportTree(treeDir string) error {
-	schemas, err := compileGateSchemas(filepath.Join(treeDir, "v1", "schemas"))
+	return validateMajorTree(treeDir, currentMajor)
+}
+
+// validateMajorTree compiles the six published schemas from
+// treeDir/<major>/schemas/ as draft 2020-12 (local resources only, never
+// fetched), then routes and validates every gated document under
+// treeDir/<major>/. The root index.json, spec/field-semantics.md, and the
+// schema files themselves are not gated by design. On the first violation it
+// returns EXPORT_002 naming the offending file and the first violation detail.
+// A frozen major is validated against its own pinned schemas.
+func validateMajorTree(treeDir, major string) error {
+	majorDir := filepath.Join(treeDir, major)
+	schemas, err := compileGateSchemas(filepath.Join(majorDir, "schemas"), schemaIDBase(major))
 	if err != nil {
 		return err
 	}
 
-	v1Dir := filepath.Join(treeDir, "v1")
-	return filepath.WalkDir(v1Dir, func(p string, d fs.DirEntry, err error) error {
+	return filepath.WalkDir(majorDir, func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if d.IsDir() {
 			return nil
 		}
-		rel, err := filepath.Rel(v1Dir, p)
+		rel, err := filepath.Rel(majorDir, p)
 		if err != nil {
 			return err
 		}
@@ -71,7 +81,7 @@ func validateExportTree(treeDir string) error {
 		if verr := schemas[name].Validate(inst); verr != nil {
 			return output.NewStructuredError(
 				"EXPORT_002",
-				fmt.Sprintf("v1/%s failed schema validation against %s.json: %s", rel, name, firstViolation(verr)),
+				fmt.Sprintf("%s/%s failed schema validation against %s.json: %s", major, rel, name, firstViolation(verr)),
 				"Fix the exporter or the published schema so the generated document conforms; a schema-invalid document must never publish.",
 			)
 		}
@@ -79,7 +89,7 @@ func validateExportTree(treeDir string) error {
 	})
 }
 
-// routeSchema maps a slash-relative path under v1/ to the base name of the
+// routeSchema maps a slash-relative path under <major>/ to the base name of the
 // schema that gates it, or "" when the file is not schema-gated (root index,
 // field-semantics.md, and the schema files themselves).
 func routeSchema(rel string) string {
@@ -104,27 +114,42 @@ func routeSchema(rel string) string {
 // compileGateSchemas compiles the six published schemas from schemasDir. Every
 // schema is added as a compiler resource under its published $id first, so
 // cross-schema $ref resolves against the local files and nothing is fetched.
-func compileGateSchemas(schemasDir string) (map[string]*jsonschema.Schema, error) {
+// A schema whose declared $id is not base+<name>.json fails closed: a v2 tree
+// carrying a v1 $id would otherwise publish a schema that names the wrong
+// major.
+func compileGateSchemas(schemasDir, base string) (map[string]*jsonschema.Schema, error) {
 	c := jsonschema.NewCompiler()
 	for _, name := range gateSchemaNames {
 		doc, err := readJSONInstance(filepath.Join(schemasDir, name+".json"))
 		if err != nil {
 			return nil, fmt.Errorf("read schema %s: %w", name, err)
 		}
-		if err := c.AddResource(schemaIDBase+name+".json", doc); err != nil {
+		want := base + name + ".json"
+		if m, ok := doc.(map[string]any); !ok || m["$id"] != want {
+			return nil, fmt.Errorf("schema %s declares $id %v, want %s", name, idOf(doc), want)
+		}
+		if err := c.AddResource(want, doc); err != nil {
 			return nil, fmt.Errorf("add schema resource %s: %w", name, err)
 		}
 	}
 
 	out := make(map[string]*jsonschema.Schema, len(gateSchemaNames))
 	for _, name := range gateSchemaNames {
-		sch, err := c.Compile(schemaIDBase + name + ".json")
+		sch, err := c.Compile(base + name + ".json")
 		if err != nil {
 			return nil, fmt.Errorf("compile schema %s: %w", name, err)
 		}
 		out[name] = sch
 	}
 	return out, nil
+}
+
+// idOf returns a decoded schema's $id for error messages.
+func idOf(doc any) any {
+	if m, ok := doc.(map[string]any); ok {
+		return m["$id"]
+	}
+	return nil
 }
 
 // readJSONInstance decodes a JSON file into the any-shaped value the jsonschema

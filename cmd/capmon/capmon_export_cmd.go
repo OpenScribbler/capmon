@@ -17,11 +17,12 @@ var (
 	exportCanonicalKeysPathOverride string
 	exportSourcesDirOverride        string
 	exportPublishAssetsDirOverride  string
+	exportStaticDirOverride         string
 )
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
-	Short: "Export the deterministic /v1/ capability JSON tree",
+	Short: "Export the deterministic capability JSON site (current major plus frozen majors)",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		verify, _ := cmd.Flags().GetString("verify")
 		if verify != "" {
@@ -51,6 +52,7 @@ var exportCmd = &cobra.Command{
 			CanonicalKeysPath: exportCanonicalKeysPathOverride,
 			SourcesDir:        exportSourcesDirOverride,
 			PublishAssetsDir:  exportPublishAssetsDirOverride,
+			StaticDir:         exportStaticDirOverride,
 			OutDir:            out,
 			SourceCommit:      sourceCommit,
 			GeneratedAt:       generatedAt,
@@ -60,8 +62,8 @@ var exportCmd = &cobra.Command{
 }
 
 func init() {
-	exportCmd.Flags().String("out", "dist", "Output directory for the exported /v1/ tree")
-	exportCmd.Flags().String("source-commit", "", "Source commit SHA to embed in v1/index.json (omitted when empty)")
+	exportCmd.Flags().String("out", "dist", "Output directory for the exported site")
+	exportCmd.Flags().String("source-commit", "", "Source commit SHA to embed in the current major's index.json (omitted when empty)")
 	exportCmd.Flags().String("generated-at", "", "Pinned RFC 3339 UTC generated_at (Z offset); default: current time")
 	exportCmd.Flags().String("verify", "", "Verify the live published site against a rebuild of this commit (ignores --out)")
 	exportCmd.Flags().String("base-url", "https://openscribbler.github.io/capmon/", "Base URL of the published site to verify against")

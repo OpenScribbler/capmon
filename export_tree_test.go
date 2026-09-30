@@ -228,19 +228,19 @@ func TestWriteExportTreeLayout(t *testing.T) {
 
 	want := []string{
 		"index.json",
-		"v1/advisories.json",
-		"v1/by-content-type/agents.json",
-		"v1/by-content-type/commands.json",
-		"v1/by-content-type/hooks.json",
-		"v1/by-content-type/mcp.json",
-		"v1/by-content-type/rules.json",
-		"v1/by-content-type/skills.json",
-		"v1/capabilities/all.json",
-		"v1/capabilities/alpha.json",
-		"v1/capabilities/bravo.json",
-		"v1/capabilities/charlie.json",
-		"v1/index.json",
-		"v1/spec/canonical-keys.json",
+		"v2/advisories.json",
+		"v2/by-content-type/agents.json",
+		"v2/by-content-type/commands.json",
+		"v2/by-content-type/hooks.json",
+		"v2/by-content-type/mcp.json",
+		"v2/by-content-type/rules.json",
+		"v2/by-content-type/skills.json",
+		"v2/capabilities/all.json",
+		"v2/capabilities/alpha.json",
+		"v2/capabilities/bravo.json",
+		"v2/capabilities/charlie.json",
+		"v2/index.json",
+		"v2/spec/canonical-keys.json",
 	}
 	sort.Strings(want)
 
@@ -280,10 +280,10 @@ func TestBuildAllAndPivotsShareNodeShape(t *testing.T) {
 		t.Fatalf("writeExportTree: %v", err)
 	}
 
-	providerDoc := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "alpha.json"))
+	providerDoc := readJSONMap(t, filepath.Join(dst, "v2", "capabilities", "alpha.json"))
 
 	// all.json reuses the exact per-provider document object under providers.<slug>.
-	allDoc := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "all.json"))
+	allDoc := readJSONMap(t, filepath.Join(dst, "v2", "capabilities", "all.json"))
 	if allDoc["schema_version"] != "1" {
 		t.Errorf("all.json schema_version = %v, want \"1\"", allDoc["schema_version"])
 	}
@@ -293,7 +293,7 @@ func TestBuildAllAndPivotsShareNodeShape(t *testing.T) {
 	}
 
 	// The agents pivot reuses the exact content-type node from the provider doc.
-	pivot := readJSONMap(t, filepath.Join(dst, "v1", "by-content-type", "agents.json"))
+	pivot := readJSONMap(t, filepath.Join(dst, "v2", "by-content-type", "agents.json"))
 	if pivot["content_type"] != "agents" {
 		t.Errorf("agents pivot content_type = %v, want \"agents\"", pivot["content_type"])
 	}
@@ -329,7 +329,7 @@ func TestProviderStatusJoin(t *testing.T) {
 	}
 
 	for slug, want := range map[string]string{"alpha": "active", "bravo": "archived"} {
-		doc := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", slug+".json"))
+		doc := readJSONMap(t, filepath.Join(dst, "v2", "capabilities", slug+".json"))
 		if doc["provider_status"] != want {
 			t.Errorf("%s provider_status = %v, want %q", slug, doc["provider_status"], want)
 		}
@@ -339,14 +339,14 @@ func TestProviderStatusJoin(t *testing.T) {
 		}
 	}
 
-	charlie := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "charlie.json"))
+	charlie := readJSONMap(t, filepath.Join(dst, "v2", "capabilities", "charlie.json"))
 	if v, ok := charlie["provider_status"]; ok {
 		t.Errorf("charlie provider_status = %v, want field absent", v)
 	}
 
 	// display_name precedence: a non-empty baseline value beats the manifest;
 	// a provider with no manifest keeps the slug fallback.
-	alpha := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "alpha.json"))
+	alpha := readJSONMap(t, filepath.Join(dst, "v2", "capabilities", "alpha.json"))
 	if alpha["display_name"] != "Alpha" {
 		t.Errorf("alpha display_name = %v, want baseline \"Alpha\" (manifest must not win over a set baseline)", alpha["display_name"])
 	}
@@ -372,7 +372,7 @@ func TestExportTreeRealData(t *testing.T) {
 		t.Fatalf("writeExportTree over real docs: %v", err)
 	}
 
-	docs, err := filepath.Glob(filepath.Join(dst, "v1", "capabilities", "*.json"))
+	docs, err := filepath.Glob(filepath.Join(dst, "v2", "capabilities", "*.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -386,13 +386,13 @@ func TestExportTreeRealData(t *testing.T) {
 		t.Errorf("staged provider doc count = %d, want 15", providerCount)
 	}
 
-	idx := readJSONMap(t, filepath.Join(dst, "v1", "index.json"))
+	idx := readJSONMap(t, filepath.Join(dst, "v2", "index.json"))
 	provs, ok := idx["providers"].([]any)
 	if !ok {
-		t.Fatalf("v1/index.json providers is not an array: %T", idx["providers"])
+		t.Fatalf("v2/index.json providers is not an array: %T", idx["providers"])
 	}
 	if len(provs) != 15 {
-		t.Errorf("v1/index.json lists %d providers, want 15", len(provs))
+		t.Errorf("v2/index.json lists %d providers, want 15", len(provs))
 	}
 	for _, pv := range provs {
 		pm := mustMap(t, pv)
@@ -413,7 +413,7 @@ func TestExportTreeRealData(t *testing.T) {
 		}
 	}
 	for slug, want := range map[string]string{"roo-code": "archived", "claude-code": "active"} {
-		doc := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", slug+".json"))
+		doc := readJSONMap(t, filepath.Join(dst, "v2", "capabilities", slug+".json"))
 		if doc["provider_status"] != want {
 			t.Errorf("%s provider_status = %v, want %q", slug, doc["provider_status"], want)
 		}
@@ -421,7 +421,7 @@ func TestExportTreeRealData(t *testing.T) {
 
 	// Every committed baseline leaves display_name empty, so the manifest
 	// display name joins in — the published value must not be the slug.
-	rooCode := readJSONMap(t, filepath.Join(dst, "v1", "capabilities", "roo-code.json"))
+	rooCode := readJSONMap(t, filepath.Join(dst, "v2", "capabilities", "roo-code.json"))
 	if rooCode["display_name"] != "Roo Code" {
 		t.Errorf("roo-code display_name = %v, want manifest \"Roo Code\"", rooCode["display_name"])
 	}
@@ -429,7 +429,7 @@ func TestExportTreeRealData(t *testing.T) {
 
 // TestSpecArtifactsCopiedVerbatim stages the fixture tree with the committed
 // publish assets (docs/publish) and asserts every asset — each schema under
-// v1/schemas/ and v1/spec/field-semantics.md — lands byte-identical to its
+// v2/schemas/ and v2/spec/field-semantics.md — lands byte-identical to its
 // committed source. The published schemas and spec are contract artifacts:
 // export copies them verbatim, it never regenerates them.
 func TestSpecArtifactsCopiedVerbatim(t *testing.T) {
@@ -458,13 +458,13 @@ func TestSpecArtifactsCopiedVerbatim(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		staged, err := os.ReadFile(filepath.Join(dst, "v1", rel))
+		staged, err := os.ReadFile(filepath.Join(dst, "v2", rel))
 		if err != nil {
-			t.Errorf("staged asset v1/%s missing: %v", filepath.ToSlash(rel), err)
+			t.Errorf("staged asset v2/%s missing: %v", filepath.ToSlash(rel), err)
 			return nil
 		}
 		if !bytes.Equal(src, staged) {
-			t.Errorf("staged v1/%s differs from committed docs/publish/%s", filepath.ToSlash(rel), filepath.ToSlash(rel))
+			t.Errorf("staged v2/%s differs from committed docs/publish/%s", filepath.ToSlash(rel), filepath.ToSlash(rel))
 		}
 		seen++
 		found[filepath.ToSlash(rel)] = true

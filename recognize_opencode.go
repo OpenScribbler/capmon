@@ -53,7 +53,7 @@ func opencodeRulesLandmarkOptions() LandmarkOptions {
 // Both invocation_patterns sub-keys gate on the single "Subagents" heading:
 // the section documents @-mention manual invocation and description-driven
 // automatic delegation together, and neither has its own heading (same
-// one-heading-many-subkeys shape as windsurf's activation modes).
+// one-heading-many-subkeys shape as devin's activation modes).
 //
 // The "Model" matcher is Kind exact: the commands doc carries an identical
 // 'Model' heading (per-command model override), so a substring match adds

@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-07-16T04:32:32Z
+# Generated at: 2026-09-30T10:13:25Z
 
 content_type: rules
 providers:
@@ -175,6 +175,43 @@ providers:
                 supported: true
                 mechanism: 'three-tier scope: Project rules (.cursor/rules) + Team Rules (org-wide) + User Rules (documented under ''Project rules'' / ''Team Rules'' / ''User Rules'')'
                 confidence: inferred
+    devin:
+        supported: true
+        capabilities:
+            activation_mode:
+                supported: true
+                capabilities:
+                    always:
+                        supported: true
+                        mechanism: always_on trigger value documented in 'Activation Modes' table — full rule content included in system prompt every message
+                        confidence: inferred
+                    glob:
+                        supported: true
+                        mechanism: glob trigger value documented in 'Activation Modes' table — activated when files matching glob pattern are in context
+                        confidence: inferred
+                    manual:
+                        supported: true
+                        mechanism: manual trigger value documented in 'Activation Modes' table — activated via @-mention
+                        confidence: inferred
+                    model_decision:
+                        supported: true
+                        mechanism: model_decision trigger value documented in 'Activation Modes' table — Cascade decides based on context
+                        confidence: inferred
+            auto_memory:
+                supported: true
+                mechanism: Cascade-managed Memories layer auto-writes context based on conversation (documented under 'Memories & Rules' / 'How to Manage Memories')
+                confidence: inferred
+            cross_provider_recognition:
+                supported: true
+                capabilities:
+                    agents_md:
+                        supported: true
+                        mechanism: AGENTS.md fallback documented in dedicated rules.1 doc with 'Comparison with Rules' section
+                        confidence: inferred
+            hierarchical_loading:
+                supported: true
+                mechanism: .devin/rules/ (preferred; .windsurf/rules/ legacy fallback) scanned in current workspace, sub-directories, and parent dirs up to git root (documented under 'Rules Discovery' / 'Rules Storage Locations')
+                confidence: inferred
     gemini-cli:
         supported: true
         capabilities:
@@ -264,43 +301,6 @@ providers:
                 supported: true
                 mechanism: AGENTS.md (CLAUDE.md fallback) collected walking up from cwd; global ~/.config/opencode/AGENTS.md and ~/.claude/CLAUDE.md appended; all matching files combined (documented under 'Types' / 'Precedence')
                 confidence: confirmed
-    windsurf:
-        supported: true
-        capabilities:
-            activation_mode:
-                supported: true
-                capabilities:
-                    always:
-                        supported: true
-                        mechanism: always_on trigger value documented in 'Activation Modes' table — full rule content included in system prompt every message
-                        confidence: inferred
-                    glob:
-                        supported: true
-                        mechanism: glob trigger value documented in 'Activation Modes' table — activated when files matching glob pattern are in context
-                        confidence: inferred
-                    manual:
-                        supported: true
-                        mechanism: manual trigger value documented in 'Activation Modes' table — activated via @-mention
-                        confidence: inferred
-                    model_decision:
-                        supported: true
-                        mechanism: model_decision trigger value documented in 'Activation Modes' table — Cascade decides based on context
-                        confidence: inferred
-            auto_memory:
-                supported: true
-                mechanism: Cascade-managed Memories layer auto-writes context based on conversation (documented under 'Memories & Rules' / 'How to Manage Memories')
-                confidence: inferred
-            cross_provider_recognition:
-                supported: true
-                capabilities:
-                    agents_md:
-                        supported: true
-                        mechanism: AGENTS.md fallback documented in dedicated rules.1 doc with 'Comparison with Rules' section
-                        confidence: inferred
-            hierarchical_loading:
-                supported: true
-                mechanism: .devin/rules/ (preferred; .windsurf/rules/ legacy fallback) scanned in current workspace, sub-directories, and parent dirs up to git root (documented under 'Rules Discovery' / 'Rules Storage Locations')
-                confidence: inferred
     zed:
         supported: true
         capabilities:

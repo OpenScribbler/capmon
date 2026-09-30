@@ -17,11 +17,11 @@ func sha256Hex(b []byte) string {
 	return fmt.Sprintf("%x", sha256.Sum256(b))
 }
 
-// assertV1IndexInvariants checks the normative v1/index.json contract against
+// assertMajorIndexInvariants checks the normative v2/index.json contract against
 // the actual staged tree at dst: constants, data_revision, per-file hashing,
-// provider sorting, and complete-and-disjoint coverage of every staged v1/ file
-// (except v1/index.json) across the providers array and the files map.
-func assertV1IndexInvariants(t *testing.T, dst string, idx map[string]any, opts ExportOptions) {
+// provider sorting, and complete-and-disjoint coverage of every staged v2/ file
+// (except v2/index.json) across the providers array and the files map.
+func assertMajorIndexInvariants(t *testing.T, dst string, idx map[string]any, opts ExportOptions) {
 	t.Helper()
 
 	if idx["schema_version"] != "1" {
@@ -39,12 +39,12 @@ func assertV1IndexInvariants(t *testing.T, dst string, idx map[string]any, opts 
 
 	// max_staleness_hours must serialize as the bare integer 48 — not "48" and
 	// not 48.0. Parsed JSON can't distinguish these, so inspect the raw bytes.
-	raw, err := os.ReadFile(filepath.Join(dst, "v1", "index.json"))
+	raw, err := os.ReadFile(filepath.Join(dst, "v2", "index.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !bytes.Contains(raw, []byte(`"max_staleness_hours": 48`)) {
-		t.Errorf("v1/index.json missing bare int `\"max_staleness_hours\": 48`:\n%s", raw)
+		t.Errorf("v2/index.json missing bare int `\"max_staleness_hours\": 48`:\n%s", raw)
 	}
 	if bytes.Contains(raw, []byte(`"max_staleness_hours": 48.0`)) ||
 		bytes.Contains(raw, []byte(`"max_staleness_hours": "48"`)) {
@@ -52,7 +52,7 @@ func assertV1IndexInvariants(t *testing.T, dst string, idx map[string]any, opts 
 	}
 
 	// data_revision is the SHA-256 of the staged all.json bytes.
-	allBytes, err := os.ReadFile(filepath.Join(dst, "v1", "capabilities", "all.json"))
+	allBytes, err := os.ReadFile(filepath.Join(dst, "v2", "capabilities", "all.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,17 +60,17 @@ func assertV1IndexInvariants(t *testing.T, dst string, idx map[string]any, opts 
 		t.Errorf("data_revision = %v, want %s (sha256 of all.json)", idx["data_revision"], wantRev)
 	}
 
-	// Enumerate every staged file under v1/, excluding v1/index.json itself.
-	v1Dir := filepath.Join(dst, "v1")
+	// Enumerate every staged file under v2/, excluding v2/index.json itself.
+	majorDir := filepath.Join(dst, "v2")
 	staged := map[string][]byte{}
-	err = filepath.WalkDir(v1Dir, func(p string, d fs.DirEntry, err error) error {
+	err = filepath.WalkDir(majorDir, func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if d.IsDir() {
 			return nil
 		}
-		rel, err := filepath.Rel(v1Dir, p)
+		rel, err := filepath.Rel(majorDir, p)
 		if err != nil {
 			return err
 		}
@@ -124,7 +124,7 @@ func assertV1IndexInvariants(t *testing.T, dst string, idx map[string]any, opts 
 		}
 		seen[path] = true
 
-		doc := readJSONMap(t, filepath.Join(v1Dir, filepath.FromSlash(path)))
+		doc := readJSONMap(t, filepath.Join(majorDir, filepath.FromSlash(path)))
 		if lv, has := doc["last_verified"]; has {
 			if pm["last_verified"] != lv {
 				t.Errorf("provider %q last_verified = %v, want %v", slug, pm["last_verified"], lv)
@@ -155,7 +155,7 @@ func assertV1IndexInvariants(t *testing.T, dst string, idx map[string]any, opts 
 		seen[rel] = true
 	}
 
-	// Coverage: every staged file (except v1/index.json) is accounted for exactly once.
+	// Coverage: every staged file (except v2/index.json) is accounted for exactly once.
 	for rel := range staged {
 		if !seen[rel] {
 			t.Errorf("staged file %q missing from both providers and files", rel)
@@ -166,7 +166,7 @@ func assertV1IndexInvariants(t *testing.T, dst string, idx map[string]any, opts 
 	}
 }
 
-func TestBuildV1Index(t *testing.T) {
+func TestBuildMajorIndex(t *testing.T) {
 	t.Run("source_commit omitted when unset", func(t *testing.T) {
 		opts := newExportFixture(t)
 		opts.SourceCommit = ""
@@ -174,11 +174,11 @@ func TestBuildV1Index(t *testing.T) {
 		if err := writeExportTree(dst, opts); err != nil {
 			t.Fatalf("writeExportTree: %v", err)
 		}
-		idx := readJSONMap(t, filepath.Join(dst, "v1", "index.json"))
+		idx := readJSONMap(t, filepath.Join(dst, "v2", "index.json"))
 		if _, ok := idx["source_commit"]; ok {
 			t.Errorf("source_commit present when opts.SourceCommit is empty: %v", idx["source_commit"])
 		}
-		assertV1IndexInvariants(t, dst, idx, opts)
+		assertMajorIndexInvariants(t, dst, idx, opts)
 	})
 
 	t.Run("source_commit present when set", func(t *testing.T) {
@@ -188,13 +188,17 @@ func TestBuildV1Index(t *testing.T) {
 		if err := writeExportTree(dst, opts); err != nil {
 			t.Fatalf("writeExportTree: %v", err)
 		}
-		idx := readJSONMap(t, filepath.Join(dst, "v1", "index.json"))
+		idx := readJSONMap(t, filepath.Join(dst, "v2", "index.json"))
 		if idx["source_commit"] != "abc123def4567890" {
 			t.Errorf("source_commit = %v, want %q", idx["source_commit"], "abc123def4567890")
 		}
-		assertV1IndexInvariants(t, dst, idx, opts)
+		assertMajorIndexInvariants(t, dst, idx, opts)
 	})
 }
+
+// v1FrozenRoot is the root hash recorded for the frozen v1 tree. Pinned here
+// as well as in frozenMajors so a silent re-record fails a test.
+const v1FrozenRoot = "cd0ad6101473289f4912903fc24dbd2366ea3bea5dde0f9bc9529313c3c93e54"
 
 func TestRootIndexBytes(t *testing.T) {
 	opts := newExportFixture(t)
@@ -208,15 +212,22 @@ func TestRootIndexBytes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// The root index is the exact canonical serialization of the constant
-	// document {latest, majors:[{prefix, status, index}]}: keys sorted, two-space
-	// indent, single trailing LF.
+	// The root index is the exact canonical serialization of the append-only
+	// document: the frozen v1 entry (with its recorded root hash) followed by
+	// the live current major. Keys sorted, two-space indent, single trailing LF.
 	const wantRootIndex = "{\n" +
-		"  \"latest\": \"v1\",\n" +
+		"  \"latest\": \"v2\",\n" +
 		"  \"majors\": [\n" +
 		"    {\n" +
+		"      \"frozen_root_sha256\": \"" + v1FrozenRoot + "\",\n" +
 		"      \"index\": \"v1/index.json\",\n" +
 		"      \"prefix\": \"v1\",\n" +
+		"      \"status\": \"frozen\",\n" +
+		"      \"superseded_by\": \"/v2/\"\n" +
+		"    },\n" +
+		"    {\n" +
+		"      \"index\": \"v2/index.json\",\n" +
+		"      \"prefix\": \"v2\",\n" +
 		"      \"status\": \"live\"\n" +
 		"    }\n" +
 		"  ]\n" +

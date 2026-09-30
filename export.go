@@ -9,9 +9,11 @@ import (
 )
 
 // RunExport is the single exporter entry point used identically by the CLI,
-// tests, and the publish workflow. It stages the complete /v1/ document tree in
-// a temp dir on the same filesystem as OutDir, runs the fail-closed schema gate
-// and provider-set assert against the staged tree, and only on full success
+// tests, and the publish workflow. It stages the complete current-major
+// document tree in a temp dir on the same filesystem as OutDir, copies in every
+// frozen major after verifying its recorded root hash, runs the fail-closed
+// schema gate and provider-set assert against the staged tree, and only on
+// full success
 // atomically replaces OutDir. A partial or invalid export never touches a
 // pre-existing OutDir.
 func RunExport(opts ExportOptions) error {
@@ -27,6 +29,9 @@ func RunExport(opts ExportOptions) error {
 	if opts.PublishAssetsDir == "" {
 		opts.PublishAssetsDir = "docs/publish"
 	}
+	if opts.StaticDir == "" {
+		opts.StaticDir = "site-static"
+	}
 	if opts.OutDir == "" {
 		opts.OutDir = "dist"
 	}
@@ -36,7 +41,7 @@ func RunExport(opts ExportOptions) error {
 	opts.OutDir = filepath.Clean(opts.OutDir)
 	if opts.GeneratedAt == "" {
 		// The only permitted time.Now() in the export path; confined to
-		// v1/index.json via buildV1Index.
+		// <major>/index.json via buildMajorIndex.
 		opts.GeneratedAt = time.Now().UTC().Format(time.RFC3339)
 	}
 
@@ -59,6 +64,9 @@ func RunExport(opts ExportOptions) error {
 	if err := validateExportTree(stageDir); err != nil {
 		return err
 	}
+	if err := copyFrozenMajors(opts.StaticDir, stageDir); err != nil {
+		return err
+	}
 
 	slugs, err := stagedProviderSlugs(stageDir)
 	if err != nil {
@@ -75,10 +83,10 @@ func RunExport(opts ExportOptions) error {
 }
 
 // stagedProviderSlugs derives the exported provider set from the staged tree:
-// every v1/capabilities/*.json filename except all.json, minus the .json
+// every <major>/capabilities/*.json filename except all.json, minus the .json
 // extension.
 func stagedProviderSlugs(stageDir string) ([]string, error) {
-	capsDir := filepath.Join(stageDir, "v1", "capabilities")
+	capsDir := filepath.Join(stageDir, currentMajor, "capabilities")
 	entries, err := os.ReadDir(capsDir)
 	if err != nil {
 		return nil, err
