@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-09-30T10:13:25Z
+# Generated at: 2026-09-30T10:31:26Z
 
 content_type: mcp
 providers:
@@ -105,7 +105,7 @@ providers:
                 confidence: inferred
             tool_filtering:
                 supported: true
-                mechanism: per-server tool filtering documented under 'Configuring MCP tools' (UI tool toggles, 100-tool cap) and 'MCP Allowlist' (admin-side regex matching) headings
+                mechanism: per-server tool filtering documented under 'Configuring MCP tools' (per-server disabledTools array in mcp_config.json, 100-tool cap; the UI toggle is per server) and 'MCP Allowlist' (admin-side regex matching) headings
                 confidence: inferred
             transport_types:
                 supported: true

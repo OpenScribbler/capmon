@@ -3,6 +3,7 @@ package capmon
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -132,9 +133,16 @@ func TestCopyFrozenMajorsFailsClosed(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(static, "v1", "advisories.json"), []byte("{\"schema_version\":\"1\",\"advisories\":[]}\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	if err := copyFrozenMajors(static, t.TempDir()); err != nil {
-		t.Errorf("advisories-only edit failed the frozen check: %v", err)
+	// The root hash skips advisories.json, but the frozen index still pins
+	// its digest, so an advisory edit fails closed rather than publishing a
+	// tree whose index contradicts its own files.
+	requireStructured(t, copyFrozenMajors(static, t.TempDir()), "EXPORT_006")
+
+	static = fresh()
+	if err := os.Remove(filepath.Join(static, "v1", "advisories.json")); err != nil {
+		t.Fatal(err)
 	}
+	requireStructured(t, copyFrozenMajors(static, t.TempDir()), "EXPORT_006")
 
 	static = fresh()
 	p := filepath.Join(static, "v1", "capabilities", "amp.json")
@@ -149,4 +157,29 @@ func TestCopyFrozenMajorsFailsClosed(t *testing.T) {
 		t.Fatal(err)
 	}
 	requireStructured(t, copyFrozenMajors(static, t.TempDir()), "EXPORT_006")
+}
+
+// TestRunFreezeRejectsInconsistentInput proves freeze refuses to pin an input
+// tree whose files disagree with the digests its index records.
+func TestRunFreezeRejectsInconsistentInput(t *testing.T) {
+	opts := committedFixtureOpts(t)
+	opts.GeneratedAt = "2026-01-01T00:00:00Z"
+	opts.OutDir = filepath.Join(t.TempDir(), "dist")
+	if err := RunExport(opts); err != nil {
+		t.Fatal(err)
+	}
+	p := filepath.Join(opts.OutDir, currentMajor, "capabilities", "all.json")
+	if err := os.WriteFile(p, append(readFileBytes(t, p), '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+	_, err := RunFreeze(FreezeOptions{
+		Major:        currentMajor,
+		FromDir:      opts.OutDir,
+		OutDir:       filepath.Join(t.TempDir(), "static"),
+		SupersededBy: "/v9/",
+		FrozenAt:     "2026-02-02T00:00:00Z",
+	})
+	if err == nil || !strings.Contains(err.Error(), "capabilities/all.json") {
+		t.Fatalf("RunFreeze on tampered input: err = %v, want digest mismatch on capabilities/all.json", err)
+	}
 }

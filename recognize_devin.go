@@ -140,7 +140,7 @@ func devinMcpLandmarkOptions() LandmarkOptions {
 		McpLandmarkPattern("env_var_expansion", "Config Interpolation",
 			"${env:VAR_NAME} and ${file:/path} interpolation documented under 'Config Interpolation' heading", required),
 		McpLandmarkPattern("tool_filtering", "MCP Allowlist",
-			"per-server tool filtering documented under 'Configuring MCP tools' (UI tool toggles, 100-tool cap) and 'MCP Allowlist' (admin-side regex matching) headings", required),
+			"per-server tool filtering documented under 'Configuring MCP tools' (per-server disabledTools array in mcp_config.json, 100-tool cap; the UI toggle is per server) and 'MCP Allowlist' (admin-side regex matching) headings", required),
 		McpLandmarkPattern("marketplace", "MCP Registry",
 			"in-IDE MCP marketplace documented under 'MCP Registry' / 'Configuring Custom Registries' headings", required),
 		McpLandmarkPattern("enterprise_management", "Admin Controls (Teams & Enterprises)",

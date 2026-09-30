@@ -219,7 +219,10 @@ live export code paths.
   (`/v2/capabilities/<slug>.json`, with `windsurf` mapped to `devin`), and
   the frozen index names `/v2/`. `all.json`, the pivots, and
   `data_revision` keep their last live bytes. The signed git tag is not
-  created yet.
+  created yet. The export also checks every digest the frozen index
+  records, and the frozen index records `advisories.json`, so an advisory
+  update to v1 fails closed until the index gains a digest scheme that can
+  change without breaking the root hash.
 - The deprecation signal lives **in the documents consumers actually
   fetch**: every per-provider document carries `status`, and frozen ones
   carry `superseded_by`/`frozen_at` — not only `index.json`.

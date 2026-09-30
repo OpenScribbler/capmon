@@ -111,6 +111,9 @@ func copyFrozenMajors(staticDir, stageDir string) error {
 		if err := copyTree(src, filepath.Join(stageDir, fm.Prefix)); err != nil {
 			return err
 		}
+		if err := checkIndexDigests(filepath.Join(stageDir, fm.Prefix)); err != nil {
+			return frozenError(fmt.Sprintf("frozen major %s: %v", fm.Prefix, err))
+		}
 		if err := validateMajorTree(stageDir, fm.Prefix); err != nil {
 			return err
 		}
@@ -200,6 +203,10 @@ func RunFreeze(opts FreezeOptions) (string, error) {
 		return "", err
 	}
 
+	if err := checkIndexDigests(tree); err != nil {
+		return "", fmt.Errorf("freeze: input tree: %w", err)
+	}
+
 	idxPath := filepath.Join(tree, "index.json")
 	idx, err := readJSONDoc(idxPath)
 	if err != nil {
@@ -277,6 +284,51 @@ func RunFreeze(opts FreezeOptions) (string, error) {
 		return "", err
 	}
 	return sum, nil
+}
+
+// checkIndexDigests confirms that every file a major's index.json lists, in
+// files and in providers, exists and hashes to its recorded sha256. The root
+// hash skips advisories.json, so this is what keeps a frozen advisories.json
+// present and consistent with the frozen index. An advisory update to a
+// frozen major therefore fails here until the index carries a digest scheme
+// that can change without breaking the root hash.
+func checkIndexDigests(tree string) error {
+	idx, err := readJSONDoc(filepath.Join(tree, "index.json"))
+	if err != nil {
+		return err
+	}
+	want := map[string]string{}
+	files, _ := idx["files"].(map[string]any)
+	for rel, v := range files {
+		entry, _ := v.(map[string]any)
+		sum, _ := entry["sha256"].(string)
+		want[rel] = sum
+	}
+	provs, _ := idx["providers"].([]any)
+	for _, pe := range provs {
+		entry, _ := pe.(map[string]any)
+		rel, _ := entry["path"].(string)
+		sum, _ := entry["sha256"].(string)
+		want[rel] = sum
+	}
+	rels := make([]string, 0, len(want))
+	for rel := range want {
+		rels = append(rels, rel)
+	}
+	sort.Strings(rels)
+	for _, rel := range rels {
+		if !filepath.IsLocal(filepath.FromSlash(rel)) {
+			return fmt.Errorf("index lists non-local path %q", rel)
+		}
+		b, err := os.ReadFile(filepath.Join(tree, filepath.FromSlash(rel)))
+		if err != nil {
+			return fmt.Errorf("index lists %s: %w", rel, err)
+		}
+		if got := hashHex(b); got != want[rel] {
+			return fmt.Errorf("%s hashes to %s, index records %q", rel, got, want[rel])
+		}
+	}
+	return nil
 }
 
 // readJSONDoc decodes a JSON object with numbers kept as json.Number, so a
