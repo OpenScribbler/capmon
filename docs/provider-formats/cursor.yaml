@@ -186,6 +186,11 @@ content_types:
         status: mapped
         mechanism: "When disable-model-invocation is true, the skill becomes an explicit slash command invocable by the user rather than auto-invoked by the model."
         confidence: confirmed
+      skill_bundled_resources:
+        status: mapped
+        extension_id: "supporting_files"
+        mechanism: "Optional sibling files and directories alongside SKILL.md (scripts/, references/, assets/) hold scripts, references, and templates; loaded on demand while the skill is active."
+        confidence: confirmed
     provider_extensions:
       - id: supporting_files
         name: Supporting file directories

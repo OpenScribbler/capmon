@@ -50,6 +50,12 @@ proposed_mappings:
       source_field: ""
       source_value: ""
       confidence: confirmed
+    - canonical_key: skill_bundled_resources
+      supported: true
+      mechanism: Co-located scripts, schemas, or checklists alongside SKILL.md that the Droid can reference, enabling self-contained skill packages.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
     - canonical_key: user_invocable
       supported: true
       mechanism: 'yaml frontmatter key: user-invocable (optional bool, default: true)'

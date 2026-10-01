@@ -73,6 +73,16 @@ content_types:
         status: absent
         mechanism: ""
         confidence: confirmed
+      auto_invocable:
+        status: mapped
+        extension_id: "auto_invocation"
+        mechanism: "Copilot auto-loads skills based on description relevance to the current task, in addition to explicit /skill-name invocation."
+        confidence: confirmed
+      skill_bundled_resources:
+        status: mapped
+        extension_id: "supporting_files"
+        mechanism: "Skill folders bundle SKILL.md plus additional scripts, resources, and instruction files as a unit of loading."
+        confidence: confirmed
     # Optional extension depth fields (populated by capmon subagent):
     # - required: true | false | null (null = source doesn't say)
     # - value_type: see allow-list in formatdoc_validate.go

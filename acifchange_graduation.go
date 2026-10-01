@@ -23,7 +23,21 @@ type graduationProviderState struct {
 	LastObserved time.Time       `json:"last_observed,omitempty"`
 }
 
+// graduationKey identifies one graduation candidate. Two content types can
+// reuse an extension id for unrelated concepts (Claude Code's skill
+// when_to_use and Roo Code's agent-mode when_to_use), so the content type is
+// part of the identity.
+type graduationKey struct {
+	ContentType string
+	ExtensionID string
+}
+
+func (k graduationKey) String() string {
+	return k.ContentType + "/" + k.ExtensionID
+}
+
 type graduationState struct {
+	ContentType             string                              `json:"content_type"`
 	ExtensionID             string                              `json:"extension_id"`
 	Providers               map[string]*graduationProviderState `json:"providers"`
 	IssueNumber             int                                 `json:"issue_number,omitempty"`
@@ -33,42 +47,49 @@ type graduationState struct {
 }
 
 // ScanGraduationCandidates walks provider format docs, records debounced
-// per-(extension id, provider) sightings, and files or refreshes ACIF class-c
-// issues for extension ids observed in 2 or more qualifying providers.
-func ScanGraduationCandidates(cacheRoot, formatDocsDir string, now time.Time) ([]int, error) {
+// per-(content type, extension id, provider) sightings, and files or refreshes
+// ACIF class-c issues for extensions observed in 2 or more qualifying providers
+// of the same content type. Extensions ACIF already covers for that content
+// type, per canonicalKeysPath, are never sighted.
+func ScanGraduationCandidates(cacheRoot, formatDocsDir, canonicalKeysPath string, now time.Time) ([]int, error) {
 	if now.IsZero() {
 		now = time.Now()
 	}
 	now = now.UTC()
 	scanDate := now.Format("2006-01-02")
 
-	sightings, err := collectGraduationCandidateSightings(formatDocsDir)
+	canonicalKeys, err := loadCanonicalKeys(canonicalKeysPath)
+	if err != nil {
+		return nil, err
+	}
+	sightings, err := collectGraduationCandidateSightings(formatDocsDir, canonicalKeys)
 	if err != nil {
 		return nil, err
 	}
 
 	var updatedIssues []int
-	for _, extensionID := range sortedGraduationExtensionIDs(sightings) {
-		if err := validateGraduationExtensionID(extensionID); err != nil {
+	for _, key := range sortedGraduationKeys(sightings) {
+		if err := validateGraduationKey(key); err != nil {
 			return nil, err
 		}
-		path := acifGraduationStatePath(cacheRoot, extensionID)
+		path := acifGraduationStatePath(cacheRoot, key)
 		state, err := readGraduationState(path)
 		if err != nil {
 			return nil, err
 		}
 		if state.ExtensionID == "" {
-			state.ExtensionID = extensionID
+			state.ContentType = key.ContentType
+			state.ExtensionID = key.ExtensionID
 			state.Providers = make(map[string]*graduationProviderState)
-		} else if state.ExtensionID != extensionID {
+		} else if state.ContentType != key.ContentType || state.ExtensionID != key.ExtensionID {
 			return nil, fmt.Errorf("graduation state key mismatch in %s", path)
 		}
 		if state.Providers == nil {
 			state.Providers = make(map[string]*graduationProviderState)
 		}
 
-		for _, provider := range sortedGraduationProviders(sightings[extensionID]) {
-			detail := sightings[extensionID][provider]
+		for _, provider := range sortedGraduationProviders(sightings[key]) {
+			detail := sightings[key][provider]
 			providerState := state.Providers[provider]
 			if providerState == nil {
 				providerState = &graduationProviderState{ScanDates: make(map[string]bool)}
@@ -107,7 +128,7 @@ func ScanGraduationCandidates(cacheRoot, formatDocsDir string, now time.Time) ([
 			continue
 		}
 
-		issueNum, found, err := findOpenACIFGraduationIssue(extensionID)
+		issueNum, found, err := findOpenACIFGraduationIssue(key)
 		if err != nil {
 			return nil, err
 		}
@@ -140,7 +161,12 @@ func ScanGraduationCandidates(cacheRoot, formatDocsDir string, now time.Time) ([
 	return updatedIssues, nil
 }
 
-func collectGraduationCandidateSightings(formatDocsDir string) (map[string]map[string]graduationExtensionDetail, error) {
+// collectGraduationCandidateSightings returns, per (content type, extension
+// id), the providers whose format docs flag that extension as a graduation
+// candidate. It skips an extension ACIF already covers for its content type:
+// one whose id is itself a canonical key, or one a canonical_mappings entry in
+// the same format doc links to a canonical key through extension_id.
+func collectGraduationCandidateSightings(formatDocsDir string, canonicalKeys map[string]map[string]bool) (map[graduationKey]map[string]graduationExtensionDetail, error) {
 	entries, err := os.ReadDir(formatDocsDir)
 	if err != nil {
 		return nil, fmt.Errorf("read format docs dir: %w", err)
@@ -149,7 +175,7 @@ func collectGraduationCandidateSightings(formatDocsDir string) (map[string]map[s
 		return entries[i].Name() < entries[j].Name()
 	})
 
-	sightings := make(map[string]map[string]graduationExtensionDetail)
+	sightings := make(map[graduationKey]map[string]graduationExtensionDetail)
 	for _, entry := range entries {
 		if entry.IsDir() || filepath.Ext(entry.Name()) != ".yaml" {
 			continue
@@ -175,6 +201,13 @@ func collectGraduationCandidateSightings(formatDocsDir string) (map[string]map[s
 		sort.Strings(contentTypes)
 		for _, contentType := range contentTypes {
 			ctDoc := doc.ContentTypes[contentType]
+			ctKeys := canonicalKeys[contentType]
+			linked := make(map[string]bool)
+			for canonicalKey, mapping := range ctDoc.CanonicalMappings {
+				if mapping.ExtensionID != "" && ctKeys[canonicalKey] {
+					linked[mapping.ExtensionID] = true
+				}
+			}
 			for _, ext := range ctDoc.ProviderExtensions {
 				if !ext.GraduationCandidate {
 					continue
@@ -182,11 +215,15 @@ func collectGraduationCandidateSightings(formatDocsDir string) (map[string]map[s
 				if ext.ID == "" {
 					return nil, fmt.Errorf("graduation candidate in %s has empty id", path)
 				}
-				if sightings[ext.ID] == nil {
-					sightings[ext.ID] = make(map[string]graduationExtensionDetail)
+				if ctKeys[ext.ID] || linked[ext.ID] {
+					continue
 				}
-				if _, exists := sightings[ext.ID][provider]; !exists {
-					sightings[ext.ID][provider] = graduationExtensionDetail{
+				key := graduationKey{ContentType: contentType, ExtensionID: ext.ID}
+				if sightings[key] == nil {
+					sightings[key] = make(map[string]graduationExtensionDetail)
+				}
+				if _, exists := sightings[key][provider]; !exists {
+					sightings[key][provider] = graduationExtensionDetail{
 						Name:    ext.Name,
 						Summary: ext.Summary,
 					}
@@ -197,13 +234,18 @@ func collectGraduationCandidateSightings(formatDocsDir string) (map[string]map[s
 	return sightings, nil
 }
 
-func sortedGraduationExtensionIDs(sightings map[string]map[string]graduationExtensionDetail) []string {
-	ids := make([]string, 0, len(sightings))
-	for id := range sightings {
-		ids = append(ids, id)
+func sortedGraduationKeys(sightings map[graduationKey]map[string]graduationExtensionDetail) []graduationKey {
+	keys := make([]graduationKey, 0, len(sightings))
+	for key := range sightings {
+		keys = append(keys, key)
 	}
-	sort.Strings(ids)
-	return ids
+	sort.Slice(keys, func(i, j int) bool {
+		if keys[i].ContentType != keys[j].ContentType {
+			return keys[i].ContentType < keys[j].ContentType
+		}
+		return keys[i].ExtensionID < keys[j].ExtensionID
+	})
+	return keys
 }
 
 func sortedGraduationProviders(providers map[string]graduationExtensionDetail) []string {
@@ -215,18 +257,23 @@ func sortedGraduationProviders(providers map[string]graduationExtensionDetail) [
 	return names
 }
 
-func validateGraduationExtensionID(extensionID string) error {
-	if extensionID == "" {
-		return fmt.Errorf("extension id is required")
-	}
-	if strings.Contains(extensionID, "/") || strings.Contains(extensionID, "\\") {
-		return fmt.Errorf("extension id %q is not safe for a state filename", extensionID)
+func validateGraduationKey(key graduationKey) error {
+	for _, part := range []struct{ name, value string }{
+		{"content type", key.ContentType},
+		{"extension id", key.ExtensionID},
+	} {
+		if part.value == "" {
+			return fmt.Errorf("%s is required", part.name)
+		}
+		if part.value == "." || part.value == ".." || strings.ContainsAny(part.value, `/\`) {
+			return fmt.Errorf("%s %q is not safe for a state path", part.name, part.value)
+		}
 	}
 	return nil
 }
 
-func acifGraduationStatePath(cacheRoot, extensionID string) string {
-	return filepath.Join(cacheRoot, acifStateDir, "graduation", extensionID+".json")
+func acifGraduationStatePath(cacheRoot string, key graduationKey) string {
+	return filepath.Join(cacheRoot, acifStateDir, "graduation", key.ContentType, key.ExtensionID+".json")
 }
 
 func readGraduationState(path string) (graduationState, error) {
@@ -255,12 +302,12 @@ func qualifyingGraduationProviders(state graduationState) []string {
 	return providers
 }
 
-func acifGraduationAnchor(extensionID string) string {
-	return fmt.Sprintf("<!-- capmon-acif-change-graduation: %s -->", extensionID)
+func acifGraduationAnchor(key graduationKey) string {
+	return fmt.Sprintf("<!-- capmon-acif-change-graduation: %s -->", key)
 }
 
-func findOpenACIFGraduationIssue(extensionID string) (int, bool, error) {
-	anchor := acifGraduationAnchor(extensionID)
+func findOpenACIFGraduationIssue(key graduationKey) (int, bool, error) {
+	anchor := acifGraduationAnchor(key)
 	return findOpenIssueByAnchor(
 		acifChangeRepo,
 		[]string{acifChangeLabel, acifClassCLabel},
@@ -269,7 +316,7 @@ func findOpenACIFGraduationIssue(extensionID string) (int, bool, error) {
 }
 
 func createACIFGraduationIssue(state graduationState, qualifyingProviders []string) (int, error) {
-	title := fmt.Sprintf("acif-change: extension %q observed in %d providers (class-c candidate)", state.ExtensionID, len(qualifyingProviders))
+	title := fmt.Sprintf("acif-change: %s extension %q observed in %d providers (class-c candidate)", state.ContentType, state.ExtensionID, len(qualifyingProviders))
 	body := buildACIFGraduationIssueBody(state, qualifyingProviders)
 	out, err := ghRunner("issue", "create",
 		"--repo", acifChangeRepo,
@@ -286,8 +333,9 @@ func createACIFGraduationIssue(state graduationState, qualifyingProviders []stri
 
 func buildACIFGraduationIssueBody(state graduationState, qualifyingProviders []string) string {
 	var b strings.Builder
-	b.WriteString(acifGraduationAnchor(state.ExtensionID))
+	b.WriteString(acifGraduationAnchor(graduationKey{ContentType: state.ContentType, ExtensionID: state.ExtensionID}))
 	b.WriteString("\n\nA provider extension has crossed the debounced 2+ provider threshold for an ACIF Class C vocabulary candidate.\n\n")
+	fmt.Fprintf(&b, "**Content type:** `%s`\n", state.ContentType)
 	fmt.Fprintf(&b, "**Extension ID:** `%s`\n", state.ExtensionID)
 	fmt.Fprintf(&b, "**Qualifying providers:** %d\n", len(qualifyingProviders))
 	fmt.Fprintf(&b, "**Last seen:** `%s`\n\n", formatACIFTime(state.LastObserved))

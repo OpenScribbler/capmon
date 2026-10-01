@@ -2,6 +2,12 @@ provider: copilot-cli
 content_type: skills
 format: ""
 proposed_mappings:
+    - canonical_key: auto_invocable
+      supported: true
+      mechanism: Copilot auto-loads skills based on description relevance to the current task, in addition to explicit /skill-name invocation.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
     - canonical_key: canonical_filename
       supported: true
       mechanism: SKILL.md (fixed filename per Agent Skills open standard)
@@ -50,6 +56,12 @@ proposed_mappings:
       source_field: ""
       source_value: ""
       confidence: inferred
+    - canonical_key: skill_bundled_resources
+      supported: true
+      mechanism: Skill folders bundle SKILL.md plus additional scripts, resources, and instruction files as a unit of loading.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
     - canonical_key: user_invocable
       supported: true
       mechanism: slash-prefixed skill name in user prompt (e.g. /frontend-design)

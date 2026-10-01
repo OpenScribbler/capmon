@@ -467,8 +467,8 @@ content_types:
         name: Filename as Command Name (Workflows)
         summary: "Markdown filenames under the workflows directory become the invocation trigger; users type /<filename>.md including the .md extension in chat."
         source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/context/instructions/user-instructions/workflows.ts"
-        graduation_candidate: true
-        graduation_notes: "Docs page removed 2026-07 (customization/workflows redirects to cline-rules.md); feature verified live in extension source (workflows.ts, disk.ts). Confidence: inferred."
+        graduation_candidate: false
+        graduation_notes: "ACIF declined graduation (agent-content-interchange-format#2): filename-derived invocation naming is provider discovery behaviour downstream of placement; [ACIF-INSTALL] §8.2 says so. Docs page removed 2026-07 (customization/workflows redirects to cline-rules.md); feature verified live in extension source (workflows.ts, disk.ts). Confidence: inferred."
         conversion: preserved
       - id: two_scope_loading
         name: Two-Scope Workflow Loading (Project and Global)

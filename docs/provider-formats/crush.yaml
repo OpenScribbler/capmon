@@ -177,6 +177,7 @@ content_types:
     canonical_mappings:
       transport_types:
         status: mapped
+        extension_id: "transport_types"
         mechanism: "Crush documents stdio, http, and sse transports in its JSON schema for MCP server configuration; default transport is stdio"
         confidence: confirmed
       oauth_support:
