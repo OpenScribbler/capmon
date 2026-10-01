@@ -51,6 +51,7 @@ const CommandsContentType = "commands"
 var CanonicalCommandsKeys = []string{
 	"argument_substitution",
 	"builtin_commands",
+	"command_scopes",
 }
 
 // canonicalCommandsKeySet is the lookup form of CanonicalCommandsKeys, built

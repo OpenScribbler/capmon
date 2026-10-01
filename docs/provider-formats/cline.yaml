@@ -462,20 +462,25 @@ content_types:
         status: mapped
         mechanism: "Built-in slash commands (/newtask, /smol alias /compact, /newrule, /deep-planning, /reportbug) are hardcoded and not user-modifiable — documented under 'Slash Commands'. As of 2026-07 /explain-changes is no longer listed; enabled skills are additive, invoked via slash command ('Skills via Slash Commands')"
         confidence: confirmed
+      command_scopes:
+        status: mapped
+        extension_id: "two_scope_loading"
+        mechanism: "Workflows are discovered from two scopes: project (.clinerules/workflows/) and global (~/Documents/Cline/Workflows)"
+        confidence: inferred
     provider_extensions:
       - id: filename_as_command_name
         name: Filename as Command Name (Workflows)
         summary: "Markdown filenames under the workflows directory become the invocation trigger; users type /<filename>.md including the .md extension in chat."
         source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/context/instructions/user-instructions/workflows.ts"
-        graduation_candidate: true
-        graduation_notes: "Docs page removed 2026-07 (customization/workflows redirects to cline-rules.md); feature verified live in extension source (workflows.ts, disk.ts). Confidence: inferred."
+        graduation_candidate: false
+        graduation_notes: "ACIF declined graduation (agent-content-interchange-format#2): filename-derived invocation naming is provider discovery behaviour downstream of placement; [ACIF-INSTALL] §8.2 says so. Docs page removed 2026-07 (customization/workflows redirects to cline-rules.md); feature verified live in extension source (workflows.ts, disk.ts). Confidence: inferred."
         conversion: preserved
       - id: two_scope_loading
         name: Two-Scope Workflow Loading (Project and Global)
         summary: "Project workflows in .clinerules/workflows/ and global workflows in ~/Documents/Cline/Workflows/ are both discovered; project scope wins on name collision."
         source_ref: "https://raw.githubusercontent.com/cline/cline/main/apps/vscode/src/core/storage/disk.ts"
         graduation_candidate: true
-        graduation_notes: "Docs page removed 2026-07; verified live in disk.ts (GlobalFileNames.workflows = .clinerules/workflows) and workflows.ts (ensureWorkflowsDirectoryExists → ~/Documents/Cline/Workflows). Confidence: inferred."
+        graduation_notes: "Docs page removed 2026-07; verified live in disk.ts (GlobalFileNames.workflows = .clinerules/workflows) and workflows.ts (ensureWorkflowsDirectoryExists → ~/Documents/Cline/Workflows). Project-wins-on-name-collision precedence is not covered by command_scopes: ACIF scopes cover placement location only and did not adopt scope ordering or merge behaviour. Confidence: inferred."
         conversion: not-portable
       - id: plain_markdown_body
         name: Plain Markdown Instruction Body (No Frontmatter)

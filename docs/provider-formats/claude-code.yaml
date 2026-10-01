@@ -60,6 +60,11 @@ content_types:
         status: mapped
         mechanism: "Variable directory name: .claude/skills/<name>/SKILL.md — directory name is the skill identifier"
         confidence: confirmed
+      skill_bundled_resources:
+        status: mapped
+        extension_id: "supporting_files"
+        mechanism: "Templates, scripts, and reference docs co-located alongside SKILL.md in the skill directory; loaded on demand via ${CLAUDE_SKILL_DIR}."
+        confidence: confirmed
     # Optional extension depth fields (populated by capmon subagent):
     # - required: true | false | null (null = source doesn't say)
     # - value_type: see allow-list in formatdoc_validate.go
@@ -235,7 +240,8 @@ content_types:
         conversion: embedded
         provider_field: "when_to_use"
         source_ref: "https://code.claude.com/docs/en/skills.md#frontmatter-reference"
-        graduation_candidate: true
+        graduation_candidate: false
+        graduation_notes: "ACIF declined graduation (agent-content-interchange-format#7): single-provider selection guidance, carried as opaque passthrough; every other surveyed provider puts it in description."
 
       - id: named_arguments
         name: Named Positional Arguments via arguments Frontmatter

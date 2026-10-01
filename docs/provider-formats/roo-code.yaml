@@ -197,6 +197,7 @@ content_types:
     canonical_mappings:
       transport_types:
         status: mapped
+        extension_id: "transport_types"
         mechanism: "transport_types: stdio, sse, and streamable-http are supported and selected via the type field on each server entry"
         confidence: confirmed
       oauth_support:
@@ -339,7 +340,8 @@ content_types:
         name: whenToUse field
         summary: Optional guidance on when the orchestrator or user should switch to this mode; consumed by mode-selection heuristics.
         source_ref: "https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/packages/types/src/mode.ts"
-        graduation_candidate: true
+        graduation_candidate: false
+        graduation_notes: "ACIF declined graduation (agent-content-interchange-format#7): single-provider selection guidance, carried as opaque passthrough; every other surveyed provider puts it in description."
         conversion: embedded
         provider_field: whenToUse
       - id: custom_instructions
@@ -422,7 +424,8 @@ content_types:
         name: Filename-as-command-name
         summary: The Markdown filename (without extension) is the slash command name — /commit.md on disk becomes /commit in the CLI.
         source_ref: "https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/.roo/commands/commit.md"
-        graduation_candidate: true
+        graduation_candidate: false
+        graduation_notes: "ACIF declined graduation (agent-content-interchange-format#2): filename-derived invocation naming is provider discovery behaviour downstream of placement; [ACIF-INSTALL] §8.2 says so."
         conversion: translated
     loading_model: "Commands are Markdown files in .roo/commands/ (project scope) or ~/.roo/commands/ (global scope). The filename (minus the .md extension) becomes the slash command name — /commit is served from commit.md. YAML frontmatter supplies optional description, argument-hint, and mode fields; the Markdown body is the prompt template sent to the agent when the command is invoked. Commands added in Roo Code 3.25+ integrate with the mode system via the mode frontmatter field."
     notes: "Commands are a Roo Code 3.25+ feature. The mode frontmatter field is Roo-specific and ties a command to a particular custom or built-in mode so the command is surfaced contextually in that mode only."

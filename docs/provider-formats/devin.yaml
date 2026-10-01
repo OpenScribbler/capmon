@@ -476,6 +476,11 @@ content_types:
         status: mapped
         mechanism: "Cascade exposes its own built-in chat slash commands (e.g. for conversation control) independently of user-authored Workflows; the `/<workflow-name>` namespace is reserved for user files"
         confidence: inferred
+      command_scopes:
+        status: mapped
+        extension_id: "two_scope_loading"
+        mechanism: "Workflows load from two scopes: workspace (.devin/workflows/, legacy .windsurf/workflows/) and global (~/.codeium/windsurf/global_workflows/)"
+        confidence: confirmed
     provider_extensions:
       - id: character_limit_12000
         name: "12,000 character per-file limit"
@@ -499,7 +504,8 @@ content_types:
         name: Filename drives slash-command identifier
         summary: "The markdown file basename (minus .md) is the invocation name; no frontmatter or manifest is required to register a workflow."
         source_ref: "https://docs.devin.ai/desktop/cascade/workflows.md"
-        graduation_candidate: true
+        graduation_candidate: false
+        graduation_notes: "ACIF declined graduation (agent-content-interchange-format#2): filename-derived invocation naming is provider discovery behaviour downstream of placement; [ACIF-INSTALL] §8.2 says so."
         conversion: embedded
     loading_model: >
       Cascade Workflows are discovered by scanning two directories at IDE startup and on

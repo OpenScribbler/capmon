@@ -49,6 +49,7 @@ vocabulary:
       - cross_provider_recognition
       - auto_memory
       - hierarchical_loading
+      - rule_scopes
   command:
     spec: ACIF-COMMAND
     section: "§9"
@@ -56,6 +57,7 @@ vocabulary:
     out_of_scope_at_l1:
       - argument_substitution
       - builtin_commands
+      - command_scopes
   agent:
     spec: ACIF-AGENT
     section: "§9"
@@ -95,3 +97,4 @@ vocabulary:
       - marketplace
       - enterprise_management
       - resource_referencing
+      - mcp_scopes

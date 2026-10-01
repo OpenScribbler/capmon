@@ -33,6 +33,7 @@ content_types:
       disable_model_invocation:
         status: mapped
         provider_field: "disable-model-invocation"
+        extension_id: "auto_invocation"
         mechanism: "yaml frontmatter key: disable-model-invocation (optional bool, default: false)"
         confidence: confirmed
       project_scope:
@@ -58,6 +59,11 @@ content_types:
       custom_filename:
         status: mapped
         mechanism: "skill.mdx is accepted as an alternative to SKILL.md within the skill directory"
+        confidence: confirmed
+      skill_bundled_resources:
+        status: mapped
+        extension_id: "supporting_files"
+        mechanism: "Co-located scripts, schemas, or checklists alongside SKILL.md that the Droid can reference, enabling self-contained skill packages."
         confidence: confirmed
     provider_extensions:
       - id: supporting_files

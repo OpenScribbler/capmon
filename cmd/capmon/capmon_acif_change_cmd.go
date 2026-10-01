@@ -21,8 +21,9 @@ var capmonACIFChangeScanCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cacheRoot, _ := cmd.Flags().GetString("cache-root")
 		formatDocsDir, _ := cmd.Flags().GetString("format-docs")
+		canonicalKeys, _ := cmd.Flags().GetString("canonical-keys")
 		now := time.Now()
-		if _, err := capmon.ScanGraduationCandidates(cacheRoot, formatDocsDir, now); err != nil {
+		if _, err := capmon.ScanGraduationCandidates(cacheRoot, formatDocsDir, canonicalKeys, now); err != nil {
 			return err
 		}
 		return capmon.MarkStaleFilings(cacheRoot, now)
@@ -92,6 +93,7 @@ CAPMON_ACIF_ADAPTER environment variable).`,
 func init() {
 	capmonACIFChangeScanCmd.Flags().String("cache-root", ".capmon-cache", "Root directory for capmon cache")
 	capmonACIFChangeScanCmd.Flags().String("format-docs", "docs/provider-formats", "Directory containing provider format docs")
+	capmonACIFChangeScanCmd.Flags().String("canonical-keys", "docs/spec/canonical-keys.yaml", "Path to canonical-keys.yaml")
 
 	capmonACIFChangeConfirmCmd.Flags().String("cache-root", ".capmon-cache", "Root directory for capmon cache")
 	capmonACIFChangeConfirmCmd.Flags().String("format-docs", "docs/provider-formats", "Directory containing provider format docs")

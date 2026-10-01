@@ -213,6 +213,15 @@ content_types:
       type: bool
       spec_ref: ACIF-RULE §9.2 (OUT-OF-SCOPE-AT-L1; provider_capability_coverage, ACIF-REGISTRY §8.4)
 
+    rule_scopes:
+      description: >
+        Which install scopes (project, user, managed) a rule can be placed at.
+        Determined by install location and surfaced via install_scope_capabilities;
+        on-disk locations are in the install matrix (ACIF-INSTALL Appendix A.2).
+        Location only, not how a provider orders or merges scopes.
+      type: object
+      spec_ref: ACIF-RULE §9.2 (OUT-OF-SCOPE-AT-L1; install_scope_capabilities, ACIF-REGISTRY §8.5)
+
   hooks:
     handler_types:
       description: >
@@ -351,6 +360,15 @@ content_types:
       type: bool
       spec_ref: ACIF-MCP §9.2 (OUT-OF-SCOPE-AT-L1)
 
+    mcp_scopes:
+      description: >
+        Which install scopes (project, user, managed) an MCP server configuration can be placed at.
+        Determined by install location and surfaced via install_scope_capabilities;
+        on-disk locations are in the install matrix (ACIF-INSTALL Appendix A.2).
+        Location only, not how a provider orders or merges scopes.
+      type: object
+      spec_ref: ACIF-MCP §9.2 (OUT-OF-SCOPE-AT-L1; install_scope_capabilities, ACIF-REGISTRY §8.5)
+
   agents:
     definition_format:
       description: >
@@ -417,3 +435,12 @@ content_types:
         custom commands.
       type: bool
       spec_ref: ACIF-COMMAND §9.2 (OUT-OF-SCOPE-AT-L1; provider_capability_coverage row)
+
+    command_scopes:
+      description: >
+        Which install scopes (project, user, managed) a command can be placed at.
+        Determined by install location and surfaced via install_scope_capabilities;
+        on-disk locations are in the install matrix (ACIF-INSTALL Appendix A.2).
+        Location only, not how a provider orders or merges scopes.
+      type: object
+      spec_ref: ACIF-COMMAND §9.2 (OUT-OF-SCOPE-AT-L1; install_scope_capabilities, ACIF-REGISTRY §8.5)

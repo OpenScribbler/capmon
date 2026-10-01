@@ -50,6 +50,12 @@ proposed_mappings:
       source_field: ""
       source_value: ""
       confidence: confirmed
+    - canonical_key: skill_bundled_resources
+      supported: true
+      mechanism: Templates, scripts, and reference docs co-located alongside SKILL.md in the skill directory; loaded on demand via ${CLAUDE_SKILL_DIR}.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
     - canonical_key: user_invocable
       supported: true
       mechanism: 'yaml frontmatter key: user-invocable (optional bool, default true); controls /menu visibility only, not Skill tool access'

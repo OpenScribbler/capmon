@@ -14,3 +14,9 @@ proposed_mappings:
       source_field: ""
       source_value: ""
       confidence: confirmed
+    - canonical_key: command_scopes
+      supported: true
+      mechanism: 'Workflows are discovered from two scopes: project (.clinerules/workflows/) and global (~/Documents/Cline/Workflows)'
+      source_field: ""
+      source_value: ""
+      confidence: inferred

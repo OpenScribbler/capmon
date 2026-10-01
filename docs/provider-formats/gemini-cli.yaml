@@ -54,6 +54,11 @@ content_types:
       user_invocable:
         status: absent
         confidence: confirmed
+      skill_bundled_resources:
+        status: mapped
+        extension_id: "supporting_files"
+        mechanism: "Optional scripts/, references/, and assets/ subdirectories alongside SKILL.md hold executable scripts, static docs, and templates."
+        confidence: confirmed
     # Optional extension depth fields (populated by capmon subagent):
     # - required: true | false | null (null = source doesn't say)
     # - value_type: see allow-list in formatdoc_validate.go
@@ -293,6 +298,7 @@ content_types:
     canonical_mappings:
       transport_types:
         status: mapped
+        extension_id: "transport_types"
         mechanism: "transport_types: Gemini CLI documents supported MCP transport protocols including stdio and HTTP"
         confidence: confirmed
       oauth_support:

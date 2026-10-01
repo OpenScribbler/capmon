@@ -12,6 +12,7 @@ import (
 func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 	cacheRoot := t.TempDir()
 	formatsDir := t.TempDir()
+	canonicalKeysPath := writeGraduationCanonicalKeys(t)
 	day1 := time.Date(2026, 7, 1, 10, 0, 0, 0, time.UTC)
 
 	writeGraduationFormatDoc(t, formatsDir, "alpha", "shared_extension", "Alpha Shared", "Alpha summary")
@@ -42,7 +43,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 	})
 	defer SetGHCommandForTest(nil)
 
-	issues, err := ScanGraduationCandidates(cacheRoot, formatsDir, day1)
+	issues, err := ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1)
 	if err != nil {
 		t.Fatalf("ScanGraduationCandidates day1: %v", err)
 	}
@@ -50,7 +51,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 		t.Fatalf("day1 issues=%v creates=%d, want none", issues, creates)
 	}
 
-	issues, err = ScanGraduationCandidates(cacheRoot, formatsDir, day1.AddDate(0, 0, 1))
+	issues, err = ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1.AddDate(0, 0, 1))
 	if err != nil {
 		t.Fatalf("ScanGraduationCandidates day2: %v", err)
 	}
@@ -59,7 +60,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 	}
 
 	writeGraduationFormatDoc(t, formatsDir, "beta", "shared_extension", "Beta Shared", "Beta summary")
-	issues, err = ScanGraduationCandidates(cacheRoot, formatsDir, day1.AddDate(0, 0, 2))
+	issues, err = ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1.AddDate(0, 0, 2))
 	if err != nil {
 		t.Fatalf("ScanGraduationCandidates day3: %v", err)
 	}
@@ -67,7 +68,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 		t.Fatalf("beta has one scan date issues=%v creates=%d, want none", issues, creates)
 	}
 
-	issues, err = ScanGraduationCandidates(cacheRoot, formatsDir, day1.AddDate(0, 0, 3))
+	issues, err = ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1.AddDate(0, 0, 3))
 	if err != nil {
 		t.Fatalf("ScanGraduationCandidates day4: %v", err)
 	}
@@ -92,7 +93,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 		}
 	}
 	for _, want := range []string{
-		acifGraduationAnchor("shared_extension"),
+		acifGraduationAnchor(sharedSkillKey),
 		"`alpha`",
 		"`beta`",
 		"Alpha Shared",
@@ -103,7 +104,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 		}
 	}
 
-	state, err := readGraduationState(acifGraduationStatePath(cacheRoot, "shared_extension"))
+	state, err := readGraduationState(acifGraduationStatePath(cacheRoot, sharedSkillKey))
 	if err != nil {
 		t.Fatalf("read graduation state: %v", err)
 	}
@@ -114,7 +115,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 		t.Fatalf("scan dates not persisted as expected: %+v", state.Providers)
 	}
 
-	issues, err = ScanGraduationCandidates(cacheRoot, formatsDir, day1.AddDate(0, 0, 4))
+	issues, err = ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1.AddDate(0, 0, 4))
 	if err != nil {
 		t.Fatalf("ScanGraduationCandidates day5: %v", err)
 	}
@@ -132,6 +133,7 @@ func TestScanGraduationCandidates_DebouncedThresholdCreatesIssue(t *testing.T) {
 func TestScanGraduationCandidates_CommentsWhenQualifyingSetChanges(t *testing.T) {
 	cacheRoot := t.TempDir()
 	formatsDir := t.TempDir()
+	canonicalKeysPath := writeGraduationCanonicalKeys(t)
 	day1 := time.Date(2026, 7, 1, 10, 0, 0, 0, time.UTC)
 	writeGraduationFormatDoc(t, formatsDir, "alpha", "shared_extension", "Alpha Shared", "Alpha summary")
 	writeGraduationFormatDoc(t, formatsDir, "beta", "shared_extension", "Beta Shared", "Beta summary")
@@ -162,7 +164,7 @@ func TestScanGraduationCandidates_CommentsWhenQualifyingSetChanges(t *testing.T)
 	defer SetGHCommandForTest(nil)
 
 	for _, day := range []time.Time{day1, day1.AddDate(0, 0, 1)} {
-		if _, err := ScanGraduationCandidates(cacheRoot, formatsDir, day); err != nil {
+		if _, err := ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day); err != nil {
 			t.Fatalf("ScanGraduationCandidates: %v", err)
 		}
 	}
@@ -171,12 +173,12 @@ func TestScanGraduationCandidates_CommentsWhenQualifyingSetChanges(t *testing.T)
 	}
 
 	writeGraduationFormatDoc(t, formatsDir, "gamma", "shared_extension", "Gamma Shared", "Gamma summary")
-	if issues, err := ScanGraduationCandidates(cacheRoot, formatsDir, day1.AddDate(0, 0, 2)); err != nil {
+	if issues, err := ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1.AddDate(0, 0, 2)); err != nil {
 		t.Fatalf("ScanGraduationCandidates gamma day1: %v", err)
 	} else if len(issues) != 0 {
 		t.Fatalf("gamma one scan date issues = %v, want none", issues)
 	}
-	if issues, err := ScanGraduationCandidates(cacheRoot, formatsDir, day1.AddDate(0, 0, 3)); err != nil {
+	if issues, err := ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1.AddDate(0, 0, 3)); err != nil {
 		t.Fatalf("ScanGraduationCandidates gamma day2: %v", err)
 	} else if len(issues) != 1 || issues[0] != 321 {
 		t.Fatalf("issues = %v, want [321]", issues)
@@ -190,6 +192,7 @@ func TestMarkStaleFilings_GraduationAddsStaleOnce(t *testing.T) {
 	cacheRoot := t.TempDir()
 	now := time.Date(2026, 7, 14, 12, 0, 0, 0, time.UTC)
 	state := graduationState{
+		ContentType:  "skills",
 		ExtensionID:  "shared_extension",
 		IssueNumber:  222,
 		LastObserved: now.Add(-31 * 24 * time.Hour),
@@ -199,7 +202,7 @@ func TestMarkStaleFilings_GraduationAddsStaleOnce(t *testing.T) {
 		},
 		LastQualifyingProviders: []string{"alpha", "beta"},
 	}
-	statePath := acifGraduationStatePath(cacheRoot, "shared_extension")
+	statePath := acifGraduationStatePath(cacheRoot, sharedSkillKey)
 	if err := writeJSONState(statePath, &state); err != nil {
 		t.Fatalf("write state: %v", err)
 	}
@@ -236,6 +239,181 @@ func TestMarkStaleFilings_GraduationAddsStaleOnce(t *testing.T) {
 	}
 	if !roundTrip.StaleApplied {
 		t.Fatal("stale_applied was not persisted")
+	}
+}
+
+var sharedSkillKey = graduationKey{ContentType: "skills", ExtensionID: "shared_extension"}
+
+// runGraduationScanDays scans on consecutive days and fails the test on any
+// gh issue create, comment, or open-issue lookup: callers expect nothing to
+// qualify.
+func runGraduationScanDays(t *testing.T, cacheRoot, formatsDir, canonicalKeysPath string, days int) {
+	t.Helper()
+	SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		t.Fatalf("unexpected gh call: %v", args)
+		return nil, nil
+	})
+	defer SetGHCommandForTest(nil)
+	day1 := time.Date(2026, 7, 1, 10, 0, 0, 0, time.UTC)
+	for i := 0; i < days; i++ {
+		issues, err := ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1.AddDate(0, 0, i))
+		if err != nil {
+			t.Fatalf("ScanGraduationCandidates day %d: %v", i+1, err)
+		}
+		if len(issues) != 0 {
+			t.Fatalf("day %d issues = %v, want none", i+1, issues)
+		}
+	}
+}
+
+func TestScanGraduationCandidates_SharedIDAcrossContentTypesDoesNotMerge(t *testing.T) {
+	cacheRoot := t.TempDir()
+	formatsDir := t.TempDir()
+	canonicalKeysPath := writeGraduationCanonicalKeys(t)
+	writeGraduationFormatDocYAML(t, formatsDir, "alpha", `
+  skills:
+    provider_extensions:
+`+graduationExtensionYAML("when_to_use"))
+	writeGraduationFormatDocYAML(t, formatsDir, "beta", `
+  agents:
+    provider_extensions:
+`+graduationExtensionYAML("when_to_use"))
+
+	runGraduationScanDays(t, cacheRoot, formatsDir, canonicalKeysPath, 3)
+
+	for _, tc := range []struct {
+		key      graduationKey
+		provider string
+	}{
+		{graduationKey{"skills", "when_to_use"}, "alpha"},
+		{graduationKey{"agents", "when_to_use"}, "beta"},
+	} {
+		state, err := readGraduationState(acifGraduationStatePath(cacheRoot, tc.key))
+		if err != nil {
+			t.Fatalf("read state %s: %v", tc.key, err)
+		}
+		if state.ContentType != tc.key.ContentType || len(state.Providers) != 1 || state.Providers[tc.provider] == nil {
+			t.Fatalf("state %s = %+v, want only provider %s", tc.key, state, tc.provider)
+		}
+	}
+}
+
+func TestScanGraduationCandidates_CanonicalExtensionsDoNotFile(t *testing.T) {
+	cacheRoot := t.TempDir()
+	formatsDir := t.TempDir()
+	canonicalKeysPath := writeGraduationCanonicalKeys(t)
+	// supporting_files is linked to a canonical key; auto_invocable is a
+	// canonical key itself. Both appear in two providers of one content type.
+	for _, provider := range []string{"alpha", "beta"} {
+		writeGraduationFormatDocYAML(t, formatsDir, provider, `
+  skills:
+    canonical_mappings:
+      skill_bundled_resources:
+        status: mapped
+        extension_id: supporting_files
+        mechanism: "co-located files"
+        confidence: confirmed
+    provider_extensions:
+`+graduationExtensionYAML("supporting_files")+graduationExtensionYAML("auto_invocable"))
+	}
+
+	runGraduationScanDays(t, cacheRoot, formatsDir, canonicalKeysPath, 3)
+
+	for _, id := range []string{"supporting_files", "auto_invocable"} {
+		path := acifGraduationStatePath(cacheRoot, graduationKey{"skills", id})
+		if _, err := os.Stat(path); !os.IsNotExist(err) {
+			t.Fatalf("canonical extension %s left state at %s (err=%v)", id, path, err)
+		}
+	}
+}
+
+func TestScanGraduationCandidates_NewConceptInOneContentTypeFiles(t *testing.T) {
+	cacheRoot := t.TempDir()
+	formatsDir := t.TempDir()
+	canonicalKeysPath := writeGraduationCanonicalKeys(t)
+	// A link to a key that is canonical only for another content type does
+	// not make the extension canonical here.
+	for _, provider := range []string{"alpha", "beta"} {
+		writeGraduationFormatDocYAML(t, formatsDir, provider, `
+  skills:
+    canonical_mappings:
+      tool_restrictions:
+        status: mapped
+        extension_id: fresh_concept
+        mechanism: "wrong content type"
+        confidence: confirmed
+    provider_extensions:
+`+graduationExtensionYAML("fresh_concept"))
+	}
+
+	var titles, bodies []string
+	SetGHCommandForTest(func(args ...string) ([]byte, error) {
+		if isIssueListCall(args) {
+			return []byte(`[]`), nil
+		}
+		if isGH(args, "issue", "create") {
+			titles = append(titles, argValue(args, "--title"))
+			bodies = append(bodies, argValue(args, "--body"))
+			return []byte("https://github.com/OpenScribbler/agent-content-interchange-format/issues/400\n"), nil
+		}
+		t.Fatalf("unexpected gh call: %v", args)
+		return nil, nil
+	})
+	defer SetGHCommandForTest(nil)
+
+	day1 := time.Date(2026, 7, 1, 10, 0, 0, 0, time.UTC)
+	for i := 0; i < 2; i++ {
+		if _, err := ScanGraduationCandidates(cacheRoot, formatsDir, canonicalKeysPath, day1.AddDate(0, 0, i)); err != nil {
+			t.Fatalf("ScanGraduationCandidates: %v", err)
+		}
+	}
+	if len(titles) != 1 {
+		t.Fatalf("creates = %d, want 1", len(titles))
+	}
+	if !strings.Contains(titles[0], `skills extension "fresh_concept"`) {
+		t.Fatalf("title %q missing content type", titles[0])
+	}
+	for _, want := range []string{acifGraduationAnchor(graduationKey{"skills", "fresh_concept"}), "**Content type:** `skills`"} {
+		if !strings.Contains(bodies[0], want) {
+			t.Fatalf("body missing %q\n\n%s", want, bodies[0])
+		}
+	}
+}
+
+func writeGraduationCanonicalKeys(t *testing.T) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "canonical-keys.yaml")
+	content := `content_types:
+  skills:
+    auto_invocable:
+      type: bool
+    skill_bundled_resources:
+      type: bool
+  agents:
+    tool_restrictions:
+      type: object
+`
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		t.Fatalf("write canonical keys: %v", err)
+	}
+	return path
+}
+
+func graduationExtensionYAML(id string) string {
+	return fmt.Sprintf(`      - id: %s
+        name: %q
+        summary: "summary"
+        source_ref: "https://example.com/%s"
+        graduation_candidate: true
+        conversion: embedded
+`, id, id, id)
+}
+
+func writeGraduationFormatDocYAML(t *testing.T, dir, provider, contentTypes string) {
+	t.Helper()
+	content := "provider: " + provider + "\ncontent_types:" + contentTypes
+	if err := os.WriteFile(filepath.Join(dir, provider+".yaml"), []byte(content), 0644); err != nil {
+		t.Fatalf("write format doc %s: %v", provider, err)
 	}
 }
 

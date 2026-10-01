@@ -68,6 +68,12 @@ proposed_mappings:
       source_field: ""
       source_value: ""
       confidence: inferred
+    - canonical_key: skill_bundled_resources
+      supported: true
+      mechanism: Optional sibling files and directories alongside SKILL.md (scripts/, references/, assets/) hold scripts, references, and templates; loaded on demand while the skill is active.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
     - canonical_key: user_invocable
       supported: true
       mechanism: When disable-model-invocation is true, the skill becomes an explicit slash command invocable by the user rather than auto-invoked by the model.

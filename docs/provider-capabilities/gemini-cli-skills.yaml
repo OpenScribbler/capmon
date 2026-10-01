@@ -50,6 +50,12 @@ proposed_mappings:
       source_field: ""
       source_value: ""
       confidence: confirmed
+    - canonical_key: skill_bundled_resources
+      supported: true
+      mechanism: Optional scripts/, references/, and assets/ subdirectories alongside SKILL.md hold executable scripts, static docs, and templates.
+      source_field: ""
+      source_value: ""
+      confidence: confirmed
     - canonical_key: user_invocable
       supported: false
       mechanism: ""

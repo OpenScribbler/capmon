@@ -55,6 +55,7 @@ var CanonicalMcpKeys = []string{
 	"marketplace",
 	"resource_referencing",
 	"enterprise_management",
+	"mcp_scopes",
 }
 
 // canonicalMcpKeySet is the lookup form of CanonicalMcpKeys, built once at
