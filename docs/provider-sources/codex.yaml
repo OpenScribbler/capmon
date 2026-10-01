@@ -44,7 +44,7 @@ content_types:
         extracts: [file_format, hierarchy, features]
         # Note: stub doc, mostly redirects to developers.openai.com/codex/guides/agents-md
 
-      - url: https://raw.githubusercontent.com/openai/codex/main/AGENTS.md
+      - url: https://raw.githubusercontent.com/openai/codex/main/codex-rs/tui/src/bottom_pane/AGENTS.md
         type: example
         format: markdown
         extracts: [file_format]
