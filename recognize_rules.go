@@ -48,6 +48,7 @@ var CanonicalRulesKeys = []string{
 	"cross_provider_recognition",
 	"auto_memory",
 	"hierarchical_loading",
+	"rule_scopes",
 }
 
 // canonicalRulesKeySet is the lookup form of CanonicalRulesKeys, built once at

@@ -109,7 +109,7 @@ func TestLoadKeyRegistryRealFile(t *testing.T) {
 			}
 		}
 	}
-	if total != 46 {
-		t.Errorf("total key count = %d, want 46", total)
+	if total != 49 {
+		t.Errorf("total key count = %d, want 49", total)
 	}
 }

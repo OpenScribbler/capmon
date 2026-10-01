@@ -14,3 +14,9 @@ proposed_mappings:
       source_field: ""
       source_value: ""
       confidence: inferred
+    - canonical_key: command_scopes
+      supported: true
+      mechanism: 'Workflows load from two scopes: workspace (.devin/workflows/, legacy .windsurf/workflows/) and global (~/.codeium/windsurf/global_workflows/)'
+      source_field: ""
+      source_value: ""
+      confidence: confirmed

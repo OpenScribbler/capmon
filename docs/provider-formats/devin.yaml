@@ -476,6 +476,11 @@ content_types:
         status: mapped
         mechanism: "Cascade exposes its own built-in chat slash commands (e.g. for conversation control) independently of user-authored Workflows; the `/<workflow-name>` namespace is reserved for user files"
         confidence: inferred
+      command_scopes:
+        status: mapped
+        extension_id: "two_scope_loading"
+        mechanism: "Workflows load from two scopes: workspace (.devin/workflows/, legacy .windsurf/workflows/) and global (~/.codeium/windsurf/global_workflows/)"
+        confidence: confirmed
     provider_extensions:
       - id: character_limit_12000
         name: "12,000 character per-file limit"
