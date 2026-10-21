@@ -79,7 +79,7 @@ content_types:
 
   skills:
     sources:
-      - url: https://raw.githubusercontent.com/github/docs/main/content/copilot/concepts/agents/about-agent-skills.md
+      - url: https://raw.githubusercontent.com/github/docs/main/content/copilot/concepts/customizations/agent-skills.md
         type: docs
         format: markdown
         extracts: [file_format, features]
