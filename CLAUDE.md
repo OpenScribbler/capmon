@@ -2,6 +2,8 @@
 
 This file provides instructions and context for AI coding agents working on this project.
 
+@AGENTS.md
+
 ## Build & Test
 
 _Add your build and test commands here_

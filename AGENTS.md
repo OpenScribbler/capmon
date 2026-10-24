@@ -1,5 +1,10 @@
 # Agent Instructions
 
+## Rules
+
+- No mutation testing while the first implementation of the OpenScribbler stack is built (the `OpenScribbler/stack` repo's README defines it), which overrides the global rule to mutation-test each stage.
+- Merge a PR you opened without asking once both second-opinion rounds are done, the second round's fixes are pushed, and CI passes on the PR's head commit. Merge with `gh pr merge <number> --squash --admin`, since `main` requires an approving review; ADR 0005's amendment allows this while capmon is unshared. `--admin` also bypasses required checks, so confirm `gh pr checks <number>` passes first. A PR the pipeline opens (a `capmon/heal-*` or `capmon/drift-*` branch) waits for a person to approve it (heal PRs under ADR 0014, drift PRs under ADR 0005's amendment).
+
 ## Non-Interactive Shell Commands
 
 **ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.

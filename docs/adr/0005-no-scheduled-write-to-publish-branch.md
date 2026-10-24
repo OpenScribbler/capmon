@@ -1,7 +1,7 @@
 ---
 id: "0005"
 title: No Scheduled Job Holds Write Access to the Publish Branch
-status: accepted
+status: accepted (amended 2026-10-24)
 date: 2026-07-11
 enforcement: strict
 files: [".github/workflows/pipeline.yml"]
@@ -67,3 +67,29 @@ No scheduled workflow holds `contents: write` on the publish branch.
 
 **What's deferred:**
 - Nothing.
+
+## Amendment (2026-10-24): maintainer merges while capmon is unshared
+
+The maintainer treats capmon as unshared while the OpenScribbler stack
+is rebuilt around it. Until the maintainer shares capmon with users
+again, the maintainer's own PRs may merge with an admin bypass of the
+required review, once two AI review rounds are done and CI passes on
+the PR's final commit. During this period "on `main`" means
+"reviewed", not "human-reviewed".
+
+While the amendment is in force, three statements are suspended for the
+maintainer's own PRs: the human-review guarantee in Context, the "day
+one" bullet in Decision, and the first "What becomes easier" bullet in
+Consequences. The feed stays publicly deployed during this period.
+Still holding: no scheduled workflow gains `contents: write`, branch
+protection stays on, and PRs the pipeline opens still wait for a
+person: heal PRs under ADR 0014, and drift PRs under this amendment.
+Pipeline PRs are recognized by branch prefix (`capmon/heal-*` and
+`capmon/drift-*`), not by author, because the pipeline opens PRs as
+the same GitHub account the maintainer uses.
+
+The amendment ends when capmon is shared again. Then the bypass comes
+out of `AGENTS.md`, this section is removed, and every merge to `main`
+needs a person's approval again. The amendment is in force exactly
+while this section exists, and only the maintainer ends it, by
+removing this section and the bypass in `AGENTS.md`.

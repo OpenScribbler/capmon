@@ -9,7 +9,9 @@ name: publish
 # carrying the re-stamped generated_at so the published index doubles as a
 # liveness heartbeat under the 48h staleness contract (ADR 0012). Nothing
 # here holds contents: write — the source of truth only changes through
-# reviewed PRs on main (ADR 0005).
+# reviewed PRs on main (ADR 0005; while capmon is unshared, the
+# maintainer's own PRs may be AI-reviewed and admin-merged, per its
+# amendment, but CI must pass and pipeline PRs are excluded).
 
 on:
   push:
