@@ -79,6 +79,11 @@ func TestRealExportPublishesInstallEntryPoints(t *testing.T) {
 			t.Errorf("%s schema_version = %v, want \"3\"", slug, doc["schema_version"])
 		}
 		cts := mustChild(t, doc, "content_types")
+		for ct := range cts {
+			if _, ok := byType[ct]; !ok {
+				t.Errorf("%s declares content type %s, which has no expected write targets", slug, ct)
+			}
+		}
 		for ct, scopes := range byType {
 			assertWriteTargets(t, slug+" "+ct, mustChild(t, cts, ct)["install_entry_points"], scopes)
 
@@ -154,6 +159,34 @@ func TestRunExportBlankOSRowFailsClosed(t *testing.T) {
 	se := requireStructured(t, err, "EXPORT_007")
 	if !strings.Contains(se.Message, "alpha.yaml") || !strings.Contains(se.Message, "os is present but null or empty") {
 		t.Errorf("message %q does not name alpha.yaml and the blank os", se.Message)
+	}
+	assertSentinelUntouched(t, outDir, before)
+}
+
+// TestRunExportMistypedRowFieldFailsClosed: a row field of the wrong YAML
+// type (scope written as a list) fails inside the row decoder, and the
+// export still reports it as EXPORT_007 rather than a plain load error.
+func TestRunExportMistypedRowFieldFailsClosed(t *testing.T) {
+	base := committedFixtureOpts(t)
+
+	baseline := strings.Replace(blankOSBaseline, "      - scope: managed\n        os:\n", "      - scope: [managed]\n        os: [darwin]\n", 1)
+	caps := t.TempDir()
+	if err := os.WriteFile(filepath.Join(caps, "alpha.yaml"), []byte(baseline), 0644); err != nil {
+		t.Fatalf("write baseline: %v", err)
+	}
+	outDir, before := sentinelOutDir(t)
+
+	err := RunExport(ExportOptions{
+		CapsDir:           caps,
+		CanonicalKeysPath: base.CanonicalKeysPath,
+		SourcesDir:        base.SourcesDir,
+		PublishAssetsDir:  base.PublishAssetsDir,
+		OutDir:            outDir,
+		GeneratedAt:       "2026-01-01T00:00:00Z",
+	})
+	se := requireStructured(t, err, "EXPORT_007")
+	if !strings.Contains(se.Message, "alpha.yaml") {
+		t.Errorf("message %q does not name alpha.yaml", se.Message)
 	}
 	assertSentinelUntouched(t, outDir, before)
 }

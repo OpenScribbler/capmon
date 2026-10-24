@@ -196,7 +196,10 @@ func buildPivotDocs(reg keyRegistry, providerDocs map[string]map[string]any) map
 			providers[slug] = node
 		}
 		pivot := map[string]any{
-			"schema_version": "1",
+			// "2": content-type nodes gained install_entry_points. The pivot
+			// embeds bare nodes with no schema_version of their own, so it
+			// bumps its own version on that shape change.
+			"schema_version": "2",
 			"content_type":   ct,
 		}
 		if len(providers) > 0 {

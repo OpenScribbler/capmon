@@ -67,7 +67,7 @@ func TestValidateInstallEntryPointsRejectsBadRows(t *testing.T) {
 		{"backslash", []InstallEntryPoint{withOS(row("managed", `C:\Demo\<content-name>.md`, "single_file"), "windows")}, "backslash"},
 		{"empty segment", []InstallEntryPoint{row("project", ".demo//<content-name>.md", "single_file")}, "empty segment"},
 		{"user not home-anchored", []InstallEntryPoint{row("user", ".demo/<content-name>.md", "single_file")}, "anchored at ~/"},
-		{"project absolute", []InstallEntryPoint{row("project", "/etc/demo/<content-name>.md", "single_file")}, "relative to the project root"},
+		{"project absolute", []InstallEntryPoint{withOS(row("project", "/etc/demo/<content-name>.md", "single_file"), "linux")}, "relative to the project root"},
 		{"managed relative", []InstallEntryPoint{row("managed", ".demo/<content-name>.md", "single_file")}, "is absolute"},
 		{"single_file without content-name", []InstallEntryPoint{row("project", ".demo/rules.md", "single_file")}, "must carry <content-name>"},
 		{"merged with content-name", []InstallEntryPoint{row("project", ".demo/<content-name>.json", "merged_into_shared_file")}, "must not carry <content-name>"},
@@ -83,6 +83,9 @@ func TestValidateInstallEntryPointsRejectsBadRows(t *testing.T) {
 		{"drive path with windows and linux", []InstallEntryPoint{withOS(row("managed", "C:/Program Files/Demo/MEMORY.md", "merged_into_shared_file"), "linux", "windows")}, "drive-letter template requires os exactly [windows]"},
 		{"rooted path with windows", []InstallEntryPoint{withOS(row("managed", "/etc/demo/MEMORY.md", "merged_into_shared_file"), "windows")}, "must not list windows"},
 		{"rooted path with linux and windows", []InstallEntryPoint{withOS(row("managed", "/etc/demo/MEMORY.md", "merged_into_shared_file"), "linux", "windows")}, "must not list windows"},
+		{"rooted path without os", []InstallEntryPoint{row("managed", "/etc/demo/MEMORY.md", "merged_into_shared_file")}, "a /-rooted template requires os"},
+		{"single_file trailing slash", []InstallEntryPoint{row("project", ".demo/agents/<content-name>.md/", "single_file")}, "names a file and must not end in /"},
+		{"merged trailing slash", []InstallEntryPoint{row("project", ".demo/", "merged_into_shared_file")}, "names a file and must not end in /"},
 		{"parent segment", []InstallEntryPoint{row("project", "../outside/AGENTS.md", "merged_into_shared_file")}, `segment ".."`},
 		{"parent segment mid-path", []InstallEntryPoint{row("project", ".demo/../AGENTS.md", "merged_into_shared_file")}, `segment ".."`},
 		{"parent segment after home", []InstallEntryPoint{row("user", "~/../etc/<content-name>.md", "single_file")}, `segment ".."`},
@@ -146,6 +149,8 @@ func TestInstallEntryPointRejectsBadRowYAML(t *testing.T) {
 		{"misspelled os key", "      - scope: managed\n        oss: [darwin]\n" + tail, `unknown field "oss"`},
 		{"unknown extra key", "      - scope: managed\n        os: [darwin]\n        notes: x\n" + tail, `unknown field "notes"`},
 		{"row is not a mapping", "      - managed\n", "must be a mapping"},
+		{"field of the wrong type", "      - scope: [managed]\n        os: [darwin]\n" + tail, "cannot unmarshal"},
+		{"duplicate row key", "      - scope: managed\n        scope: managed\n        os: [darwin]\n" + tail, "already defined"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

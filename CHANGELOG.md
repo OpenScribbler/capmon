@@ -9,11 +9,16 @@ Changes to the published feed at https://openscribbler.github.io/capmon/.
 - Content-type nodes now carry `install_entry_points`: an ordered list of
   ACIF install-targets rows (`scope`, optional `os`, `path_template`,
   `layout`, `status`, `as_of`) saying where the provider reads that
-  content type on disk. The first `current` row for a scope is the write
-  target. The field appears in `capabilities/<slug>.json`, `all.json` and
-  `by-content-type/<type>.json` (ADR 0016).
+  content type on disk. After filtering by the target OS, the first
+  `current` row for a scope is the write target. The field appears in
+  `capabilities/<slug>.json`, `all.json` and `by-content-type/<type>.json`
+  (ADR 0016).
 - The provider-capabilities schema and documents moved from
   `schema_version` "2" to "3". No existing field changed.
+- The by-content-type schema and every `by-content-type/<type>.json` pivot
+  moved from `schema_version` "1" to "2", because the content-type nodes
+  they embed gained `install_entry_points`. `all.json` stays at "1"; each
+  provider document it embeds carries its own `schema_version` "3".
 
 ### Data
 
@@ -23,8 +28,10 @@ Changes to the published feed at https://openscribbler.github.io/capmon/.
   names the page.
 - Claude Code gained a `commands` content type (`.claude/commands/`, the
   older format that still works). Codex gained `commands` (custom prompts
-  in `~/.codex/prompts/`, which Codex documents as deprecated) and `mcp`
-  (`config.toml`).
+  in `~/.codex/prompts/`) and `mcp` (`config.toml`). Codex documents custom
+  prompts as deprecated; the row is still `status: current` because
+  `status` ranks rows against each other and does not record provider
+  deprecation.
 
 ## 2026-09-30 — v2
 

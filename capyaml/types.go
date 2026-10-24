@@ -35,8 +35,9 @@ type ContentTypeEntry struct {
 	Capabilities map[string]CapabilityEntry `yaml:"capabilities,omitempty"`
 	Tools        map[string]ToolEntry       `yaml:"tools,omitempty"`
 	// InstallEntryPoints lists where the provider reads this content type on
-	// disk, as ACIF install-targets rows (spec §6). Order is precedence: the
-	// first current row for a scope is the write target. See
+	// disk, as ACIF install-targets rows (spec §6). Order is precedence: after
+	// filtering by the target OS, the first current row for a scope is the
+	// write target. See
 	// ValidateInstallEntryPoints for the rules each list must satisfy.
 	InstallEntryPoints []InstallEntryPoint `yaml:"install_entry_points,omitempty"`
 }

@@ -9,8 +9,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ErrInstallRowShape marks a row whose keys or os field break the row model
-// at decode time, before ValidateInstallEntryPoints can see it.
+// ErrInstallRowShape marks a row that breaks the row model at decode time,
+// before ValidateInstallEntryPoints can see it: an unknown or duplicate key,
+// a null or scalar os, or a field of the wrong YAML type.
 var ErrInstallRowShape = errors.New("install entry point row")
 
 // installRowFields are the six keys of an ACIF install-targets row (spec §6).
@@ -53,7 +54,9 @@ func (r *InstallEntryPoint) UnmarshalYAML(node *yaml.Node) error {
 	type plain InstallEntryPoint // drops this method so Decode does not recurse
 	var p plain
 	if err := node.Decode(&p); err != nil {
-		return err
+		// Wrapping also stops yaml.v3 from flattening a *yaml.TypeError
+		// into the document's error list, which would drop the sentinel.
+		return fmt.Errorf("%w: line %d: %v", ErrInstallRowShape, node.Line, err)
 	}
 	*r = InstallEntryPoint(p)
 	return nil
@@ -222,11 +225,15 @@ func validatePathTemplate(r InstallEntryPoint) error {
 	// The other two OS-specific anchors bind os the same way <appdata> does.
 	// A drive-letter path is relative on POSIX and a /-rooted path is not a
 	// Windows path, so a row carrying either on the wrong OS set publishes a
-	// location no consumer on that OS can resolve as written.
+	// location no consumer on that OS can resolve as written. An absent os
+	// means every OS, Windows included, so a /-rooted row must carry one.
 	if isDriveAbsolute(t) && !(len(r.OS) == 1 && r.OS[0] == "windows") {
 		return fmt.Errorf("path_template %q: a drive-letter template requires os exactly [windows]", t)
 	}
 	if strings.HasPrefix(t, "/") {
+		if len(r.OS) == 0 {
+			return fmt.Errorf("path_template %q: a /-rooted template requires os (an absent os includes windows)", t)
+		}
 		for _, o := range r.OS {
 			if o == "windows" {
 				return fmt.Errorf("path_template %q: a /-rooted template must not list windows in os", t)
@@ -260,6 +267,11 @@ func validatePathTemplate(r InstallEntryPoint) error {
 		if hasContentName {
 			return fmt.Errorf("path_template %q: layout merged_into_shared_file names a shared file and must not carry <content-name>", t)
 		}
+	}
+	// Both file layouts name a file, and a trailing / gives the target
+	// directory semantics an installer cannot open as a file.
+	if r.Layout != "directory_of_files" && strings.HasSuffix(t, "/") {
+		return fmt.Errorf("path_template %q: layout %s names a file and must not end in /", t, r.Layout)
 	}
 	return nil
 }

@@ -297,8 +297,8 @@ func TestBuildAllAndPivotsShareNodeShape(t *testing.T) {
 	if pivot["content_type"] != "agents" {
 		t.Errorf("agents pivot content_type = %v, want \"agents\"", pivot["content_type"])
 	}
-	if pivot["schema_version"] != "1" {
-		t.Errorf("agents pivot schema_version = %v, want \"1\"", pivot["schema_version"])
+	if pivot["schema_version"] != "2" {
+		t.Errorf("agents pivot schema_version = %v, want \"2\"", pivot["schema_version"])
 	}
 	alphaNode := mustChild(t, mustChild(t, pivot, "providers"), "alpha")
 	agentsNode := mustChild(t, mustChild(t, providerDoc, "content_types"), "agents")
