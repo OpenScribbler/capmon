@@ -3,7 +3,7 @@
 ## Rules
 
 - No mutation testing while the first implementation of the OpenScribbler stack is built (the `OpenScribbler/stack` repo's README defines it), which overrides the global rule to mutation-test each stage.
-- Merge a PR without asking once its CI checks pass and both second-opinion rounds are done, with the second round's fixes pushed. Merge with `gh pr merge --admin`, since `main` requires an approving review. This covers PRs opened for your own work; a heal PR (`capmon/heal-*` branch) waits for a person to approve it (ADR 0014).
+- Merge a PR you opened without asking once both second-opinion rounds are done, the second round's fixes are pushed, and CI passes on the commit that carries them. Merge with `gh pr merge --admin`, since `main` requires an approving review. A PR the pipeline opens (a `capmon/heal-*` or `capmon/drift-*` branch) waits for a person to approve it (ADR 0014).
 
 ## Non-Interactive Shell Commands
 
