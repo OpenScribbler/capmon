@@ -11,7 +11,7 @@ name: publish
 # here holds contents: write — the source of truth only changes through
 # reviewed PRs on main (ADR 0005; while capmon is unshared, the
 # maintainer's own PRs may be AI-reviewed and admin-merged, per its
-# amendment).
+# amendment, but CI must pass and pipeline PRs are excluded).
 
 on:
   push:
