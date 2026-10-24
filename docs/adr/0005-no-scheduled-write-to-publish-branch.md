@@ -67,3 +67,21 @@ No scheduled workflow holds `contents: write` on the publish branch.
 
 **What's deferred:**
 - Nothing.
+
+## Amendment (2026-10-24): maintainer merges while capmon is unshared
+
+The maintainer treats capmon as unshared while the OpenScribbler stack
+is rebuilt around it. Until the maintainer shares capmon with users
+again, the maintainer's own PRs may merge with an admin bypass of the
+required review, once two AI review rounds are done and CI passes on
+the PR's final commit. During this period "on `main`" means
+"reviewed", not "human-reviewed".
+
+The rest of this decision stands. No scheduled workflow gains
+`contents: write`, branch protection stays on, and PRs the pipeline
+opens still wait for a person: heal PRs under ADR 0014, and drift PRs
+under this amendment.
+
+The amendment ends when capmon is shared again. Then the bypass comes
+out of `AGENTS.md`, this section is removed, and every merge to `main`
+needs a person's approval again.
