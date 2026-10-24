@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-09-30T10:31:26Z
+# Generated at: 2026-10-24T21:52:41Z
 
 content_type: skills
 providers:
@@ -34,6 +34,17 @@ providers:
                 supported: true
                 mechanism: .claude/skills/<skill-name>/SKILL.md committed to version control
                 confidence: confirmed
+        install_entry_points:
+            - scope: user
+              path_template: ~/.claude/skills/<content-name>/
+              layout: directory_of_files
+              status: current
+              as_of: code.claude.com/docs/en/skills, verified 2026-10-24
+            - scope: project
+              path_template: .claude/skills/<content-name>/
+              layout: directory_of_files
+              status: current
+              as_of: code.claude.com/docs/en/skills, verified 2026-10-24
     cline:
         supported: true
         capabilities:
@@ -72,6 +83,25 @@ providers:
                 supported: true
                 mechanism: .agents/skills/<name>/ under project config folder or between project root and cwd (SkillScope::Repo)
                 confidence: confirmed
+        install_entry_points:
+            - scope: user
+              path_template: ~/.agents/skills/<content-name>/
+              layout: directory_of_files
+              status: current
+              as_of: developers.openai.com/codex/skills, verified 2026-10-24
+            - scope: project
+              path_template: .agents/skills/<content-name>/
+              layout: directory_of_files
+              status: current
+              as_of: developers.openai.com/codex/skills, verified 2026-10-24
+            - scope: managed
+              os:
+                - darwin
+                - linux
+              path_template: /etc/codex/skills/<content-name>/
+              layout: directory_of_files
+              status: current
+              as_of: developers.openai.com/codex/skills and developers.openai.com/codex/config-basic, verified 2026-10-24
     copilot-cli:
         supported: true
         capabilities:

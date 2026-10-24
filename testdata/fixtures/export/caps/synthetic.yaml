@@ -40,6 +40,29 @@ content_types:
         capabilities:
           claude_code:
             supported: true
+    install_entry_points:
+      - scope: user
+        os: [darwin, linux]
+        path_template: ~/.synthetic/skills/<content-name>/
+        layout: directory_of_files
+        status: current
+        as_of: example.com/spec, verified 2026-01-02
+      - scope: user
+        os: [windows]
+        path_template: <appdata>/synthetic/skills/<content-name>/
+        layout: directory_of_files
+        status: current
+        as_of: example.com/spec, verified 2026-01-02
+      - scope: project
+        path_template: .synthetic/skills/<content-name>/
+        layout: directory_of_files
+        status: current
+        as_of: example.com/spec, verified 2026-01-02
+      - scope: project
+        path_template: SYNTHETIC.md
+        layout: merged_into_shared_file
+        status: superseded
+        as_of: example.com/spec, verified 2026-01-02
 provider_exclusive:
   skills.custom_thing:
     supported: true

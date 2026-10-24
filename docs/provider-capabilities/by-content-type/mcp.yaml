@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-09-30T10:31:26Z
+# Generated at: 2026-10-24T21:52:41Z
 
 content_type: mcp
 providers:
@@ -50,6 +50,17 @@ providers:
                 supported: true
                 mechanism: 'four transport options documented under ''Option 1: Add a remote HTTP server'' / ''Option 2: Add a remote SSE server'' / ''Option 3: Add a local stdio server'' / ''Option 4: Add a remote WebSocket server'' headings'
                 confidence: inferred
+        install_entry_points:
+            - scope: user
+              path_template: ~/.claude.json
+              layout: merged_into_shared_file
+              status: current
+              as_of: code.claude.com/docs/en/mcp, verified 2026-10-24
+            - scope: project
+              path_template: .mcp.json
+              layout: merged_into_shared_file
+              status: current
+              as_of: code.claude.com/docs/en/mcp, verified 2026-10-24
     cline:
         supported: true
         capabilities:
@@ -57,6 +68,19 @@ providers:
                 supported: true
                 mechanism: transport types documented under 'Transport types' heading (STDIO + remote streamableHttp/sse) on the consolidated mcp-overview page
                 confidence: inferred
+    codex:
+        supported: true
+        install_entry_points:
+            - scope: user
+              path_template: ~/.codex/config.toml
+              layout: merged_into_shared_file
+              status: current
+              as_of: developers.openai.com/codex/mcp, verified 2026-10-24
+            - scope: project
+              path_template: .codex/config.toml
+              layout: merged_into_shared_file
+              status: current
+              as_of: developers.openai.com/codex/mcp, verified 2026-10-24
     cursor:
         supported: true
         capabilities:

@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-09-30T10:31:26Z
+# Generated at: 2026-10-24T21:52:41Z
 
 content_type: agents
 providers:
@@ -46,6 +46,17 @@ providers:
                 supported: true
                 mechanism: per-subagent tool allowlist (tools), denylist (disallowedTools), and per-spawn restrictions documented under 'Control subagent capabilities' / 'Available tools' / 'Restrict which subagents can be spawned' headings
                 confidence: inferred
+        install_entry_points:
+            - scope: user
+              path_template: ~/.claude/agents/<content-name>.md
+              layout: single_file
+              status: current
+              as_of: code.claude.com/docs/en/sub-agents, verified 2026-10-24
+            - scope: project
+              path_template: .claude/agents/<content-name>.md
+              layout: single_file
+              status: current
+              as_of: code.claude.com/docs/en/sub-agents, verified 2026-10-24
     codex:
         supported: true
         capabilities:
@@ -61,6 +72,17 @@ providers:
                 supported: true
                 mechanism: multi-agent coordination via MultiAgentV2ConfigToml + FeatureToml_for_MultiAgentV2ConfigToml feature flag — one agent can delegate to or spawn another
                 confidence: inferred
+        install_entry_points:
+            - scope: user
+              path_template: ~/.codex/agents/<content-name>.toml
+              layout: single_file
+              status: current
+              as_of: developers.openai.com/codex/subagents, verified 2026-10-24
+            - scope: project
+              path_template: .codex/agents/<content-name>.toml
+              layout: single_file
+              status: current
+              as_of: developers.openai.com/codex/subagents, verified 2026-10-24
     copilot-cli:
         supported: true
         capabilities:

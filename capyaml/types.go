@@ -34,6 +34,25 @@ type ContentTypeEntry struct {
 	Events       map[string]EventEntry      `yaml:"events,omitempty"`
 	Capabilities map[string]CapabilityEntry `yaml:"capabilities,omitempty"`
 	Tools        map[string]ToolEntry       `yaml:"tools,omitempty"`
+	// InstallEntryPoints lists where the provider reads this content type on
+	// disk, as ACIF install-targets rows (spec §6). Order is precedence: after
+	// filtering by the target OS, the first current row for a scope is the
+	// write target. See
+	// ValidateInstallEntryPoints for the rules each list must satisfy.
+	InstallEntryPoints []InstallEntryPoint `yaml:"install_entry_points,omitempty"`
+}
+
+// InstallEntryPoint is one ACIF install-targets row. Field names and value
+// spellings are ACIF's, verbatim, so a consumer resolves a path by the ACIF
+// rules without translation. UnmarshalYAML decodes a row strictly (no extra
+// keys, no null os).
+type InstallEntryPoint struct {
+	Scope        string   `yaml:"scope"`
+	OS           []string `yaml:"os,omitempty"`
+	PathTemplate string   `yaml:"path_template"`
+	Layout       string   `yaml:"layout"`
+	Status       string   `yaml:"status"`
+	AsOf         string   `yaml:"as_of"`
 }
 
 // EventEntry is one hook event in a capability YAML.

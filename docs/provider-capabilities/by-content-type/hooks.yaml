@@ -1,6 +1,6 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-09-30T10:31:26Z
+# Generated at: 2026-10-24T21:52:41Z
 
 content_type: hooks
 providers:
@@ -74,6 +74,22 @@ providers:
                 supported: true
                 mechanism: permission control documented under 'PermissionRequest' / 'Permission update entries' headings (addRules/replaceRules/removeRules/setMode)
                 confidence: inferred
+        install_entry_points:
+            - scope: user
+              path_template: ~/.claude/settings.json
+              layout: merged_into_shared_file
+              status: current
+              as_of: code.claude.com/docs/en/hooks, verified 2026-10-24
+            - scope: project
+              path_template: .claude/settings.json
+              layout: merged_into_shared_file
+              status: current
+              as_of: code.claude.com/docs/en/hooks, verified 2026-10-24
+            - scope: project
+              path_template: .claude/settings.local.json
+              layout: merged_into_shared_file
+              status: current
+              as_of: code.claude.com/docs/en/hooks, verified 2026-10-24
     cline:
         supported: true
         capabilities:
@@ -148,6 +164,27 @@ providers:
                 supported: true
                 mechanism: 'hook_permission_decision: PreToolUse hooks return allow/deny/ask permission decisions via PreToolUsePermissionDecisionWire'
                 confidence: inferred
+        install_entry_points:
+            - scope: user
+              path_template: ~/.codex/hooks.json
+              layout: merged_into_shared_file
+              status: current
+              as_of: developers.openai.com/codex/hooks, verified 2026-10-24
+            - scope: user
+              path_template: ~/.codex/config.toml
+              layout: merged_into_shared_file
+              status: current
+              as_of: developers.openai.com/codex/hooks, verified 2026-10-24
+            - scope: project
+              path_template: .codex/hooks.json
+              layout: merged_into_shared_file
+              status: current
+              as_of: developers.openai.com/codex/hooks, verified 2026-10-24
+            - scope: project
+              path_template: .codex/config.toml
+              layout: merged_into_shared_file
+              status: current
+              as_of: developers.openai.com/codex/hooks, verified 2026-10-24
     copilot-cli:
         supported: true
         capabilities:

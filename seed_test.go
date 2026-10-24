@@ -392,3 +392,49 @@ func TestSeedProviderCapabilities_AppliesDotPaths(t *testing.T) {
 		}
 	}
 }
+
+// TestSeedProviderCapabilities_BadRowFailsAndKeepsFile: a capability file
+// that exists but fails to load (here, a misspelled os key on an install
+// row) is an error, not a missing file. Seeding must fail and leave the
+// curated file byte-identical rather than rewrite it from an empty document.
+func TestSeedProviderCapabilities_BadRowFailsAndKeepsFile(t *testing.T) {
+	capsDir := t.TempDir()
+	path := filepath.Join(capsDir, "test-provider.yaml")
+	initial := `schema_version: "1"
+slug: test-provider
+content_types:
+  rules:
+    supported: true
+    capabilities:
+      global_scope:
+        supported: true
+        mechanism: curated text
+    install_entry_points:
+      - scope: managed
+        oss: [darwin]
+        path_template: /Library/Application Support/Demo/MEMORY.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: example.com, verified 2026-01-01
+`
+	if err := os.WriteFile(path, []byte(initial), 0644); err != nil {
+		t.Fatal(err)
+	}
+	err := capmon.SeedProviderCapabilities(capmon.SeedOptions{
+		CapsDir:  capsDir,
+		Provider: "test-provider",
+		Extracted: map[string]string{
+			"hooks.events.before_tool_execute.native_name": "PreToolUse",
+		},
+	})
+	if err == nil {
+		t.Fatal("seed over a file with a bad row = nil, want an error")
+	}
+	got, readErr := os.ReadFile(path)
+	if readErr != nil {
+		t.Fatal(readErr)
+	}
+	if string(got) != initial {
+		t.Errorf("seed rewrote the file after a load error:\n%s", got)
+	}
+}

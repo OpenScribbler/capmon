@@ -248,6 +248,44 @@ func assertSyntheticProviderDoc(t *testing.T, outDir string) {
 		t.Errorf("invocation_patterns refs = %v, want to contain spec_doc", refs)
 	}
 
+	// install_entry_points: rows mirrored in source order with exactly the
+	// ACIF row fields; os emitted only where the source row carries it.
+	rows, ok := mustChild(t, cts, "skills")["install_entry_points"].([]any)
+	if !ok || len(rows) != 4 {
+		t.Fatalf("skills.install_entry_points = %v, want 4 rows", mustChild(t, cts, "skills")["install_entry_points"])
+	}
+	wantTemplates := []string{
+		"~/.synthetic/skills/<content-name>/",
+		"<appdata>/synthetic/skills/<content-name>/",
+		".synthetic/skills/<content-name>/",
+		"SYNTHETIC.md",
+	}
+	for i, raw := range rows {
+		row, ok := raw.(map[string]any)
+		if !ok {
+			t.Fatalf("install_entry_points[%d] is %T, want object", i, raw)
+		}
+		if row["path_template"] != wantTemplates[i] {
+			t.Errorf("install_entry_points[%d].path_template = %v, want %q (source order)", i, row["path_template"], wantTemplates[i])
+		}
+		for k := range row {
+			switch k {
+			case "scope", "os", "path_template", "layout", "status", "as_of":
+			default:
+				t.Errorf("install_entry_points[%d] carries non-ACIF field %q", i, k)
+			}
+		}
+	}
+	if got := toStrings(t, rows[0].(map[string]any)["os"]); len(got) != 2 || got[0] != "darwin" || got[1] != "linux" {
+		t.Errorf("install_entry_points[0].os = %v, want [darwin linux]", got)
+	}
+	if _, has := rows[2].(map[string]any)["os"]; has {
+		t.Error("install_entry_points[2] has os; a row without os in source must omit it")
+	}
+	if rows[3].(map[string]any)["status"] != "superseded" || rows[3].(map[string]any)["layout"] != "merged_into_shared_file" {
+		t.Errorf("install_entry_points[3] = %v, want superseded merged_into_shared_file", rows[3])
+	}
+
 	// provider_exclusive nodes: capability-shaped, keyless, keyed by <ct>.<name>.
 	pe := mustChild(t, doc, "provider_exclusive")
 	node := mustChild(t, pe, "skills.custom_thing")

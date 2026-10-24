@@ -1,7 +1,9 @@
 package capmon
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -59,16 +61,21 @@ func SeedProviderCapabilities(opts SeedOptions) error {
 		return reg, nil
 	}
 
+	// Only a missing file starts a new document. Any other load error (a
+	// malformed row, a permission error) is returned, so seed never rewrites
+	// a curated baseline from an empty document.
 	var caps capyaml.ProviderCapabilities
 	existing, err := capyaml.LoadCapabilityYAML(path)
-	if err == nil {
+	switch {
+	case err == nil:
 		caps = *existing
-	} else {
-		// New file
+	case errors.Is(err, fs.ErrNotExist):
 		caps = capyaml.ProviderCapabilities{
 			SchemaVersion: "1",
 			Slug:          opts.Provider,
 		}
+	default:
+		return fmt.Errorf("load existing %s: %w", path, err)
 	}
 
 	// Curated provider_exclusive entries present before this run: extracted

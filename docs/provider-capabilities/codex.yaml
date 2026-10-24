@@ -18,6 +18,25 @@ content_types:
         supported: true
         mechanism: multi-agent coordination via MultiAgentV2ConfigToml + FeatureToml_for_MultiAgentV2ConfigToml feature flag — one agent can delegate to or spawn another
         confidence: inferred
+    install_entry_points:
+      - scope: user
+        path_template: ~/.codex/agents/<content-name>.toml
+        layout: single_file
+        status: current
+        as_of: developers.openai.com/codex/subagents, verified 2026-10-24
+      - scope: project
+        path_template: .codex/agents/<content-name>.toml
+        layout: single_file
+        status: current
+        as_of: developers.openai.com/codex/subagents, verified 2026-10-24
+  commands:
+    supported: true
+    install_entry_points:
+      - scope: user
+        path_template: ~/.codex/prompts/<content-name>.md
+        layout: single_file
+        status: current
+        as_of: developers.openai.com/codex/custom-prompts, verified 2026-10-24
   hooks:
     supported: true
     capabilities:
@@ -53,6 +72,40 @@ content_types:
         supported: true
         mechanism: 'hook_permission_decision: PreToolUse hooks return allow/deny/ask permission decisions via PreToolUsePermissionDecisionWire'
         confidence: inferred
+    install_entry_points:
+      - scope: user
+        path_template: ~/.codex/hooks.json
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/hooks, verified 2026-10-24
+      - scope: user
+        path_template: ~/.codex/config.toml
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/hooks, verified 2026-10-24
+      - scope: project
+        path_template: .codex/hooks.json
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/hooks, verified 2026-10-24
+      - scope: project
+        path_template: .codex/config.toml
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/hooks, verified 2026-10-24
+  mcp:
+    supported: true
+    install_entry_points:
+      - scope: user
+        path_template: ~/.codex/config.toml
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/mcp, verified 2026-10-24
+      - scope: project
+        path_template: .codex/config.toml
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/mcp, verified 2026-10-24
   rules:
     supported: true
     capabilities:
@@ -74,6 +127,27 @@ content_types:
         supported: true
         mechanism: "Codex unconditionally collects every AGENTS.md from the project root down to the cwd and combines them (codex-rs/core/src/agents_md.rs module doc + find_nearest_ancestor_with_markers). The former child_agents_md feature flag was removed upstream (openai/codex #28993); base hierarchical loading is now always-on."
         confidence: confirmed
+    install_entry_points:
+      - scope: user
+        path_template: ~/.codex/AGENTS.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/guides/agents-md, verified 2026-10-24
+      - scope: user
+        path_template: ~/.codex/AGENTS.override.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/guides/agents-md, verified 2026-10-24
+      - scope: project
+        path_template: AGENTS.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/guides/agents-md, verified 2026-10-24
+      - scope: project
+        path_template: AGENTS.override.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: developers.openai.com/codex/guides/agents-md, verified 2026-10-24
   skills:
     supported: true
     capabilities:
@@ -97,6 +171,25 @@ content_types:
         supported: true
         mechanism: .agents/skills/<name>/ under project config folder or between project root and cwd (SkillScope::Repo)
         confidence: confirmed
+    install_entry_points:
+      - scope: user
+        path_template: ~/.agents/skills/<content-name>/
+        layout: directory_of_files
+        status: current
+        as_of: developers.openai.com/codex/skills, verified 2026-10-24
+      - scope: project
+        path_template: .agents/skills/<content-name>/
+        layout: directory_of_files
+        status: current
+        as_of: developers.openai.com/codex/skills, verified 2026-10-24
+      - scope: managed
+        os:
+          - darwin
+          - linux
+        path_template: /etc/codex/skills/<content-name>/
+        layout: directory_of_files
+        status: current
+        as_of: developers.openai.com/codex/skills and developers.openai.com/codex/config-basic, verified 2026-10-24
 provider_exclusive:
   skills.allow_implicit_invocation:
     supported: true
