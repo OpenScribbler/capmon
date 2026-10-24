@@ -55,9 +55,14 @@ also exports its own rows for every provider in
   ACIF row-data amendment.
 - `capyaml.ValidateInstallEntryPoints` enforces the closed sets for
   `scope`, `layout`, `status` and `os`, the `os` set rules, the closed
-  template grammar and its anchors, the layout and `<content-name>`
-  agreement, and uniqueness of (scope, path_template). `capmon verify`
-  runs it, and the export runs it again and fails closed with
+  template grammar (no glob or alternation characters, no `.` or `..`
+  segments) and its anchors (`<appdata>` and drive-letter templates
+  require `os` exactly `[windows]`; a `/`-rooted template never lists
+  `windows`), the layout and `<content-name>` agreement, and uniqueness
+  of (scope, path_template). Decoding a row is strict as well: a key
+  outside the six row fields, or an `os` key that is null or empty, is
+  rejected, because either would read as "every OS". `capmon verify`
+  runs both, and the export runs them again and fails closed with
   `EXPORT_007`. The published schema keeps these fields as open strings.
   Under ADR 0001 a consumer handles an unrecognized enum value as
   "unknown/other", and ACIF §11 handles an unrecognized template token

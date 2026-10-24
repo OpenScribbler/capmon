@@ -2,6 +2,7 @@ package capmon
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -110,4 +111,49 @@ func assertWriteTargets(t *testing.T, label string, raw any, want map[string]str
 			t.Errorf("%s: write target for scope %s = %q, want %q", label, scope, got[scope], tmpl)
 		}
 	}
+}
+
+// blankOSBaseline is a capability file whose darwin-only managed row lost its
+// os value. YAML decodes `os:` to a nil list, so without a decode-time check
+// the export would publish the macOS location as a row for every OS.
+const blankOSBaseline = `schema_version: "1"
+slug: alpha
+display_name: Alpha
+content_types:
+  rules:
+    supported: true
+    install_entry_points:
+      - scope: managed
+        os:
+        path_template: /Library/Application Support/Alpha/MEMORY.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: example.com, verified 2026-01-01
+`
+
+// TestRunExportBlankOSRowFailsClosed: a row whose os key is null fails the
+// export with EXPORT_007, like any other row that breaks the row model, and
+// leaves a pre-existing OutDir untouched.
+func TestRunExportBlankOSRowFailsClosed(t *testing.T) {
+	base := committedFixtureOpts(t)
+
+	caps := t.TempDir()
+	if err := os.WriteFile(filepath.Join(caps, "alpha.yaml"), []byte(blankOSBaseline), 0644); err != nil {
+		t.Fatalf("write baseline: %v", err)
+	}
+	outDir, before := sentinelOutDir(t)
+
+	err := RunExport(ExportOptions{
+		CapsDir:           caps,
+		CanonicalKeysPath: base.CanonicalKeysPath,
+		SourcesDir:        base.SourcesDir,
+		PublishAssetsDir:  base.PublishAssetsDir,
+		OutDir:            outDir,
+		GeneratedAt:       "2026-01-01T00:00:00Z",
+	})
+	se := requireStructured(t, err, "EXPORT_007")
+	if !strings.Contains(se.Message, "alpha.yaml") || !strings.Contains(se.Message, "os is present but null or empty") {
+		t.Errorf("message %q does not name alpha.yaml and the blank os", se.Message)
+	}
+	assertSentinelUntouched(t, outDir, before)
 }

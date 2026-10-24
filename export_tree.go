@@ -1,12 +1,14 @@
 package capmon
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/OpenScribbler/capmon/capyaml"
+	"github.com/OpenScribbler/capmon/internal/output"
 )
 
 // currentMajor is the one URL major the exporter generates (ADR 0001: freeze,
@@ -131,6 +133,13 @@ func loadProviderDocs(capsDir string, reg keyRegistry, manifests map[string]mani
 			continue
 		}
 		caps, err := capyaml.LoadCapabilityYAML(filepath.Join(capsDir, e.Name()))
+		if errors.Is(err, capyaml.ErrInstallRowShape) {
+			return nil, output.NewStructuredError(
+				"EXPORT_007",
+				fmt.Sprintf("load %s: %v", e.Name(), err),
+				"Correct the row so it satisfies the ACIF install-targets row model (spec §6–§9), then re-run capmon verify.",
+			)
+		}
 		if err != nil {
 			return nil, fmt.Errorf("load %s: %w", e.Name(), err)
 		}

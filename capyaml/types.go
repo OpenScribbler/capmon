@@ -43,7 +43,8 @@ type ContentTypeEntry struct {
 
 // InstallEntryPoint is one ACIF install-targets row. Field names and value
 // spellings are ACIF's, verbatim, so a consumer resolves a path by the ACIF
-// rules without translation.
+// rules without translation. UnmarshalYAML decodes a row strictly (no extra
+// keys, no null os).
 type InstallEntryPoint struct {
 	Scope        string   `yaml:"scope"`
 	OS           []string `yaml:"os,omitempty"`
