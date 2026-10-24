@@ -34,6 +34,43 @@
           "supported": true
         }
       },
+      "install_entry_points": [
+        {
+          "as_of": "example.com/spec, verified 2026-01-02",
+          "layout": "directory_of_files",
+          "os": [
+            "darwin",
+            "linux"
+          ],
+          "path_template": "~/.synthetic/skills/<content-name>/",
+          "scope": "user",
+          "status": "current"
+        },
+        {
+          "as_of": "example.com/spec, verified 2026-01-02",
+          "layout": "directory_of_files",
+          "os": [
+            "windows"
+          ],
+          "path_template": "<appdata>/synthetic/skills/<content-name>/",
+          "scope": "user",
+          "status": "current"
+        },
+        {
+          "as_of": "example.com/spec, verified 2026-01-02",
+          "layout": "directory_of_files",
+          "path_template": ".synthetic/skills/<content-name>/",
+          "scope": "project",
+          "status": "current"
+        },
+        {
+          "as_of": "example.com/spec, verified 2026-01-02",
+          "layout": "merged_into_shared_file",
+          "path_template": "SYNTHETIC.md",
+          "scope": "project",
+          "status": "superseded"
+        }
+      ],
       "supported": true
     }
   },

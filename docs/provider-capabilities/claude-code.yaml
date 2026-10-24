@@ -45,6 +45,30 @@ content_types:
         supported: true
         mechanism: per-subagent tool allowlist (tools), denylist (disallowedTools), and per-spawn restrictions documented under 'Control subagent capabilities' / 'Available tools' / 'Restrict which subagents can be spawned' headings
         confidence: inferred
+    install_entry_points:
+      - scope: user
+        path_template: ~/.claude/agents/<content-name>.md
+        layout: single_file
+        status: current
+        as_of: code.claude.com/docs/en/sub-agents, verified 2026-10-24
+      - scope: project
+        path_template: .claude/agents/<content-name>.md
+        layout: single_file
+        status: current
+        as_of: code.claude.com/docs/en/sub-agents, verified 2026-10-24
+  commands:
+    supported: true
+    install_entry_points:
+      - scope: user
+        path_template: ~/.claude/commands/<content-name>.md
+        layout: single_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: project
+        path_template: .claude/commands/<content-name>.md
+        layout: single_file
+        status: current
+        as_of: code.claude.com/docs/en/skills, verified 2026-10-24
   hooks:
     supported: true
     capabilities:
@@ -76,6 +100,22 @@ content_types:
         supported: true
         mechanism: permission control documented under 'PermissionRequest' / 'Permission update entries' headings (addRules/replaceRules/removeRules/setMode)
         confidence: inferred
+    install_entry_points:
+      - scope: user
+        path_template: ~/.claude/settings.json
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/hooks, verified 2026-10-24
+      - scope: project
+        path_template: .claude/settings.json
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/hooks, verified 2026-10-24
+      - scope: project
+        path_template: .claude/settings.local.json
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/hooks, verified 2026-10-24
   mcp:
     supported: true
     capabilities:
@@ -107,6 +147,17 @@ content_types:
         supported: true
         mechanism: 'four transport options documented under ''Option 1: Add a remote HTTP server'' / ''Option 2: Add a remote SSE server'' / ''Option 3: Add a local stdio server'' / ''Option 4: Add a remote WebSocket server'' headings'
         confidence: inferred
+    install_entry_points:
+      - scope: user
+        path_template: ~/.claude.json
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/mcp, verified 2026-10-24
+      - scope: project
+        path_template: .mcp.json
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/mcp, verified 2026-10-24
   rules:
     supported: true
     capabilities:
@@ -140,6 +191,58 @@ content_types:
         supported: true
         mechanism: user-level rules from ~/.claude/CLAUDE.md plus project + additional directories (documented under 'User-level rules')
         confidence: inferred
+    install_entry_points:
+      - scope: user
+        path_template: ~/.claude/rules/<content-name>.md
+        layout: single_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: user
+        path_template: ~/.claude/CLAUDE.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: project
+        path_template: .claude/rules/<content-name>.md
+        layout: single_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: project
+        path_template: CLAUDE.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: project
+        path_template: .claude/CLAUDE.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: project
+        path_template: CLAUDE.local.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: managed
+        os:
+          - darwin
+        path_template: /Library/Application Support/ClaudeCode/CLAUDE.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: managed
+        os:
+          - linux
+        path_template: /etc/claude-code/CLAUDE.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+      - scope: managed
+        os:
+          - windows
+        path_template: C:/Program Files/ClaudeCode/CLAUDE.md
+        layout: merged_into_shared_file
+        status: current
+        as_of: code.claude.com/docs/en/memory, verified 2026-10-24
   skills:
     supported: true
     capabilities:
@@ -155,6 +258,17 @@ content_types:
         supported: true
         mechanism: .claude/skills/<skill-name>/SKILL.md committed to version control
         confidence: confirmed
+    install_entry_points:
+      - scope: user
+        path_template: ~/.claude/skills/<content-name>/
+        layout: directory_of_files
+        status: current
+        as_of: code.claude.com/docs/en/skills, verified 2026-10-24
+      - scope: project
+        path_template: .claude/skills/<content-name>/
+        layout: directory_of_files
+        status: current
+        as_of: code.claude.com/docs/en/skills, verified 2026-10-24
 provider_exclusive:
   skills.additional_directories:
     supported: true

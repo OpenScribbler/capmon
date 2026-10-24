@@ -2,6 +2,30 @@
 
 Changes to the published feed at https://openscribbler.github.io/capmon/.
 
+## 2026-10-24
+
+### Added
+
+- Content-type nodes now carry `install_entry_points`: an ordered list of
+  ACIF install-targets rows (`scope`, optional `os`, `path_template`,
+  `layout`, `status`, `as_of`) saying where the provider reads that
+  content type on disk. The first `current` row for a scope is the write
+  target. The field appears in `capabilities/<slug>.json`, `all.json` and
+  `by-content-type/<type>.json` (ADR 0016).
+- The provider-capabilities schema and documents moved from
+  `schema_version` "2" to "3". No existing field changed.
+
+### Data
+
+- Claude Code and Codex publish `install_entry_points` for every content
+  type they declare. Each row was verified on 2026-10-24 against
+  code.claude.com/docs or developers.openai.com/codex, and its `as_of`
+  names the page.
+- Claude Code gained a `commands` content type (`.claude/commands/`, the
+  older format that still works). Codex gained `commands` (custom prompts
+  in `~/.codex/prompts/`, which Codex documents as deprecated) and `mcp`
+  (`config.toml`).
+
 ## 2026-09-30 — v2
 
 ### Breaking

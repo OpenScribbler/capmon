@@ -12,9 +12,10 @@ import (
 // closed with EXPORT_001 on any non-canonical node in canonical-key position.
 func buildProviderDoc(caps *capyaml.ProviderCapabilities, reg keyRegistry) (map[string]any, error) {
 	doc := map[string]any{
-		// "2": provider_status added (additive bump per the contract's
-		// versioning table — new fields bump the owning schema's version).
-		"schema_version": "2",
+		// "2": provider_status added. "3": install_entry_points added to
+		// content-type nodes. Each is an additive bump per the contract's
+		// versioning table — new fields bump the owning schema's version.
+		"schema_version": "3",
 		// status is the published document's lifecycle (live → frozen/removed
 		// per the consumer contract), not the provider product's health — that
 		// is joined from the source manifest as provider_status.
@@ -123,6 +124,31 @@ func buildContentTypeNode(slug, ctName string, ct capyaml.ContentTypeEntry, reg 
 			caps[name] = child
 		}
 		node["capabilities"] = caps
+	}
+
+	if len(ct.InstallEntryPoints) > 0 {
+		if err := capyaml.ValidateInstallEntryPoints(ct.InstallEntryPoints); err != nil {
+			return nil, output.NewStructuredError(
+				"EXPORT_007",
+				fmt.Sprintf("provider %q: invalid content_types.%s.install_entry_points: %v", slug, ctName, err),
+				"Correct the row so it satisfies the ACIF install-targets row model (spec §6–§9), then re-run capmon verify.",
+			)
+		}
+		rows := make([]any, 0, len(ct.InstallEntryPoints))
+		for _, r := range ct.InstallEntryPoints {
+			row := map[string]any{
+				"scope":         r.Scope,
+				"path_template": r.PathTemplate,
+				"layout":        r.Layout,
+				"status":        r.Status,
+				"as_of":         r.AsOf,
+			}
+			if len(r.OS) > 0 {
+				row["os"] = r.OS
+			}
+			rows = append(rows, row)
+		}
+		node["install_entry_points"] = rows
 	}
 
 	return node, nil

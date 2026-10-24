@@ -1,6 +1,6 @@
 {
   "cadence": "daily",
-  "data_revision": "fb7aff4ed16bd398567814cbf0935f3901b6ce8f814f8d978ab9727f08d73520",
+  "data_revision": "ecb53d6b91925891fce113a7afe136e3e9faf5a1f06abba81c07bc44b4c4912b",
   "files": {
     "advisories.json": {
       "sha256": "deddbb22674d330c52383b1fc7022118e76d597abca1b7fb69e446151b352851"
@@ -21,10 +21,10 @@
       "sha256": "00f5a77a51030a5ceff31a82707c51f59cde372fb349919ee118b2b0f975eff1"
     },
     "by-content-type/skills.json": {
-      "sha256": "eb9459c9acbee3c2593469410c2a791c9ecfe3af0652031c528a6c8ea0c86e8f"
+      "sha256": "148bce074937c225152d48d36f75c77f0540278639cb8bc5a4a3727bb4b9e358"
     },
     "capabilities/all.json": {
-      "sha256": "fb7aff4ed16bd398567814cbf0935f3901b6ce8f814f8d978ab9727f08d73520"
+      "sha256": "ecb53d6b91925891fce113a7afe136e3e9faf5a1f06abba81c07bc44b4c4912b"
     },
     "schemas/advisories.json": {
       "sha256": "fa5ae97a45e6c05930dee2125b996e54588f8fb72c11514011712ac10bfcecff"
@@ -42,13 +42,13 @@
       "sha256": "151eba649378550d2d9de94f681a5e8fbf33611285341a9cd7867a45beef6f99"
     },
     "schemas/provider-capabilities.json": {
-      "sha256": "7c97fb06b478d80f3dc8ab6b46fe09707fd1cdbfbe76ecffc7dab8c8cf9f36cb"
+      "sha256": "af57f63dae4b5d7a2f6c380e8c6dc8bc21cd1b3073b0a9be1aec6737b4ad7357"
     },
     "spec/canonical-keys.json": {
       "sha256": "2224ad6005678f8af2b608689c6af8973fb9ce697de94c6bf6e5082dd3ede379"
     },
     "spec/field-semantics.md": {
-      "sha256": "8e39e0ece917446e78ca83d822e8b16663e166aa87c9b6b76149b8eb3c272e0a"
+      "sha256": "3cd3b66442a1d2ec6de6d660c5eef75a20e1a89b65af60869181e33a262af50b"
     }
   },
   "generated_at": "2026-01-01T00:00:00Z",
@@ -57,13 +57,13 @@
     {
       "last_verified": "2026-07-10",
       "path": "capabilities/alpha.json",
-      "sha256": "d7b6fd67b54c54824515b72801fac47d9514e9388e36825b9e44119298cead4c",
+      "sha256": "2ec71f8201eedaba49c66fd1e4294ec226ae83ead03b4f3558bfd15114fa3eff",
       "slug": "alpha",
       "status": "tracked"
     },
     {
       "path": "capabilities/synthetic.json",
-      "sha256": "2bcd7574b9f1381cd565caabbcd1e1b1764f492bc1d6553aed099cd8fbae6e31",
+      "sha256": "beb4d7e1d60deff6a8b8cfeb38308170afa827077a503de26e99cb1a41866323",
       "slug": "synthetic",
       "status": "tracked"
     }

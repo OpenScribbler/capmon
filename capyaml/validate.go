@@ -15,7 +15,7 @@ var supportedSchemaVersions = []string{"1"}
 // ValidateAgainstSchema validates a capability YAML file against the schema version policy.
 // If migrationWindow is true, the immediately previous schema version (index 1 in
 // supportedSchemaVersions) is also accepted. Returns an error if schema_version is
-// unknown or the file cannot be parsed.
+// unknown, the file cannot be parsed, or ValidateCapabilities rejects it.
 func ValidateAgainstSchema(path string, migrationWindow bool) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -39,6 +39,9 @@ func ValidateAgainstSchema(path string, migrationWindow bool) error {
 	// Full struct parse to catch type errors
 	var caps ProviderCapabilities
 	if err := yaml.Unmarshal(data, &caps); err != nil {
+		return fmt.Errorf("validate %s: %w", path, err)
+	}
+	if err := ValidateCapabilities(&caps); err != nil {
 		return fmt.Errorf("validate %s: %w", path, err)
 	}
 	return nil

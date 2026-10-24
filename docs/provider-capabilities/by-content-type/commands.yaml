@@ -1,9 +1,22 @@
 # THIS FILE IS GENERATED. Do not edit directly.
 # Source: docs/provider-capabilities/*.yaml
-# Generated at: 2026-09-30T10:31:26Z
+# Generated at: 2026-10-24T21:52:41Z
 
 content_type: commands
 providers:
+    claude-code:
+        supported: true
+        install_entry_points:
+            - scope: user
+              path_template: ~/.claude/commands/<content-name>.md
+              layout: single_file
+              status: current
+              as_of: code.claude.com/docs/en/memory, verified 2026-10-24
+            - scope: project
+              path_template: .claude/commands/<content-name>.md
+              layout: single_file
+              status: current
+              as_of: code.claude.com/docs/en/skills, verified 2026-10-24
     cline:
         supported: true
         capabilities:
@@ -11,6 +24,14 @@ providers:
                 supported: true
                 mechanism: 5 built-in slash commands documented as individual headings (/newtask, /smol, /newrule, /deep-planning, /reportbug); hardcoded, not user-modifiable
                 confidence: inferred
+    codex:
+        supported: true
+        install_entry_points:
+            - scope: user
+              path_template: ~/.codex/prompts/<content-name>.md
+              layout: single_file
+              status: current
+              as_of: developers.openai.com/codex/custom-prompts, verified 2026-10-24
     devin:
         supported: true
     factory-droid:
