@@ -83,7 +83,7 @@ content_types:
         format: markdown
         extracts: [file_format, config_fields, features]
 
-      - url: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/opencode/src/config/agent.ts
+      - url: https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/schema/src/config/agent.ts
         type: source-code
         format: typescript
         extracts: [config_fields]
