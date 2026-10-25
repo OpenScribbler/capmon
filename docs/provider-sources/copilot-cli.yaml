@@ -72,7 +72,7 @@ content_types:
         format: markdown
         extracts: [server_config_fields, transport_types, config_examples]
 
-      - url: https://raw.githubusercontent.com/github/docs/main/content/copilot/concepts/context/mcp.md
+      - url: https://raw.githubusercontent.com/github/docs/main/content/copilot/concepts/customizations/mcp.md
         type: docs
         format: markdown
         extracts: [features]
