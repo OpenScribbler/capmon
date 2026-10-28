@@ -52,7 +52,7 @@ content_types:
         format: markdown
         extracts: [config_examples, features]
 
-      - url: https://raw.githubusercontent.com/anthropics/claude-code/main/plugins/hookify/hooks/hooks.json
+      - url: https://raw.githubusercontent.com/anthropics/claude-code/main/mods/diff/hooks/hooks.json
         type: example
         format: json
         extracts: [hook_config_fields, config_examples]
