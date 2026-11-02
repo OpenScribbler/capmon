@@ -13,7 +13,11 @@ Arguments:
 - `<slug>`: process only that provider's issue. Without it, take the smallest
   open issue first and stop after each provider to report.
 - `--dry-run`: run every step up to the commit (step 8), then report what the
-  PR would contain. Commit nothing, push nothing, open nothing.
+  PR would contain. Commit nothing, push nothing, open nothing, and restore the
+  tree before the next provider (step 8 says how).
+
+Run step 0 again before each provider, so every drift branch starts from an
+up-to-date `main` rather than from the previous provider's branch.
 
 ## What a capmon-change issue is
 
@@ -37,9 +41,11 @@ Everything it finds for one provider goes into one issue titled
 - <source uri> (<content_type>): fetch error: unexpected status 404
 ```
 
-The check rewrites the body in place on every run, so the body is the latest
-run's view and the issue's `updatedAt` says when that run was. The check never
-closes the issue. It stops reporting a source once the format doc's
+A run that finds drift rewrites the body in place, but only when the new body
+differs from the old one. A run that finds nothing for the provider leaves the
+issue untouched. So `updatedAt` is the last run that changed the body, not the
+last run, and a provider that has since gone clean keeps its old body. The
+check never closes the issue. It stops reporting a source once the format doc's
 `content_hash` matches the live body again, and the drift PR closes the issue
 with `Closes #<n>`.
 
@@ -63,8 +69,12 @@ capability baseline has a non-canonical key in a canonical position.
 Rules that bind this work:
 
 - `.claude/rules/capmon-drift-detection.md`: a 404 or a thin page is evidence
-  of drift and never a reason for a won't-fix. A won't-fix needs a
-  `Verified live:` line.
+  of drift, so probe the live docs site before concluding anything. Its
+  `Verified live:` attestation applies to won't-fix comments in
+  `recognize_*.go`. One step differs here: for a moved URL the rule says to
+  clear `content_hash`, but this skill writes the `capmon hash-url` value
+  instead. The check treats an empty `content_hash` as a change, so a cleared
+  hash keeps the issue open.
 - `docs/onboarding.md`, section 2: the `mapped`, `absent`, and `unmapped`
   statuses; `unmapped` needs a verbatim `source_form`; never invent a canonical
   key; reuse another provider's extension `id` for the same concept.
@@ -93,9 +103,11 @@ gh issue list --label capmon-change --state open --limit 100 \
   --json number,title,labels,updatedAt,body
 ```
 
-Take the provider from the `provider:<slug>` label or the anchor. An issue
-without the `<!-- capmon-check: <slug> -->` anchor was filed by hand, so report
-it and skip it.
+Take the provider from the `provider:<slug>` label or the anchor. An anchor of
+the form `<!-- capmon-check: <slug>/<content_type> -->` comes from
+`capmon onboard`, which files one issue per content type when it records a new
+provider's first hashes; process it the same way, limited to that content type.
+An issue with no anchor was filed by hand, so report it and skip it.
 
 Confirm the body is still current. The dry run prints one count line for the
 provider and nothing when the provider is clean:
@@ -105,17 +117,21 @@ provider and nothing when the provider is clean:
 # dry-run: would create issue for <slug> (<n> changes, <m> fetch errors)
 ```
 
+A provider that prints nothing has no work left; its issue only needs closing,
+and a person closes it.
+
 When the counts differ from the issue body, trust the dry run, because the body
-dates from the last scheduled run that reached this provider. The check visits
-providers in alphabetical order and stops at the first error, so one failing
-provider leaves every later provider's issue stale. Check the job before you
-trust any body:
+dates from the last run that changed it. The check visits providers in
+alphabetical order and stops at the first error, so one failing provider leaves
+every later provider's issue stale. Check the Content Hash Check job of the
+latest pipeline run before you trust any body:
 
 ```bash
-gh run list --workflow pipeline.yml --limit 5 --json conclusion,createdAt
-gh run view <run-id> --log-failed | grep -i error   # when the latest run failed
-``` A provider that prints nothing has no work
-left; its issue only needs closing, and a person closes it.
+gh run list --workflow pipeline.yml --limit 5 --json databaseId,conclusion,createdAt
+gh run view <databaseId> --json jobs \
+  --jq '.jobs[] | select(.name == "Content Hash Check") | .conclusion'
+gh run view <databaseId> --log-failed | grep -i error   # when that job failed
+```
 
 ## Step 2: Check for an open heal PR
 
@@ -136,8 +152,26 @@ reviewer can close it. Name a wrong one in your PR body with the evidence.
 
 ## Step 3: Triage each changed source
 
-Build the work list from the issue body as `(content_type, uri)` pairs. One URI
-can appear under several content types; curate it once for each.
+Build the work list from live state, not from the issue body: the body can name
+a source that has since recovered and miss one that started drifting, and the
+dry run gives only counts. This loop re-hashes every non-local source in the
+format doc and prints each one whose live hash differs from its stored
+`content_hash`, as `content_type uri stored live`. A fetch error prints its
+status code in the `live` column.
+
+```bash
+awk '/^  [a-z_]+:$/{ct=$1; sub(":","",ct)} /- uri:/{u=$3; gsub(/"/,"",u)}
+     /fetch_method:/{fm=$2} /content_hash:/{h=$2; gsub(/"/,"",h); print ct, u, h, fm; fm=""}' \
+  docs/provider-formats/<slug>.yaml |
+while read -r ct u h fm; do
+  [ "$fm" = local_file ] && continue
+  n=$(./capmon hash-url "$u" 2>&1 | head -1 | awk '{print $NF}')
+  [ "$n" = "$h" ] || echo "$ct $u stored=$h live=$n"
+done
+```
+
+Its count should match the dry run's. One URI can appear under several content
+types; curate it once for each.
 
 For every pair:
 
@@ -181,23 +215,29 @@ For every pair:
 
 ## Step 4: Triage each fetch error
 
-First tell a moved page from a fetch-contract mismatch. Compare the check's
-fetch with a plain one:
+Take the reason from the issue's `## Fetch Errors` line, or from the dry run
+when it disagrees. A `content invalid: ...` reason goes to its own row below,
+because `capmon hash-url` sends the check's request but skips the check's
+content validation: it prints a hash for a page the check still rejects.
+
+For a `fetch error: ...` reason, tell a moved page from a fetch-contract
+mismatch by comparing the check's request with a plain one:
 
 ```bash
-./capmon hash-url <uri>                                   # the check's view
+./capmon hash-url <uri>                                   # the check's request
 curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' -L <uri>   # a plain client's view
 ```
 
 | What you see | What it means | Action |
 |---|---|---|
 | Both fail with 404 or 410 | The page moved or was removed | Follow the drift rule: search the provider's docs site and its `llms.txt`, check `docs_conventions` in the source manifest, and match the new page by content. Update `uri` in the format doc and the URL in the source manifest, then re-hash with `capmon hash-url` |
-| `hash-url` fails and plain `curl` succeeds | The host answers differently to the check's pinned headers, so the page did not move | Stop work on this provider. The fix belongs in `CheckFetch` in `check.go` or in the choice of URL, and it changes the hash contract for every provider, so report it with both outputs |
-| `content invalid: ...` | The page fetched but failed `ValidateContentResponse` in `fetch_validity.go`: an empty body, an HTML body under the size floor, a binary content type, or a redirect to another registrable domain | Read the reason, then treat it as a moved page or a contract mismatch |
+| `hash-url` fails and plain `curl` succeeds | The host answers differently to the check's pinned headers, so the page did not move | Look for another URL on the same host that `capmon hash-url` fetches, that carries the same document, and that hashes the same on two fetches a minute apart. If one exists, swap it in as for a moved page. If none does, stop work on this provider and report both outputs: the remaining fix is in `CheckFetch` in `check.go`, which changes the hash contract for every provider |
+| `content invalid: ...` | The page fetched but failed `ValidateContentResponse` in `fetch_validity.go`: an empty body, an HTML body under the size floor, a binary content type, or a redirect to another registrable domain | Read the reason. A redirect to another domain or an empty body usually means the page moved; find the new page as in the first row. Write no hash until `capmon check --provider <slug> --dry-run` stops listing the source |
 | The source is the only one for its content type and nothing live replaces it | The provider may have dropped the feature | Stop and ask. Marking a content type `unsupported` is a product statement, not a mechanical fix |
 
-Dropping a source the recognizer never anchored on is allowed only with a
-`Verified live:` attestation, per the drift rule.
+Drop a source from the format doc only after you have probed the live site and
+found the page gone with nothing replacing it. Put that evidence (the URLs you
+tried and what each returned) in the PR body.
 
 ## Step 5: Curate the format doc
 
@@ -259,42 +299,55 @@ open with the reason.
 
 ## Step 8: Open the drift PR
 
-Skip this step under `--dry-run`, and report the diff and the draft PR body
-instead.
+Under `--dry-run`, skip this step: report `git diff` and the draft PR body,
+then restore every file the run touched so `main` is clean for the next
+provider:
+
+```bash
+git diff
+git restore docs/
+git clean -fd docs/        # removes only untracked files, which step 0 proved this run made
+git status --porcelain     # must be empty again
+```
+
+Otherwise, branch from the `main` that step 0 just updated:
 
 ```bash
 git switch -c capmon/drift-<slug>-$(date -u +%Y%m%d)
 git add docs/provider-formats/<slug>.yaml docs/provider-capabilities/<slug>-*.yaml
 # plus, only when changed: the capability baseline, the source manifest,
 # and docs/provider-capabilities/by-content-type/
-git commit
+git commit -F <message-file>     # never a bare `git commit`, which opens an editor
 git push -u origin HEAD
 gh pr create --base main --title "Curate <slug> drift from <date>" --body "..."
 ```
 
 Write the PR body for the reviewer:
 
-- `Closes #<n>`.
+- `Closes #<n>` only when step 7's dry run printed nothing. When a source is
+  left open, write `Refs #<n>` instead, so the merge leaves the issue open for
+  what remains.
 - Each source, with the upstream change that caused the hash change and what
   changed in capmon's data because of it, or "hash only" when nothing did.
 - Each fetch error and how it was resolved, or why it was left open.
 - Any heal PR this fix makes redundant or shows to be wrong.
 
-Leave the PR open for a person. Do not comment on or close the issue; the merge
-closes it.
+Leave the PR open for a person. Do not comment on or close the issue; a merge
+with `Closes` closes it.
 
 ## Gotchas
 
-- **The issue body lags.** It reflects the last scheduled run. Trust
+- **The issue body lags.** It reflects the last run that changed it. Trust
   `capmon check --provider <slug> --dry-run` and `capmon hash-url` over it.
 - **Never hash with plain curl.** Mintlify sites and `code.claude.com` vary
   bytes on headers. `capmon hash-url` is the only hash the check will agree
   with.
 - **cursor.com rejects `Accept: text/markdown` on `.md` paths.** Since about
   July 2026, `https://cursor.com/docs/<page>.md` returns 404 to the check's
-  headers and 200 to a plain client. The bare path returns HTML to the check's
-  `Accept: */*`. This is a fetch-contract mismatch from step 4, not five moved
-  pages.
+  headers and 200 to a plain client. This is a fetch-contract mismatch from
+  step 4, not five moved pages. The bare path (`https://cursor.com/docs/rules`)
+  returns a stable hash to `capmon hash-url`, but as rendered HTML rather than
+  Markdown, so confirm it carries the document before swapping it in.
 - **A failure partway leaves the format doc half edited.** Check
   `git status` before retrying, and finish or revert that provider before
   starting the next one.
