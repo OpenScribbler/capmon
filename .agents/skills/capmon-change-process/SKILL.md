@@ -173,7 +173,7 @@ bash .agents/skills/capmon-change-process/scripts/live-worklist.sh <slug>
 | `CHANGED` | The body passes the check's content rules and its hash differs from `content_hash` (`stored=-` means the stored hash is empty) | This step |
 | `ERROR` | `capmon hash-url` failed, for example with a 404 | Step 4 |
 | `INVALID` | The body breaks a `ValidateContentResponse` rule: empty, HTML under 512 bytes, or a binary content type | Step 4 |
-| `REDIRECT` | The final URL is on another host. The check rejects it only when the registrable domain differs (`docs.factory.ai` to `docs.factory.com` fails; `x.dev` to `docs.x.dev` passes), so treat a same-domain redirect as `CHANGED` | Step 4 |
+| `REDIRECT` | The final URL is on another registrable domain (`docs.factory.ai` to `docs.factory.com`), which the check rejects. A redirect within one domain (`x.dev` to `docs.x.dev`) passes the check, so the script reports it as `CHANGED` or not at all | Step 4 |
 
 `capmon hash-url` itself skips the check's content validation, which is why the
 script applies those rules. The rows should add up to the dry run's
@@ -219,8 +219,7 @@ For every pair:
 
 ## Step 4: Triage each fetch error
 
-The fetch errors are the step 3 `ERROR`, `INVALID`, and cross-domain
-`REDIRECT` rows. The issue's `## Fetch Errors` lines give the check's own
+The fetch errors are the step 3 `ERROR`, `INVALID`, and `REDIRECT` rows. The issue's `## Fetch Errors` lines give the check's own
 wording where they are still current; the dry run gives only counts.
 
 For an `ERROR` row, tell a moved page from a fetch-contract
@@ -235,7 +234,7 @@ curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' -L <uri>   # a plain c
 |---|---|---|
 | Both fail with 404 or 410 | The page moved or was removed | Follow the drift rule: search the provider's docs site and its `llms.txt`, check `docs_conventions` in the source manifest, and match the new page by content. Update `uri` in the format doc and the URL in the source manifest, then re-hash with `capmon hash-url` |
 | `hash-url` fails and plain `curl` succeeds | The host answers differently to the check's pinned headers, so the page did not move | Look for another URL on the same host that `capmon hash-url` fetches, that carries the same document, and that hashes the same on two fetches a minute apart. If one exists, swap it in as for a moved page. If none does, stop work on this provider and report both outputs: the remaining fix is in `CheckFetch` in `check.go`, which changes the hash contract for every provider |
-| An `INVALID` or cross-domain `REDIRECT` row | The page fetched but fails `ValidateContentResponse` in `fetch_validity.go`, so the check reports `content invalid` | Read the row. A redirect to another domain or an empty body usually means the page moved; find the new page as in the first row. Write a hash only for a URL that the script reports as `CHANGED` or not at all |
+| An `INVALID` or `REDIRECT` row | The page fetched but fails `ValidateContentResponse` in `fetch_validity.go`, so the check reports `content invalid` | Read the row. A redirect to another domain or an empty body usually means the page moved; find the new page as in the first row. Write a hash only for a URL that the script reports as `CHANGED` or not at all |
 | The source is the only one for its content type and nothing live replaces it | The provider may have dropped the feature | Stop and ask. Marking a content type `unsupported` is a product statement, not a mechanical fix |
 
 Drop a source only after you have probed the live site and found the page gone
