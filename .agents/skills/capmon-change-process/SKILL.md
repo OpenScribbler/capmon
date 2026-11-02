@@ -99,15 +99,17 @@ itself, and every PR this skill opens would carry that unrelated churn.
 ## Step 1: Pick the issue
 
 ```bash
-gh issue list --label capmon-change --state open --limit 100 \
+gh issue list --label capmon-change --state open --limit 500 \
   --json number,title,labels,updatedAt,body
 ```
 
 Take the provider from the `provider:<slug>` label or the anchor. An anchor of
 the form `<!-- capmon-check: <slug>/<content_type> -->` comes from
 `capmon onboard`, which files one issue per content type when it records a new
-provider's first hashes; process it the same way, limited to that content type.
-An issue with no anchor was filed by hand, so report it and skip it.
+provider's first hashes. It records a capture, not drift: process the whole
+provider as below, and list every open `capmon-change` issue for that provider
+in the PR body, onboard ones included. An issue with no anchor was filed by
+hand, so report it and skip it.
 
 Confirm the body is still current. The dry run prints one count line for the
 provider and nothing when the provider is clean:
@@ -133,12 +135,16 @@ gh run view <databaseId> --json jobs \
 gh run view <databaseId> --log-failed | grep -i error   # when that job failed
 ```
 
-## Step 2: Check for an open heal PR
+## Step 2: Check for open drift and heal PRs
 
 ```bash
-gh pr list --state open --json number,title,headRefName \
-  --jq '.[] | select(.headRefName | startswith("capmon/heal-<slug>/"))'
+gh pr list --state open --limit 500 --json number,title,headRefName \
+  --jq '.[] | select(.headRefName | startswith("capmon/drift-<slug>") or startswith("capmon/heal-<slug>/"))'
 ```
+
+An open `capmon/drift-<slug>*` PR means this provider is already waiting for
+review, from an earlier run of this skill or from the pipeline. Skip the
+provider and report the PR; a second drift PR would redo the same curation.
 
 A heal PR proposes a replacement URL for a source that stopped fetching. For
 each one, read its diff with `gh pr diff <n>`, fetch the proposed URL, and
@@ -154,50 +160,48 @@ reviewer can close it. Name a wrong one in your PR body with the evidence.
 
 Build the work list from live state, not from the issue body: the body can name
 a source that has since recovered and miss one that started drifting, and the
-dry run gives only counts. This loop re-hashes every non-local source in the
-format doc and prints each one whose live hash differs from its stored
-`content_hash`, as `content_type uri stored live`. A fetch error prints its
-status code in the `live` column.
+dry run gives only counts. This script fetches every non-local source in the
+format doc the way the check does and prints one row for each source that needs
+work:
 
 ```bash
-awk '/^  [a-z_]+:$/{ct=$1; sub(":","",ct)} /- uri:/{u=$3; gsub(/"/,"",u)}
-     /fetch_method:/{fm=$2} /content_hash:/{h=$2; gsub(/"/,"",h); print ct, u, h, fm; fm=""}' \
-  docs/provider-formats/<slug>.yaml |
-while read -r ct u h fm; do
-  [ "$fm" = local_file ] && continue
-  n=$(./capmon hash-url "$u" 2>&1 | head -1 | awk '{print $NF}')
-  [ "$n" = "$h" ] || echo "$ct $u stored=$h live=$n"
-done
+bash .agents/skills/capmon-change-process/scripts/live-worklist.sh <slug>
 ```
 
-Its count should match the dry run's. One URI can appear under several content
-types; curate it once for each.
+| Row | Meaning | Goes to |
+|---|---|---|
+| `CHANGED` | The body passes the check's content rules and its hash differs from `content_hash` (`stored=-` means the stored hash is empty) | This step |
+| `ERROR` | `capmon hash-url` failed, for example with a 404 | Step 4 |
+| `INVALID` | The body breaks a `ValidateContentResponse` rule: empty, HTML under 512 bytes, or a binary content type | Step 4 |
+| `REDIRECT` | The final URL is on another host. The check rejects it only when the registrable domain differs (`docs.factory.ai` to `docs.factory.com` fails; `x.dev` to `docs.x.dev` passes), so treat a same-domain redirect as `CHANGED` | Step 4 |
+
+`capmon hash-url` itself skips the check's content validation, which is why the
+script applies those rules. The rows should add up to the dry run's
+`<n> changes, <m> fetch errors`. One URI can appear under several content types;
+curate it once for each.
 
 For every pair:
 
-1. Re-hash it the way the check does:
-
-   ```bash
-   ./capmon hash-url <uri>
-   ```
-
-   Use this command and never plain `curl` for any hash you write. Several
-   hosts serve different bytes under different headers, and `hash-url` sends
-   the check's exact `User-Agent`, `Accept`, and `Accept-Encoding`. When its
-   hash differs from the issue's `New hash`, the source changed again since
-   the issue was written; use the `hash-url` value.
+1. Take the `live` hash from the script's row, never from plain `curl`. Several
+   hosts serve different bytes under different headers, and `capmon hash-url`
+   sends the check's exact `User-Agent`, `Accept`, and `Accept-Encoding`. When
+   it differs from the issue's `New hash`, the source changed again since the
+   issue was written; use the live value.
 
 2. Find what changed.
    - For a `raw.githubusercontent.com` source, list upstream commits to that
      path since the format doc's `fetched_at` for the source:
 
      ```bash
-     gh api "repos/<owner>/<repo>/commits?path=<path>&since=<fetched_at>&per_page=100" \
+     gh api --paginate "repos/<owner>/<repo>/commits?path=<path>&since=<fetched_at>&per_page=100" \
        --jq '.[] | "\(.sha[:7]) \(.commit.message | split("\n")[0])"'
      ```
 
      Then read the diff of each commit that sounds relevant:
      `gh api repos/<owner>/<repo>/commits/<sha> --jq '.files[] | select(.filename == "<path>") | .patch'`.
+     That prints nothing when the commit touched more than 300 files or the
+     patch is too large; then diff the file itself across the commit range,
+     fetched from `https://raw.githubusercontent.com/<owner>/<repo>/<sha>/<path>`.
    - For a docs page, fetch the current body with the check's headers and
      read it against the format doc's claims for that content type:
 
@@ -215,12 +219,11 @@ For every pair:
 
 ## Step 4: Triage each fetch error
 
-Take the reason from the issue's `## Fetch Errors` line, or from the dry run
-when it disagrees. A `content invalid: ...` reason goes to its own row below,
-because `capmon hash-url` sends the check's request but skips the check's
-content validation: it prints a hash for a page the check still rejects.
+The fetch errors are the step 3 `ERROR`, `INVALID`, and cross-domain
+`REDIRECT` rows. The issue's `## Fetch Errors` lines give the check's own
+wording where they are still current; the dry run gives only counts.
 
-For a `fetch error: ...` reason, tell a moved page from a fetch-contract
+For an `ERROR` row, tell a moved page from a fetch-contract
 mismatch by comparing the check's request with a plain one:
 
 ```bash
@@ -232,12 +235,14 @@ curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' -L <uri>   # a plain c
 |---|---|---|
 | Both fail with 404 or 410 | The page moved or was removed | Follow the drift rule: search the provider's docs site and its `llms.txt`, check `docs_conventions` in the source manifest, and match the new page by content. Update `uri` in the format doc and the URL in the source manifest, then re-hash with `capmon hash-url` |
 | `hash-url` fails and plain `curl` succeeds | The host answers differently to the check's pinned headers, so the page did not move | Look for another URL on the same host that `capmon hash-url` fetches, that carries the same document, and that hashes the same on two fetches a minute apart. If one exists, swap it in as for a moved page. If none does, stop work on this provider and report both outputs: the remaining fix is in `CheckFetch` in `check.go`, which changes the hash contract for every provider |
-| `content invalid: ...` | The page fetched but failed `ValidateContentResponse` in `fetch_validity.go`: an empty body, an HTML body under the size floor, a binary content type, or a redirect to another registrable domain | Read the reason. A redirect to another domain or an empty body usually means the page moved; find the new page as in the first row. Write no hash until `capmon check --provider <slug> --dry-run` stops listing the source |
+| An `INVALID` or cross-domain `REDIRECT` row | The page fetched but fails `ValidateContentResponse` in `fetch_validity.go`, so the check reports `content invalid` | Read the row. A redirect to another domain or an empty body usually means the page moved; find the new page as in the first row. Write a hash only for a URL that the script reports as `CHANGED` or not at all |
 | The source is the only one for its content type and nothing live replaces it | The provider may have dropped the feature | Stop and ask. Marking a content type `unsupported` is a product statement, not a mechanical fix |
 
-Drop a source from the format doc only after you have probed the live site and
-found the page gone with nothing replacing it. Put that evidence (the URLs you
-tried and what each returned) in the PR body.
+Drop a source only after you have probed the live site and found the page gone
+with nothing replacing it. Remove it from both the format doc and the source
+manifest, since the pipeline's fetch stage reads the manifest and would keep
+fetching and trying to heal the dead URL. Put the evidence (the URLs you tried
+and what each returned) in the PR body.
 
 ## Step 5: Curate the format doc
 
@@ -324,7 +329,8 @@ gh pr create --base main --title "Curate <slug> drift from <date>" --body "..."
 
 Write the PR body for the reviewer:
 
-- `Closes #<n>` only when step 7's dry run printed nothing. When a source is
+- `Closes #<n>`, one per open `capmon-change` issue for the provider, only when
+  step 7's dry run printed nothing. When a source is
   left open, write `Refs #<n>` instead, so the merge leaves the issue open for
   what remains.
 - Each source, with the upstream change that caused the hash change and what
@@ -338,7 +344,7 @@ with `Closes` closes it.
 ## Gotchas
 
 - **The issue body lags.** It reflects the last run that changed it. Trust
-  `capmon check --provider <slug> --dry-run` and `capmon hash-url` over it.
+  `capmon check --provider <slug> --dry-run` and the step 3 script over it.
 - **Never hash with plain curl.** Mintlify sites and `code.claude.com` vary
   bytes on headers. `capmon hash-url` is the only hash the check will agree
   with.
