@@ -1,4 +1,4 @@
 interface:
   display_name: "capmon change processing"
   short_description: "Triage capmon-change issues into drift PRs"
-  default_prompt: "Use $capmon-change-process to triage the smallest open capmon-change issue into a drift PR."
+  default_prompt: "Use $capmon-change-process to triage the open capmon-change issue with the shortest body into a drift PR."

@@ -10,8 +10,10 @@ that closes it. Run it from the capmon repo root.
 
 Arguments:
 
-- `<slug>`: process only that provider's issue. Without it, take the smallest
-  open issue first and stop after each provider to report.
+- `<slug>`: process only that provider. Without it, take the open issue with
+  the shortest body first and stop after each provider to report. A slug with
+  drift but no open issue (the check can stop before reaching it) is processed
+  the same way, and its PR names no issue.
 - `--dry-run`: run every step up to the commit (step 8), then report what the
   PR would contain. Commit nothing, push nothing, open nothing, and restore the
   tree before the next provider (step 8 says how).
@@ -90,7 +92,7 @@ git status --porcelain            # must be empty
 git switch main && git pull --ff-only
 gh auth status
 go build -o capmon ./cmd/capmon   # the binary is gitignored
-go test -run 'TestDeriveOutputMatchesCommitted|TestAllBaselinesBuildProviderDocs' .
+go test -run 'TestDeriveOutputMatchesCommitted|TestAllBaselinesBuildProviderDocs' .   # through sandbox-run where your setup requires it
 ```
 
 Stop if the test fails. A failing test means `main` already disagrees with
@@ -112,14 +114,16 @@ in the PR body, onboard ones included. An issue with no anchor was filed by
 hand, so report it and skip it.
 
 Confirm the body is still current. The dry run prints one count line for the
-provider and nothing when the provider is clean:
+provider and no count line when the provider is clean. Any `warning: format doc
+for ...` lines on stderr are format-doc validation warnings, not drift; fix
+them in step 5 if your edits caused them.
 
 ```bash
 ./capmon check --provider <slug> --dry-run
 # dry-run: would create issue for <slug> (<n> changes, <m> fetch errors)
 ```
 
-A provider that prints nothing has no work left; its issue only needs closing,
+A provider with no count line has no work left; its issue only needs closing,
 and a person closes it.
 
 When the counts differ from the issue body, trust the dry run, because the body
@@ -206,8 +210,10 @@ For every pair:
      read it against the format doc's claims for that content type:
 
      ```bash
-     curl -sL -H 'User-Agent: capmon/1.0' -H 'Accept: text/markdown' \
-       -H 'Accept-Encoding: identity' <uri>    # Accept is */* when the path doesn't end in .md
+     # a path ending in .md
+     curl -sL -H 'User-Agent: capmon/1.0' -H 'Accept: text/markdown' -H 'Accept-Encoding: identity' <uri>
+     # any other path
+     curl -sL -H 'User-Agent: capmon/1.0' -H 'Accept: */*' -H 'Accept-Encoding: identity' <uri>
      ```
 
 3. Classify the change.
@@ -292,8 +298,8 @@ Do not run `capmon seed` in this loop. It merges recognizer output from
 ## Step 7: Prove the issue is resolved
 
 ```bash
-./capmon check --provider <slug> --dry-run     # prints nothing when clean
-go test ./...
+./capmon check --provider <slug> --dry-run     # no count line when clean
+go test ./...                                   # through sandbox-run where your setup requires it
 git status --porcelain                          # only the files from the table above
 ```
 
@@ -323,13 +329,13 @@ git add docs/provider-formats/<slug>.yaml docs/provider-capabilities/<slug>-*.ya
 # and docs/provider-capabilities/by-content-type/
 git commit -F <message-file>     # never a bare `git commit`, which opens an editor
 git push -u origin HEAD
-gh pr create --base main --title "Curate <slug> drift from <date>" --body "..."
+gh pr create --base main --label capmon --title "Curate <slug> drift from <date>" --body-file <body-file>
 ```
 
 Write the PR body for the reviewer:
 
 - `Closes #<n>`, one per open `capmon-change` issue for the provider, only when
-  step 7's dry run printed nothing. When a source is
+  step 7's dry run printed no count line. When a source is
   left open, write `Refs #<n>` instead, so the merge leaves the issue open for
   what remains.
 - Each source, with the upstream change that caused the hash change and what
@@ -342,11 +348,6 @@ with `Closes` closes it.
 
 ## Gotchas
 
-- **The issue body lags.** It reflects the last run that changed it. Trust
-  `capmon check --provider <slug> --dry-run` and the step 3 script over it.
-- **Never hash with plain curl.** Mintlify sites and `code.claude.com` vary
-  bytes on headers. `capmon hash-url` is the only hash the check will agree
-  with.
 - **cursor.com rejects `Accept: text/markdown` on `.md` paths.** Since about
   July 2026, `https://cursor.com/docs/<page>.md` returns 404 to the check's
   headers and 200 to a plain client. This is a fetch-contract mismatch from
